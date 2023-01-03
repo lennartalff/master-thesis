@@ -193,15 +193,14 @@
 
 \raggedbottom	%Sorgt beim Dokumenttyp book dafür, daß kein Ausgleich des unteren Seitenrandes durch Dehnung der Absatzabstände durchgeführt wird. \raggedbottom ist bei den Dokumenttypen article, report und letter bereits voreingestellt. ==> da es zu Problemen kam wird der Befehl hier nochmals explizit definiert
 
-\usepackage{sectsty}								% Einstellen der Textformatierung der Überschriften
-\allsectionsfont{\raggedright}						% Linksbündige Ausrichtung der Überschriften ==> sonst teilweise Blocksatz wobei Überschriften große unschöne weiße Lücken bekommen können
+% \usepackage{sectsty}								% Einstellen der Textformatierung der Überschriften
+% \allsectionsfont{\raggedright}						% Linksbündige Ausrichtung der Überschriften ==> sonst teilweise Blocksatz wobei Überschriften große unschöne weiße Lücken bekommen können
 
 \graphicspath{{images/}}
 
-\include{abbrevations}
-
-\include{tikz}
-\include{custom_symbols}
+\input{abbrevations}
+\input{tikz}
+\input{custom_symbols}
 
 
 \DeclareMathOperator{\absolute}{abs}
