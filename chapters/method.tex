@@ -19,6 +19,13 @@
 
 \subsection{Equations of Motion}
 
+\begin{itemize}
+	\color{red}
+	\item Start with the general eq of motion
+	\item Apply and justify/explain the simplifications and assumptions to get to the simplified eom in \Cref{eq:equation-of-motion-translational,eq:equation-of-motion-rotational} \todo[inline]{further simplications for trajectory generation. but gazebo simulation uses this equations. how to structure this?}
+	\item 
+\end{itemize}
+
 The vector of absolute linear and angular velocities expressed in the body-fixed frame $\mathcal{B}$
 \begin{equation}
 	\nub = 
@@ -190,10 +197,12 @@ Because \emph{principal axes of inertia} coincide with body frame axes, $\Jb$ wi
 	\Jbs = \left(\Jb + \Jadded\right), \text{ with }
 	\Dadded = \text{diag}(\Dvadded, \Domegaadded)
 \end{equation}
+Splitting \Cref{eq:6dof-equation-of-motion} in a translational and rotational gives
 \begin{equation}
 	\label{eq:equation-of-motion-translational}
 	\Mbs \vlinbodydot = \vlinbody \times \Mbs \vangbody - \Dvadded \vlinbody - \gb(\etab) + u_1 \eb_1
 \end{equation}\todo{Muss es nicht nur die obere Haelfte von $\gb$ sein? Muesste $\Mbs$ nicht vor $\vlinbody$ stehen?}
+and
 \begin{equation}
 	\label{eq:equation-of-motion-rotational}
 	\Jbs \vangbodydot =
@@ -203,8 +212,9 @@ Because \emph{principal axes of inertia} coincide with body frame axes, $\Jb$ wi
 	- \gb(\etab)
 	+ \begin{bmatrix}
 		u_2 & u_3 & u_4	
-	\end{bmatrix}^\top
+	\end{bmatrix}^\top,
 \end{equation}
+respectively.
 
 We make the following assumptions:
 \begin{itemize}
@@ -224,7 +234,7 @@ Using body symmetry for $xz$, $yz$ and $xy$ planes \todo{Fossen 7.5.5}
 
 In general, 
 \begin{equation}
-	\Db(\nub) = -\text{diag}(X_\text{u}, Y_\text{v}, Z_\text{w}, K_\text{p}, M_\text{q}, N_\text{r})
+	\Dadded(\nub) = -\text{diag}(X_\text{u}, Y_\text{v}, Z_\text{w}, K_\text{p}, M_\text{q}, N_\text{r})
 \end{equation}
 \todo{Nicht-linearen Teil lass ich direkt weg, weil der auch nicht mal simuliert wird.}
 
@@ -253,7 +263,51 @@ In general,
 }
 
 \section{Trajectory Generation}
-\label{sec:trajectory-generation}
+\label{sec:trajectory-generation} 
+We neglect the cross-coupling term in \Cref{eq:equation-of-motion-translational} and can write the translational equation of motion expressed in the world frame $\mathcal{W}$ as
+\begin{equation}
+	\label{eq:eom-world-without-cross-coupling}
+	\Rbodyworld \, \Mbs \, \Rbodyworld^\top \, \pworldddot = \Rbodyworld\Dadded\Rbodyworld^\top \pworlddot + u_1 \exbodyinworld.
+\end{equation}
+We further assume the \ac{uauv} is mainly moving in surge direction, which seems reasonable when taking the thruster configuration into account. Therefore, we approximate the inertia and damping matrix by
+\begin{equation}
+	\label{eq:added-mass-trajectory-simplification}
+	\Mbs = m\Ib + \text{diag}\left(X_{\dot{u}}, Y_{\dot{v}}, Z_{\dot{w}}\right)
+	=
+	m\Ib + X_{\dot{u}} \Ib
+\end{equation}
+and
+\begin{equation}
+	\label{eq:added-damping-trajectory-simplification}
+	\Dvadded = -\text{diag}\left(X_\text{u}, Y_\text{v}, Z_\text{w}\right)
+	= -X_\text{u} \Ib
+\end{equation}
+
+Using \Cref{eq:added-mass-trajectory-simplification,eq:added-damping-trajectory-simplification}, we rewrite \Cref{eq:eom-world-without-cross-coupling} as
+\begin{equation}
+	(m+X_{\dot{u}})\pworldddot
+	=
+	-X_u \pworlddot
+	+ u_1\exbodyinworld
+\end{equation}
+
+and reordering yields
+\begin{equation}
+	\label{eq:trajectory-acceleration-eom}
+	\pworldddot = \frac{\Rbodyworld \eb_1 f - X_u \pworlddot}{m + X_{\dot{u}}},
+\end{equation}
+where $f=u_1$ denotes the thrust input of the system.
+
+The required thrust, given the acceleration $\pworldddot$ and the velocity $\pworlddot$, can be computed by applying the euclidean norm to \Cref{eq:trajectory-acceleration-eom}
+\begin{equation}
+	\label{eq:trajectory-thrust}
+	f =
+	\left\lVert
+	\left(m + X_{\dot{u}}\right) \pworldddot + X_u \pworlddot
+	\right\rVert.
+\end{equation}
+
+In the following all equations are expressed in the world-fixed frame $\mathcal{W}$ and the corresponding indices are omitted for readability.
 
 \begin{itemize}
 	\color{red}
@@ -268,7 +322,29 @@ In general,
 	\begin{bmatrix}
 		\pbo \\ \vb \\ \ab	
 	\end{bmatrix}
+	\quad
+	\text{and}
+	\quad
+	\sbp =
+	\begin{bmatrix}
+		\vb \\
+		\ab \\
+		\jb
+	\end{bmatrix}
 \end{equation}
+with
+\begin{equation}
+	\vb = \pbp
+	\quad
+	\text{and}
+	\quad
+	\ab = \pbpp
+	\quad
+	\text{and}
+	\quad
+	\jb = \pbppp
+\end{equation}
+being the velocity, acceleration and jerk.
 
 \begin{equation}
 	\label{eq:trajectory-state-per-axis}
@@ -409,6 +485,7 @@ In general,
 	\color{red}
 	\item cubic instead of quadratic function is to be solved
 	\item stress out, that feasibility criterium is quite coarse -> feasible solution might be classified as indeterminable
+	\item following equations are per axis. Indies are omitted if unambiguous.
 \end{itemize}
 
 \begin{align}
@@ -421,6 +498,18 @@ In general,
 	&\geq
 	f_\text{min}^2
 \end{align}
+
+By suqaring \Cref{eq:trajectory-thrust}, we can write the squared thrust in per-axis notation
+\begin{equation}
+	f^2 = 
+	\left\lVert
+	\left(m + X_{\dot{u}}\right) \pbpp + X_u \pbp
+	\right\rVert^2
+	= 
+	\sum_{k=1}^{3}
+	\left(\left(m + X_{\dot{u}}\right)\ppp_k + X_u \pp_k \right)^2
+	.
+\end{equation}
 
 \subsubsection{Body Rates Input Feasibility}
 \begin{itemize}
