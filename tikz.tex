@@ -1,0 +1,80 @@
+% !TeX root = ../Thesis.tex
+\pgfplotsset{compat=newest} %globally avoid intereference of ticks and yaxis labels in plots with tikz package
+
+\usetikzlibrary{positioning, arrows, fit, backgrounds, chains, shapes, angles, quotes}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{babel}
+\usetikzlibrary{pgfplots.statistics}
+\usepgfplotslibrary{polar}
+\usepgfplotslibrary{groupplots}
+\usepgfplotslibrary{external}
+\usetikzlibrary{pgfplots.groupplots}
+\usetikzlibrary{patterns} %for patterns in bar plot
+\pgfplotsset{plot coordinates/math parser=false}
+
+%% e.g. pdflatex -synctex=1 -interaction=nonstopmode -shell-escape %.tex  is needed for using tikzexternalize!
+\usetikzlibrary{external} %save tikz pictures as pdf and if not changed just use the pdf==>much faster compilation
+% \tikzexternalize	% ACHTUNG: falls \usepackage{pdfpages} genutzt werden soll muss dieses zuerst deklariert werden und DANACH erst \tikzexternalize[optimize command away=\includepdf], mit diesem 						“away” Zusatz.
+
+\makeatletter				% use this to define TiKZ paths for images AND ADD THE BELOW BEFORE INPUTTING EACH CHAPTER
+\newcommand{\useexternalfile}[1]{%
+	\tikzsetnextfilename{#1-output}%
+	\input{\tikzexternal@filenameprefix#1.tikz}}
+\makeatother
+%%
+
+\pgfplotsset{every axis/.append style={cycle list={
+			{mumblue},
+			{mumred},
+			{mumgreen},
+			{mumorange},
+			{mumteal}
+}}}
+
+
+\tikzsetexternalprefix{Bilder/externalize/}
+
+\tikzset{%
+	>=triangle 45,
+	proto base/.style={
+		rectangle, draw, minimum height=0.8cm, align=center, text width=1.0cm, thick
+	},
+	proto block/.style n args={1}{
+		append after command={
+			\pgfextra{
+				\node[below=of \tikzlastnode, yshift=-0.2cm] {\normalsize #1};
+			}
+		}
+	},
+	proto header/.style={fill=green!30},
+	proto marker/.style={fill=red!30},
+	proto data/.style={fill=gray!30},
+	proto block/.default={0}{-2cm},
+	proto short/.style n args={1}{
+		proto base,
+		proto block={#1}
+	},
+	proto long/.style n args={1}{proto block={#1}, proto base, text width=2cm},
+	proto vlong/.style n args={1}{proto block={#1}, proto base, text width=},
+	show curve controls/.style={
+		postaction={
+			decoration={
+				show path construction,
+				curveto code={
+					\draw [blue] 
+					(\tikzinputsegmentfirst) -- (\tikzinputsegmentsupporta)
+					(\tikzinputsegmentlast) -- (\tikzinputsegmentsupportb);
+					\fill [red, opacity=0.5] 
+					(\tikzinputsegmentsupporta) circle [radius=.5ex]
+					(\tikzinputsegmentsupportb) circle [radius=.5ex];
+				}
+			},
+			decorate
+	}}
+}
+
+\pgfplotsset{
+	every axis/.append style={legend cell align={left}, font=\footnotesize, axis line style=thick, ylabel near ticks, xlabel near ticks},
+	every major tick/.append style={black, thick},
+	/pgf/number format/use comma
+}

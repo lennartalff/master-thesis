@@ -1,0 +1,104 @@
+%###########################################################################
+%
+%   Titelseite
+%
+%###########################################################################
+\begin{titlepage}
+
+\hspace{20mm}\begin{minipage}{0.3\linewidth}
+		 \ifthenelse{\equal{\MScBSc}{0}}
+			{\ifthenelse{\equal{\Sprache}{0}}
+				{\textbf{Bachelorarbeit}\\
+				\large{BSC-\NummerDerArbeit}}{}
+			\ifthenelse{\equal{\Sprache}{1}}
+			{\textbf{Bachelor's Thesis}\\
+				\large{BSC-\NummerDerArbeit}}{}
+			}{}
+		\ifthenelse{\equal{\MScBSc}{1}}
+			{\ifthenelse{\equal{\Sprache}{0}}
+				{\textbf{Projektarbeit}\\
+				\large{PRO-\NummerDerArbeit}}{}
+				\ifthenelse{\equal{\Sprache}{1}}
+				{\textbf{Project Thesis}\\
+				\large{PRO-\NummerDerArbeit}}{}
+			}{}
+		\ifthenelse{\equal{\MScBSc}{2}}
+			{\ifthenelse{\equal{\Sprache}{0}}
+				{\textbf{Masterarbeit}\\
+				\large{MSC-\NummerDerArbeit}}{}
+				\ifthenelse{\equal{\Sprache}{1}}
+				{\textbf{Master's Thesis}\\
+				\large{MSC-\NummerDerArbeit}}{}
+			}{}
+
+	 	 
+\end{minipage}\hfill
+\begin{minipage}{0.3\linewidth}
+	\includegraphics[height=45pt]{Styles/mum_logo.pdf}
+\end{minipage}
+\vspace{8mm}
+\begin{center}
+	\vspace{10mm}
+    {\ThemaDerArbeit}
+	%\vspace{2mm}
+	{\ThemaArbeitZweitSprache}
+	\vspace{10mm}
+	\ifthenelse{\equal{\Sprache}{0}}
+	{\hspace{20mm}{\normalsize von}\large\\
+	}{}
+	\ifthenelse{\equal{\Sprache}{1}}
+	{\hspace{20mm}{\normalsize by}\large\\
+	}{}
+	\hspace{20mm}{\large \VornameDesStudenten \ \NachnameDesStudenten}\\
+	\vspace{15mm}
+	\normalsize
+	\ifthenelse{\equal{\Sprache}{0}}
+	{	\hspace{20mm}\begin{tabular}{rl}
+			Betreuer: & Prof. Dr.-Ing. R. Seifried \\
+			& \Betreuer
+		\end{tabular}\\
+			\vfill
+			\large
+			\hspace{20mm}Technische Universität Hamburg (TUHH) \\
+			\hspace{20mm}Institut für Mechanik und Meerestechnik\\
+			\hspace{20mm}Prof.\ Dr.-Ing.\ R.\ Seifried
+		}{}
+	\ifthenelse{\equal{\Sprache}{1}}
+	{	\hspace{20mm}\begin{tabular}{rl}
+			Supervisors: & Prof. Dr.-Ing. R. Seifried \\
+			& \Betreuer
+		\end{tabular}\\
+			\vfill
+			\large
+			\hspace{20mm}Hamburg University of Technology (TUHH) \\
+			\hspace{20mm}Institute of Mechanics and Ocean Engineering\\
+			\hspace{20mm}Prof.\ Dr.-Ing.\ R.\ Seifried
+		}{}
+
+\end{center}
+\vspace{0.5cm}
+\begin{center}
+	\ifthenelse{\equal{\Sprache}{0}}
+	{		{\large \hspace{20mm} Hamburg,
+%			\month=\the\month
+%			\makeatletter
+%			\month@ngerman
+%			\makeatother~\the\year
+			\printdayoff \today \printdayon}}{}
+	\ifthenelse{\equal{\Sprache}{1}}
+	{	{\large \hspace{20mm} Hamburg, 
+			\printdayoff \today \printdayon
+	}}{}
+	
+\vspace{1cm}	
+	
+\centering	
+\hspace{1.7cm} \includegraphics[height=45pt]{Styles/Tuhh_logo.png}
+
+\end{center}
+
+\end{titlepage}
+
+\clearpage
+\thispagestyle{empty}
+\cleardoublepage

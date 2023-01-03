@@ -1,0 +1,40 @@
+% !TeX root = ../Thesis.tex
+\chapter{Introduction}
+\begin{itemize}
+    \color{red}
+    \item Definition micro auv \cite{micro-auv}
+    \item Definition of hydrobatic \cite{hydrobatic} (bridge between fully actuated hover style AUVs and the traditional ones)
+    \item Definition of agile \cite{duecker-phd}
+    \item 
+\end{itemize}
+\section{Motivation}
+\section{Problem Statement}
+Consider the scenario of the highly agile and underactuated HippoCampus \ac{uauv} maneuvering in a confined environment -- such as a water tank -- to reach a time dependent goal state.
+Such a time dependent goal state can be represented by a moving ring, that is to be caught by the \ac{uauv}.
+Additionally, there might be obstacles present, which make a method for collision avoidance mandatory.
+Due to the physical limitations of wireless underwater communication \cite{Bettale08p1,GeistEtAl16}, all algorithms have to be executed on-board and in real time to allow for autonomous maneuvering.
+
+From this scenario we can derive the following requirements for a trajectory generation and tracking system:
+
+\begin{itemize}
+    \item real time capability of the trajectory generation algorithm, when executed by the on-board hardware
+    \item verification of the trajectories' feasibility based on the dynamics of the \ac{uauv}
+    \item a control scheme to track the planned trajectory
+    \item dynamic collision avoidance due to obstacles
+    \item make clear what I mean by real time capable (i.e. fast enough to keep up with the update rate, but no real time guarantees in worst case execution time)
+\end{itemize}
+
+Goal of this thesis is to develop such a system meeting the above-mentioned requirements and assess its performance by carrying out simulations and lab experiments.
+
+\section{Contribution and Outline}
+
+Based on a literature review in \Cref{sec:review-path-planning} on existing underwater path planning approaches in general and agile path planning -- including publications in the field of aerial vehicles -- the suitability of different approaches is discussed. 
+
+By leveraging the synergies between aerobatic \acp{uav} and hydrobatic \acp{uauv}, the approach of computational efficient trajectory generation for quadrocopters in \cite{MuellerHehn15} is transferred to the underwater domain in \Cref{sec:approach-to-agile-maneuvering}.
+This includes taking the differences in modelling the vehicle's dynamics into account and addressing them with respect to computational efficiency, robustness of the trajectory tracking performance, and the sampling strategy.
+
+The dynamic model of the HippoCampus \ac{uauv} is derived in \Cref{sec:system-dynamics} and applied to the sampling-based trajectory generation framework presented in \Cref{sec:trajectory-generation} and \Cref{sec:feasibility}.
+It is complemented by a attitude controller as proposed in \Cref{sec:control}.
+The framework's implementation details are presented in this thesis are given in \Cref{sec:implementation}
+
+\todo[inline]{Schon mal sagen, welche Erkenntnisse konkret aus den Experimenten gewonnen werden. Muss abgestimmt werden, mit dem, was ich am Ende tatsaechlich dort stehen habe}

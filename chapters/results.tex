@@ -1,0 +1,38 @@
+% !TeX root = ../Thesis.tex
+\chapter{Analysis}
+\begin{itemize}
+	\color{red}
+	\item Test the dynamic behavior of the body rates to assess whether the assumptions that they are reached slowly and by far not instantaneously holds.
+	\item real time capability on limited hardware is required for deployment -> analysis of computation times required for assessment
+	\item single trajectory tracking without implicit feedback, to analyze performance of (half) open loop trajectory tracking. while keeping disturbances at a minimum, this should show how susceptible the tracking performance is for errors in the assumed model parameters.
+	\item Multi Trajectory/Implicit Feedback should show the full capability of the approach. Collision avoidance can be added optionally
+\end{itemize}
+
+\section{Body Rates Analysis}
+
+\begin{itemize}
+	\color{red}
+	\item Useful for myself to get reasonable values for the body rate limit
+	\item Either use the body rate controller or just feed through
+	\item Use step function and compute the time constant?
+	\item Only test pitch/yaw. Roll is irrelevant
+\end{itemize}
+
+\section{Computational Performance}
+
+\begin{itemize}
+	\color{red}
+	\item Measure the following
+	\begin{itemize}
+		\item generation time (expected to be constant, small variance due to running on a best effort machine)
+		\item input feasibility (a recursive algorithm. maybe have a special look on worst case)
+		\item position feasibility (only extrema need to be considered. small variance expected)
+		\item collision avoidance ()
+	\end{itemize}
+	\item Tabular, or BoxPlot? Or Barplot? 
+\end{itemize}
+
+\section{Single Trajectory Tracking}
+
+
+\section{Implicit Feedback}
