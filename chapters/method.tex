@@ -307,7 +307,7 @@ The required thrust, given the acceleration $\pworldddot$ and the velocity $\pwo
 	\right\rVert.
 \end{equation}
 
-In the following all equations are expressed in the world-fixed frame $\mathcal{W}$ and the corresponding indices are omitted for readability.
+In the following all equations are expressed in the world-fixed frame $\mathcal{W}$ and the corresponding indices are omitted in favor of readability.
 
 \begin{itemize}
 	\color{red}
@@ -320,15 +320,15 @@ In the following all equations are expressed in the world-fixed frame $\mathcal{
 	\label{eq:trajectory-state}
 	\sbo = 
 	\begin{bmatrix}
-		\pbo \\ \vb \\ \ab	
+		\pbo & \vb & \ab	
 	\end{bmatrix}
 	\quad
 	\text{and}
 	\quad
 	\sbp =
 	\begin{bmatrix}
-		\vb \\
-		\ab \\
+		\vb &
+		\ab &
 		\jb
 	\end{bmatrix}
 \end{equation}
@@ -350,8 +350,8 @@ being the velocity, acceleration and jerk.
 	\label{eq:trajectory-state-per-axis}
 	\sbo_{i} =
 	\begin{bmatrix}
-		p_{i} \\
-		v_{i} \\
+		p_{i} &
+		v_{i} &
 		a_{i}
 	\end{bmatrix}
 \end{equation}
@@ -360,8 +360,8 @@ being the velocity, acceleration and jerk.
 	\label{eq:trajectory-state-derivative-per-axis}
 	\sbp_\text{i} =
 	\begin{bmatrix}
-		v_{i} \\
-		a_{i} \\
+		v_{i} &
+		a_{i} &
 		j_{i}
 	\end{bmatrix}
 \end{equation}
@@ -466,6 +466,8 @@ being the velocity, acceleration and jerk.
 \section{Feasibility of Trajectories}
 \label{sec:feasibility}
 
+
+
 \subsection{Input Feasibility}
 
 \begin{equation}
@@ -501,6 +503,7 @@ being the velocity, acceleration and jerk.
 
 By suqaring \Cref{eq:trajectory-thrust}, we can write the squared thrust in per-axis notation
 \begin{equation}
+	\label{eq:thrust-squared-per-axis}
 	f^2 = 
 	\left\lVert
 	\left(m + X_{\dot{u}}\right) \pbpp + X_u \pbp
@@ -508,14 +511,292 @@ By suqaring \Cref{eq:trajectory-thrust}, we can write the squared thrust in per-
 	= 
 	\sum_{k=1}^{3}
 	\left(\left(m + X_{\dot{u}}\right)\ppp_k + X_u \pp_k \right)^2
-	.
 \end{equation}
+and find the conservative thrust limits by summing the per axis extrema.
+\begin{align}
+	\label{eq:fmax-per-axis}
+	\max_{t \in \mathcal{T}} f(t)^2
+	&\leq
+	\sum_{k=1}^{3}
+	\max_{t \in \mathcal{T}}
+	\left(
+		\left(m + X_{\dot{u}}\right)
+		\ppp_k
+		+ X_u \pp_k
+	\right)^2 \\
+	\label{eq:fmin-per-axis}
+	\min_{t \in \mathcal{T}} f(t)^2
+	&\geq
+	\sum_{k=1}^{3}
+	\min_{t \in \mathcal{T}}
+	\left(
+		\left(m + X_{\dot{u}}\right)
+		\ppp_k
+		+ X_u \pp_k
+	\right)^2
+\end{align}
+
+We denote the maximum and minimum of the per axis thrust as \fmaxaxis and \fminaxis, respectively\todo{Hier ist im Unterschied zu Mueller eine kubische Funktion fuer die Nullstellen zu loesen} 
+and write the extrema in \Cref{eq:fmax-per-axis,eq:fmax-per-axis} as
+\begin{align}
+	\max_{t \in \mathcal{T}}
+	\left(
+		\left(m + X_{\dot{u}}\right)
+		\ppp_k
+		+ X_u \pp_k
+	\right)^2
+	&= 
+	\max\left\{\fmaxaxis^2, \fminaxis^2\right\} \\
+	\min_{t \in \mathcal{T}}
+	\left(
+		\left(m + X_{\dot{u}}\right)
+		\ppp_k
+		+ X_u \pp_k
+	\right)^2
+	&=
+	\begin{cases}
+		\min\left\{\fmaxaxis^2, \fminaxis^2\right\}
+		& \text{if } \fmaxaxis\cdot\fminaxis > 0 \\
+		0
+		& \text{otherwise}
+	\end{cases}
+\end{align}
+
+A sufficient criterion, rendering the trajectory infeasible, is
+\begin{equation}
+	\label{eq:sufficient-infeasible-thrust}
+	\max\left\{\fmaxaxis^2, \fminaxis^2\right\}
+	> \fmaxsquare
+	,
+\end{equation}
+whereas a sufficient criterion for feasibility with respect to the thrust input is if both
+\begin{align}
+	\label{eq:sufficient-feasible-thrust-max}
+	\sum_{k=1}^{3}
+	\max_{t \in \mathcal{T}}
+	\left\{\fmaxaxis^2, \fminaxis^2\right\}
+	& \leq
+	\fmaxsquare \\
+	\label{eq:sufficient-feasible-thrust-min}
+	\sum_{k=1}^{3}
+	\min_{t \in \mathcal{T}}
+	\left\{\fmaxaxis^2, \fminaxis^2\right\}
+	& \geq
+	\fminsquare
+\end{align}
+hold. Note that it might be the case, that neither \Cref{eq:sufficient-infeasible-thrust} nor \Cref{eq:sufficient-feasible-thrust-max,eq:sufficient-feasible-thrust-min} hold. In this case, the interval $\mathcal{T}$ is divided in half and the feasibility is tested recursively on both half intervals. This procedure is repeated until either at least one interval is infeasible, rendering the whole trajectory infeasible, all tested sub intervals yield feasibility, or the tested sub intervals become smaller than some defined minimum interval $\Delta\tau_{\text{min}}$. In the latter case the trajectory is declared indeterminable.
+
 
 \subsubsection{Body Rates Input Feasibility}
 \begin{itemize}
 	\color{red}
 	\item Insert dynamics into definition of jerk
 \end{itemize}
+
+In terms of the jerk \pbppp, the vehicle dynamics are 
+\begin{equation}
+	\label{eq:jerk}
+	\pbppp = 
+	\frac{1}{m + X_{\dot{u}}}
+	\left(
+		\Rb \eb_1 \fp 
+		+ \Rb \Sb(\omeb)\eb_1 f
+		- X_u \pbpp
+	\right)
+\end{equation}
+
+By squaring \Cref{eq:trajectory-thrust} and applying the first derivative, we get
+\begin{equation}
+	f\fp = 
+	\left(
+		\left(m + X_{\dot{u}}\right) \pbpp
+		+ X_u \pbp
+	\right)^\top
+	\left(
+		\left(m + X_{\dot{u}}\right) \pbppp
+		+ X_u \pbpp
+	\right).
+\end{equation}
+With \Cref*{eq:trajectory-acceleration-eom} this yields
+\begin{equation}
+	\label{eq:fdot}
+	\fp = \left(\Rb \eb_1\right)^\top
+	\left(
+		\left(m + X_{\dot{u}}\right) \pbppp
+		+ X_u \pbpp
+	\right)
+\end{equation}
+for the derivative of the thrust.
+
+We substitute \fp by \Cref{eq:fdot} in \Cref{eq:jerk} and simplify the equation
+\begin{equation}
+	\pbppp = 
+	\frac{1}{m + X_{\up}}
+	\left(
+		\begin{bmatrix}
+			1 & 0 & 0 \\
+			0 & 0 & 0 \\
+			0 & 0 & 0
+		\end{bmatrix}
+		\left(
+			\left(m + X_{\dot{u}}\right)
+			\pbppp
+			+ X_u \pbpp
+		\right)
+		+
+		\Rb
+		\begin{bmatrix}
+			0 \\
+			\omega_3 \\
+			-\omega_2
+		\end{bmatrix}
+		f
+		- X_u \pbpp
+	\right)
+\end{equation}
+
+\begin{equation}
+	\label{eq:jerk-vs-bodyrates}
+	\begin{bmatrix}
+		0 & 0 & 0\\
+		0 & 1 & 0\\
+		0 & 0 & 1
+	\end{bmatrix}
+	\pbppp = 
+	\Rb
+	\begin{bmatrix}
+		0 \\
+		\omega_3 \\
+		- \omega_2
+	\end{bmatrix}
+	\frac{f}{m + X_{\dot{u}}}
+	-
+	\begin{bmatrix}
+		0 & 0 & 0 \\
+		0 & 1 & 0 \\
+		0 & 0 & 1
+	\end{bmatrix}
+	\frac{X_u}{m + X_{\dot{u}}}
+	\pbpp
+\end{equation}
+We can observe, that the angular velocity about the roll axis $\omega_1$ has no influence on the translational dynamics. For the further course of this thesis we assume $\omega_1 = \unit[0]{\frac{rad}{s}}$.
+
+To find a criterion for input feasibility with respect to the body rates, we reorder \Cref{eq:jerk-vs-bodyrates} for the body rates
+\begin{equation}
+	\begin{bmatrix}
+		0 \\
+		\omega_3 \\
+		- \omega_2
+	\end{bmatrix}
+	=
+	\frac{m + X_{\dot{u}}}{f}
+	\Rb^\top
+	\begin{bmatrix}
+		0 & 0 & 0 \\
+		0 & 1 & 0 \\
+		0 & 0 & 1
+	\end{bmatrix}
+	\left(
+		\pbppp + X_u \pbpp
+	\right),
+\end{equation}
+apply the vector induced euclidean norm
+\begin{equation}
+	\left\lVert\Rb\right\rVert \leq 1,
+\end{equation}
+and get the bound of the body rates 
+\begin{equation}
+	\label{eq:body-rates-bound}
+	\omega_3^2 + \omega_2^2 \leq
+	\frac{
+		\left(
+			m + X_{\dot{u}}
+		\right)^2
+	}{f^2}
+	\left\lVert
+		\pbppp + X_u \pbpp
+	\right\rVert^2
+	.
+\end{equation}
+
+A conservative upper bound of \Cref{eq:body-rates-bound} in per axis notation denoted as $\bar{\omega}^2$ can be written with \Cref{eq:thrust-squared-per-axis} as
+\begin{equation}
+	\omega_2^2 + \omega_3^2
+	\leq
+	\bar{\omega}^2
+	=
+	\left(
+		m + X_{\dot{u}}
+	\right)^2
+	\frac{
+		\sum_{k=1}^{3}
+		\max_{t \in \mathcal{T}}
+		\left(
+			\dddot{p}_k + X_u \ddot{p}
+		\right)^2
+	}{
+		\sum_{k=1}^{3}
+		\min_{t \in \mathcal{T}}
+		\left(
+			\left(m + X_{\dot{u}}\right)\ppp_k
+			+ X_u \pp_k
+		\right)^2
+	}
+	,
+\end{equation}
+
+and simplified with \Cref{eq:sufficient-feasible-thrust-min} and defining $\xi_k = \dddot{p}_k + X_u \ddot{p}$
+\begin{equation}
+	\bar{\omega}^2 =
+	\left(
+		m + X_{\dot{u}}
+	\right)^2
+	\frac{
+		\sum_{k=1}^{3}
+		\max_{t \in \mathcal{T}}
+		\xi_k^2
+	}{
+		\sum_{k=1}^{3}
+		\min_{t \in \mathcal{T}}
+		\left\{\fmaxaxis^2, \fminaxis^2\right\}
+	}
+\end{equation}
+The minimum and maximum of $\xi_k$ is denoted as \ximaxaxis and \ximinaxis, respectively. With
+\begin{equation}
+	\max_{t \in \mathcal{T}}
+	\left(
+		\dddot{p}_k + X_u \ddot{p}
+	\right)^2 =
+	\max_{t \in \mathcal{T}}
+	\left\{
+		\ximaxaxis^2, \ximinaxis^2
+	\right\}
+	,
+\end{equation}
+we formulate the feasibility criterion with respect to the body rates
+\begin{equation}
+	\label{eq:body-rates-criterion-per-axis}
+	\bar{\omega}^2
+	=
+	\left(
+		m + X_{\dot{u}}
+	\right)^2
+	\frac{
+		\sum_{k=1}^{3}
+		\max_{t \in \mathcal{T}}
+		\left\{
+			\ximaxaxis^2, \ximinaxis^2
+		\right\}
+	}{
+		\sum_{k=1}^{3}
+		\min_{t \in \mathcal{T}}
+		\left\{\fmaxaxis^2, \fminaxis^2\right\}
+	}
+	\leq
+	\omegamax
+	.
+\end{equation}
+If \Cref{eq:body-rates-criterion-per-axis} does not hold, the tested section is split in half. The feasibility criterion is applied recursively on both sub intervals.
 
 
 \subsection{Position Feasibility}
