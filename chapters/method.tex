@@ -17,22 +17,16 @@
 \subsubsection{World-fixed Frame}
 \subsubsection{Body-fixed Frame}
 
-\subsection{Equations of Motion}
+\subsection{Kinematics}
 
-\begin{itemize}
-	\color{red}
-	\item Start with the general eq of motion
-	\item Apply and justify/explain the simplifications and assumptions to get to the simplified eom in \Cref{eq:equation-of-motion-translational,eq:equation-of-motion-rotational} \todo[inline]{further simplications for trajectory generation. but gazebo simulation uses these equations. how to structure this?}
-	\item 
-\end{itemize}
-
-The vector of absolute linear and angular velocities expressed in the body-fixed frame $\mathcal{B}$
+We write the combined velocity vector \nub as
 \begin{equation}
 	\nub = 
 	\begin{bmatrix}
 		\prescript{\mathcal{B}}{}{\vb} \\
 		\prescript{\mathcal{B}}{}{\omeb}
 	\end{bmatrix}
+	,
 \end{equation}
 with 
 \begin{equation}
@@ -46,36 +40,19 @@ with
 	\begin{bmatrix}
 		p & q & r
 	\end{bmatrix}^\top
+	,
 \end{equation}
+where $\prescript{\mathcal{B}}{}{\vb}$ and $\prescript{\mathcal{B}}{}{\omeb}$ are the linear and angular velocity expressed in the body-fixed frame $\mathcal{B}$, respectively.
 
-Forces and moments with respect to the body-fixed frame.
-\begin{equation}
-	\taub = 
-	\begin{bmatrix}
-		\prescript{\mathcal{B}}{}{\fb} \\
-		\prescript{\mathcal{B}}{}{\mb}
-	\end{bmatrix}
-\end{equation}
-with 
-\begin{equation}
-	\prescript{\mathcal{B}}{}{\fb} = 
-	\begin{bmatrix}
-		X & Y & Z
-	\end{bmatrix}^\top
-	\text{ and }
-	\prescript{\mathcal{B}}{}{\mb} = 
-	\begin{bmatrix}
-		K & M & N
-	\end{bmatrix}^\top
-\end{equation}
+The pose of the vehicle in the world-fixed frame $\mathcal{W}$ reads
 
-The vehicle's absolute pose $\etab$, i.e. position and orientation, expressed in $\mathcal{W}$, is
 \begin{equation}
 	\etab = 
 	\begin{bmatrix}
 		\prescript{\mathcal{W}}{}{\pbo} \\
 		\prescript{\mathcal{W}}{}{\Theb_{\mathcal{W}\mathcal{B}}}
 	\end{bmatrix}
+	,
 \end{equation}
 with
 \begin{equation}
@@ -89,10 +66,11 @@ with
 		\phi & \theta & \psi
 	\end{bmatrix}^\top,
 \end{equation}
-where $\prescript{\mathcal{W}}{}{\pbo}$ is the vehicle's position, i.e. the position of body frame origin $O_\mathcal{B}$, with respect to the world frame origin $O_\mathcal{W}$, and $\Theb_{\mathcal{W}\mathcal{B}}$ denotes the euler angle vector describing the transformation between $\mathcal{W}$ and $\mathcal{B}$ following the extrinsic $x$-$y$-$z$ convention.
+where $\prescript{\mathcal{W}}{}{\pbo}$ is the vehicle's position, i.e. the position of body frame origin $O_\mathcal{B}$, with respect to the world frame origin $O_\mathcal{W}$, and $\Theb_{\mathcal{W}\mathcal{B}}$ denotes the euler angle vector describing the rotation between $\mathcal{W}$ and $\mathcal{B}$ following the extrinsic $x$-$y$-$z$ convention.
 
 We write the relation between the linear and angular velocities $\vlinbody$ and $\vangbody$ expressed in the body-fixed frame and the corresponding velocities in the world-fixed frame as
 \begin{equation}
+	\label[]{eq:velocity-world-body-transformation}
 	\begin{bmatrix}
 		\vlinworld \\
 		\vangworld
@@ -137,14 +115,75 @@ and the transformation matrix
 \end{equation}
 where $\text{s}\cdot$, $\text{c}\cdot$ and $\text{t}\cdot$ represent the functions $\sin(\cdot)$, $\cos(\cdot)$ and $\tan(\cdot)$, respectively.
 
+The time derivative of $\Rbodyworld$ is
+\begin{equation}
+	\label{eq:rotation-matrix-derivative}
+	\prescript{\mathcal{W}}{}{\dot{\bm{R}}_{\mathcal{B}}} = \Rbodyworld \Sb(\vangbody)
+	,
+\end{equation}
+with the cross product skew-symmetric matrix
+\begin{equation}
+	\Sb(\vangbody) = 
+	\begin{bmatrix}
+		0 & -\vangbodyz & \vangbodyy \\
+		\vangbodyz & 0 & -\vangbodyx \\
+		-\vangbodyy & \vangbodyx & 0
+	\end{bmatrix},
+	\quad
+	\vangbody = 
+	\begin{bmatrix}
+		\vangbodyx \\
+		\vangbodyy \\ 
+		\vangbodyz
+	\end{bmatrix}
+	.
+\end{equation}
 
+
+
+\subsection{Equations of Motion}
+
+\begin{itemize}
+	\color{red}
+	\item Start with the general eq of motion
+	\item Apply and justify/explain the simplifications and assumptions to get to the simplified eom in \Cref{eq:equation-of-motion-translational,eq:equation-of-motion-rotational} \todo[inline]{further simplications for trajectory generation. but gazebo simulation uses these equations. how to structure this?}
+	\item 
+\end{itemize}
+
+In the following, we derive a dynamic model for the HippoCampus \ac{uauv} based on \cite{Fossen11}.
+Subsequently, we simplify the model by exploiting the properties of the robot and making reasonable assumptions.
+
+Let
+\begin{equation}
+	\taub = 
+	\begin{bmatrix}
+		\prescript{\mathcal{B}}{}{\fb} \\
+		\prescript{\mathcal{B}}{}{\mb}
+	\end{bmatrix}
+\end{equation}
+denote the load vector with 
+\begin{equation}
+	\prescript{\mathcal{B}}{}{\fb} = 
+	\begin{bmatrix}
+		X & Y & Z
+	\end{bmatrix}^\top
+	\text{ and }
+	\prescript{\mathcal{B}}{}{\mb} = 
+	\begin{bmatrix}
+		K & M & N
+	\end{bmatrix}^\top
+\end{equation}
+being the forces and moments with respect to the body-fixed frame $\mathcal{B}$.
+
+We write the rigid-body equation of motion as
 \begin{equation}
 	\label{eq:rigid-body-equation-of-motion}
 	\Mrigid \nubp
 	+ \Crigid(\nub) \nub
 	= \taub
+	,
 \end{equation}
-
+with
 \begin{equation}
 	\label{eq:rigid-body-mass-matrix}
 	\Mrigid =
@@ -152,10 +191,10 @@ where $\text{s}\cdot$, $\text{c}\cdot$ and $\text{t}\cdot$ represent the functio
 		m \Ib_{3 \times 3} & \bm{0} \\
 		\bm{0} & \Jb
 	\end{bmatrix}
-\end{equation}
+\end{equation},
+where $\Mrigid$ is the rigid-body mass matrix, $\Crigid$ is the rigid-body Coriolis and centripetal matrix, and $\Jb$ the vehicle's inertia matrix with respect to its center of gravity.
 
-Because \emph{principal axes of inertia} coincide with body frame axes, $\Jb$ will be diagonal, i.e. $\Jb = \text{diag}(J_x, J_y, J_z)$.
-
+To account for hydrodynamic and hydrostatic effects, we extend \Cref{eq:rigid-body-equation-of-motion} by the corresponding terms, which yields in accordance with \cite{Fossen11}
 \begin{equation}
 	\label{eq:6dof-equation-of-motion}
 	\Mrigid \nubp + \Crigid(\nub) \nub +
@@ -169,7 +208,70 @@ Because \emph{principal axes of inertia} coincide with body frame axes, $\Jb$ wi
 		\gb(\etab)
 	}_\text{\makebox[0pt]{hydrostatic load}}
 	= \taub
+	,
 \end{equation}
+where $\Madded$ is the added mass matrix, $\Cadded$ the added Coriolis matrix, and $\Dadded$ the added damping matrix.
+The hydrostatic load, denoted by $\gb(\etab)$, represents the forces acting on the body due to gravity and buoyancy and moments induced by them.
+
+We make the following assumptions with respect to HippoCampus \ac{uauv} to simplify \Cref{eq:6dof-equation-of-motion}:
+\begin{itemize}
+	\item Symmetry with respect to $xz$, $yz$ and $xy$ planes.
+	\item The center of gravity lies in the origin $O_\mathcal{B}$ of the body-fixed frame $\mathcal{B}$.
+	\item The difference in the magnitudes of buoyancy force and gravitational force is zero, i.e. the vehicle is neutrally buoyant. Therefore, the restoring force is assumed to be zero.
+	\item The center of buoyancy and the center of gravity coincide. The resulting restoring moment will be zero.
+	\item The vehicle's velocity is relatively small.
+	\item The motion of the vehicle is uncoupled.
+	\item The principal axes of inertia coincide with the body-fixed frame axes.
+\end{itemize}
+
+Using the body symmetry, the added mass matrix becomes \todo{Fossen 7.5.2 p.172}
+\begin{equation}
+	\Madded =
+	\text{diag}\left(X_{\up}, Y_{\vp}, Z_{\wpo}, K_{\pp}, M_{\qp}, N_{\rp}\right)
+\end{equation}
+and since the axes of inertia coincide with the body-fixed frame, the rigid-body inertia matrix $\Jb$ becomes diagonal as well, i.e.
+\begin{equation}
+	\Jb = \text{diag}(J_x, J_y, J_z)
+	.
+\end{equation}
+For uncoupled motions \cite{Fossen11} suggests assuming diagonal shape for $\Dadded$ as well. \todo{find a reference for assuming linear terms only. see hastedt}
+
+
+Since the vehicle is neutrally buoyant and the center of buoyancy and gravity are identical, the hydrostatic forces and moments vanish.
+
+With $\Madded = \text{diag}\left(\Mvadded, \Jadded\right)$ and $\Dadded = \text{diag}(\Dvadded, \Domegaadded)$, we introduce the following auxiliary variables
+\begin{equation}
+	\Mbs = \left(m\Ib + \Mvadded\right),\text{ and }
+	\Jbs = \left(\Jb + \Jadded\right)
+\end{equation}
+and write \Cref{eq:6dof-equation-of-motion} separated by the translational and rotational dynamics as
+\begin{equation}
+	\label{eq:equation-of-motion-translational}
+	\Mbs \vlinbodydot = \vlinbody \times \Mbs \vangbody - \Dvadded \vlinbody - \gb(\etab) + u_1 \eb_1
+\end{equation}\todo{Muss es nicht nur die obere Haelfte von $\gb$ sein? Muesste $\Mbs$ nicht vor $\vlinbody$ stehen?}
+and
+\begin{equation}
+	\label{eq:equation-of-motion-rotational}
+	\Jbs \vangbodydot =
+	\vlinbody \times \Mbs \vangbody
+	- \vangbody \times \Jbs \vangbody
+	- \Domegaadded \vangbody
+	- \gb(\etab)
+	+ \begin{bmatrix}
+		u_2 & u_3 & u_4	
+	\end{bmatrix}^\top
+	.
+\end{equation}
+
+
+
+
+
+
+
+Because \emph{principal axes of inertia} coincide with body frame axes, $\Jb$ will be diagonal, i.e. $\Jb = \text{diag}(J_x, J_y, J_z)$.
+
+
 \todo{make sure to reference \cite{Fossen11}}
 \begin{equation}
 \Mb = \Mrigid + \Madded
@@ -198,39 +300,13 @@ Because \emph{principal axes of inertia} coincide with body frame axes, $\Jb$ wi
 	\Dadded = \text{diag}(\Dvadded, \Domegaadded)
 \end{equation}
 Splitting \Cref{eq:6dof-equation-of-motion} in a translational and rotational gives
-\begin{equation}
-	\label{eq:equation-of-motion-translational}
-	\Mbs \vlinbodydot = \vlinbody \times \Mbs \vangbody - \Dvadded \vlinbody - \gb(\etab) + u_1 \eb_1
-\end{equation}\todo{Muss es nicht nur die obere Haelfte von $\gb$ sein? Muesste $\Mbs$ nicht vor $\vlinbody$ stehen?}
-and
-\begin{equation}
-	\label{eq:equation-of-motion-rotational}
-	\Jbs \vangbodydot =
-	\vlinbody \times \Mbs \vangbody
-	- \vangbody \times \Jbs \vangbody
-	- \Domegaadded \vangbody
-	- \gb(\etab)
-	+ \begin{bmatrix}
-		u_2 & u_3 & u_4	
-	\end{bmatrix}^\top,
-\end{equation}
+
 respectively.
 
 We make the following assumptions:
-\begin{itemize}
-	\item Symmetry with respect to $xz$, $yz$ and $xy$ planes.
-	\item The center of gravity lies in the origin $O_\mathcal{B}$ of the body-fixed frame $\mathcal{B}$.
-	\item The difference in the magnitudes of buoyancy force and gravitational force is zero, i.e. the vehicle is neutrally buoyant. Therefore, the restoring force is assumed to be zero.
-	\item The center of buoyancy and the center of gravity coincide. The resulting restoring moment will be zero.
-	\item The vehicle's velocity is relatively small.
-	\item The motion of the vehicle is uncoupled.
-	\item The principal axes of inertia coincide with the body-fixed frame axes.
-\end{itemize}
+
 Using body symmetry for $xz$, $yz$ and $xy$ planes \todo{Fossen 7.5.5}
-\begin{equation}
-	\Madded =
-	\text{diag}\left(X_{\up}, Y_{\vp}, Z_{\wpo}, K_{\pp}, M_{\qp}, N_{\rp}\right)
-\end{equation}
+
 
 In general, 
 \begin{equation}
