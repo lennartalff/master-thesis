@@ -217,7 +217,7 @@ The hydrostatic load, denoted by $\gb(\etab)$, represents the forces acting on t
 We make the following assumptions with respect to HippoCampus \ac{uauv} to simplify \Cref{eq:6dof-equation-of-motion}:
 \begin{itemize}
 	\item Symmetry with respect to $xz$, $yz$ and $xy$ planes.
-	\item The center of gravity lies in the origin $O_\mathcal{B}$ of the body-fixed frame $\mathcal{B}$.
+	\item The center of gravity lies in the origin $\bodyframeorigin$ of the body-fixed frame $\mathcal{B}$.
 	\item The difference in the magnitudes of buoyancy force and gravitational force is zero, i.e. the vehicle is neutrally buoyant. Therefore, the restoring force is assumed to be zero.
 	\item The center of buoyancy and the center of gravity coincide. The resulting restoring moment will be zero.
 	\item The vehicle's velocity is relatively small.
@@ -237,6 +237,11 @@ and since the axes of inertia coincide with the body-fixed frame, the rigid-body
 \end{equation}
 For uncoupled motions \cite{Fossen11} suggests assuming diagonal shape for $\Dadded$ as well. For high speeds, the damping is non-linear. But the speed of the HippoCampus \ac{uauv} is assumed to be small enough, that the linear terms are dominant. Therefore, the damping is approximated as linear function in terms of velocity.
 \todo{find a reference for assuming linear terms only. see hastedt}
+Hence, the added damping reads
+\begin{equation}
+	\Dadded(\nub) = -\text{diag}(X_\text{u}, Y_\text{v}, Z_\text{w}, K_\text{p}, M_\text{q}, N_\text{r})
+	.
+\end{equation}
 
 Since the vehicle is neutrally buoyant and the center of buoyancy and gravity are identical, the hydrostatic forces and moments vanish. Based on these simplifications we rewrite \Cref{eq:6dof-equation-of-motion}. With $\Madded = \text{diag}\left(\Mvadded, \Jadded\right)$ and $\Dadded = \text{diag}(\Dvadded, \Domegaadded)$, we introduce the following auxiliary variables
 \begin{equation}
@@ -262,22 +267,119 @@ and
 	.
 \end{equation}
 
-
-
-
-
-
-
-
-Because \emph{principal axes of inertia} coincide with body frame axes, $\Jb$ will be diagonal, i.e. $\Jb = \text{diag}(J_x, J_y, J_z)$.
-
-
-\todo{make sure to reference \cite{Fossen11}}
+\subsection{Thruster Model}
+The HippoCampus \ac{uauv} has four thrusters mounted in parallel to its forward axis depicted in \Cref{fig:free-body-diagram}.
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.7\linewidth]{placeholders/free_body.png}
+	\caption{Free body diagram of the HippoCampus \mu AUV with buoyancy force $\bm{f}_\textrm{B}$, gravitational force $\bm{f}_\textrm{G}$, thruster forces $\bm{f}_\textrm{1:4}$, and thruster torques $\bm{m}_{1:4}$.}
+	\label{fig:free-body-diagram}
+\end{figure}
+The thruster configuration enables the vehicle to apply forces and moments.
+Each thruster applies a force $\fb_{i}$ in the direction of $\exbody$ and induces a moment $\mb_{i}$ around $\bodyframeorigin$.
+Furthermore, due to the thruster's rotational movement, it generates a moment around the forward axis. A physically based modelling approach is presented in \cite{Newman77} and following it, we can express the thruster force as
 \begin{equation}
-\Mb = \Mrigid + \Madded
+	\label{eq:thrust-function-newman}
+	f_i = \kappa_{\text{F},i}\rho d^4 n_i^2
+	,
 \end{equation}
-\todo[inline]{Replace \taub with $\inputbody$? Assumption of no other external loads?}
+where $n$ are the rotations per second, $d$ is the propeller's diameter, and $\kappa_{\text{F},i}$ is the thruster's force coefficient. In general, $\kappa_{\text{F},i}$ depends on the relative velocity of the fluid surrounding the thruster.
 
+Another relation for the thruster forces is presented in \cite{Hastedt19}, according to which $f_i$ can be modelled quite accurately by
+\begin{equation}
+	\label{eq:thrust-function-hastedt}
+	f_i = \ForceQuadCoeffi \inputesci^2
+	+ \ForceLinCoeffi \left\lvert \inputesci \right\rvert
+	,
+\end{equation}
+where $\ForceQuadCoeffi$ and $\ForceLinCoeffi$ denote constant thrust coefficients, and $\inputesci$ is the control input of the \ac{esc} controlling the thruster.
+Since the \acp{esc} of the HippoCampus \ac{uauv} do not apply feedback control, we cannot assume the actual velocity for a given $\inputesci$ being constant.
+Furthermore, the vehicle has no ability to measure the rotational velocity of the thrusters during operation.
+Hence, we choose \Cref{eq:thrust-function-hastedt} over \Cref{eq:thrust-function-newman} for modelling the forces of the thrusters.
+
+This implies three simplifications.
+First, we neglect the relative velocity between fluid and thruster.
+Second, we neglect the deadzone of the motors.
+And last, we do not account for asymmetries in the thrust function regarding the direction of rotation of the thrusters.
+The deadzone is a range of $\inputesci$, for which the motors do not start spinning.
+As a consequence, forces and moments induced by the thrusters cannot be arbitrarily small.
+Neglecting the deadzone seems appropriate, as we can assume a sufficiently high forward thrust during agile maneuvering that keeps the thrusters operating outside their deadzone.
+
+Regarding the thruster dynamics, we assume the forces and moments being reached instantaneously. Considering the much slower vehicle dynamics, this seems justified.
+
+In accordance to \Cref{eq:thrust-function-hastedt}, the moment $m_i$ applied by a thruster reads
+\begin{equation}
+	\label{eq:moment-function}
+	m_i = \MomentQuadCoeffi \inputesci^2
+	+ \MomentLinCoeffi \left\lvert \inputesci \right\rvert
+	,
+\end{equation}
+where $\MomentQuadCoeffi$ and $\MomentLinCoeffi$ denote the thruster's moment coefficients.
+
+For each thruster at position $\dbo_{i}$, we can express the load vector $\taub_{i}$ as
+\begin{equation}
+	\label{eq:load-per-thruster-short}
+	\taub_{i} = 
+	\begin{bmatrix}
+		\fb_i \\
+		\dbo_i \times \fb_i + \mb_i
+	\end{bmatrix}
+	,
+\end{equation}
+and by substituting with \Cref{eq:thrust-function-hastedt,eq:moment-function} this yields
+\begin{equation}
+	\taub_{i} = 
+	\begin{bmatrix}
+		\ForceQuadCoeffi \inputesci^2
+		+ \ForceLinCoeffi \left\lvert \inputesci \right\rvert
+		\\
+		0 \\
+		0 \\
+		\MomentQuadCoeffi \inputesci^2
+		+ \MomentLinCoeffi \left\lvert \inputesci \right\rvert
+		\\
+		d_{i,z}
+		\left(
+			\ForceQuadCoeffi \inputesci^2
+			+ \ForceLinCoeffi \left\lvert \inputesci \right\rvert
+		\right)
+		\\
+		-d_{i,y}
+		\left(
+			\ForceQuadCoeffi \inputesci^2
+			+ \ForceLinCoeffi \left\lvert \inputesci \right\rvert
+		\right)
+	\end{bmatrix}
+\end{equation}
+and as sum over all thrusters
+\begin{equation}
+	\taub = 
+	\sum_{i=1}^{4}
+	\begin{bmatrix}
+		\ForceQuadCoeffi \inputesci^2
+		+ \ForceLinCoeffi \left\lvert \inputesci \right\rvert
+		\\
+		0 \\
+		0 \\
+		\MomentQuadCoeffi \inputesci^2
+		+ \MomentLinCoeffi \left\lvert \inputesci \right\rvert
+		\\
+		d_{i,z}
+		\left(
+			\ForceQuadCoeffi \inputesci^2
+			+ \ForceLinCoeffi \left\lvert \inputesci \right\rvert
+		\right)
+		\\
+		-d_{i,y}
+		\left(
+			\ForceQuadCoeffi \inputesci^2
+			+ \ForceLinCoeffi \left\lvert \inputesci \right\rvert
+		\right)
+	\end{bmatrix}
+	.
+\end{equation}
+
+By defining the input vector $\inputbody$ as
 \begin{equation}
 	\label{eq:input-vector}
 	\inputbody =
@@ -289,37 +391,47 @@ Because \emph{principal axes of inertia} coincide with body frame axes, $\Jb$ wi
 		u_3 &
 		u_4 
 	\end{bmatrix}^\top
+	,
 \end{equation}
-
+with
 \begin{equation}
-	\Mbs = \left(m\Ib + \Mvadded\right), \text{ with }
-	\Madded = \text{diag}\left(\Mvadded, \Jadded\right)
+	\inputbody = \taub =
+	\sum_{i=1}^{4}
+	\begin{bmatrix}
+		f_i \\
+		0 \\
+		0 \\
+		m_i \\
+		d_{i, z} f_i\\
+		-d_{i, y} f+i
+	\end{bmatrix}
+	,
 \end{equation}
+
+we rewrite \Cref{eq:equation-of-motion-translational,eq:equation-of-motion-rotational} as
 \begin{equation}
-	\Jbs = \left(\Jb + \Jadded\right), \text{ with }
-	\Dadded = \text{diag}(\Dvadded, \Domegaadded)
+	\label{eq:eom-translational-with-input}
+	\Mbs \vlinbodydot =
+	\vlinbody \times \Mbs \vangbody
+	-\Dvadded \vlinbody
+	+
+	\begin{bmatrix}
+		u_1 & 0 & 0
+	\end{bmatrix}^\top
 \end{equation}
-Splitting \Cref{eq:6dof-equation-of-motion} in a translational and rotational gives
-
-respectively.
-
-We make the following assumptions:
-
-Using body symmetry for $xz$, $yz$ and $xy$ planes \todo{Fossen 7.5.5}
-
-
-In general, 
+and
 \begin{equation}
-	\Dadded(\nub) = -\text{diag}(X_\text{u}, Y_\text{v}, Z_\text{w}, K_\text{p}, M_\text{q}, N_\text{r})
+	\Jbs \vangbodydot =
+	\vlinbody \times \Mbs \vangbody
+	- \vangbody \times \Jbs \vangbody
+	- \Domegaadded \vangbody
+	+
+	\begin{bmatrix}
+		u_2 & u_3 & u_4
+	\end{bmatrix}^\top
+	.
 \end{equation}
-\todo{Nicht-linearen Teil lass ich direkt weg, weil der auch nicht mal simuliert wird.}
 
-
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width=0.7\linewidth]{placeholders/free_body.png}
-	\caption{Free body diagram of the HippoCampus \mu AUV with buoyancy force $\bm{f}_\textrm{B}$, gravitational force $\bm{f}_\textrm{G}$, thruster forces $\bm{f}_\textrm{1:4}$, and thruster torques $\bm{m}_{1:4}$.}
-\end{figure}
 \begin{itemize}
 	\color{red}
 	\item Rigid body dynamics -> added hydrodynamic terms -> assumptions and simplifications -> yields simplified dynamic model
@@ -339,25 +451,69 @@ In general,
 }
 
 \section{Trajectory Generation}
-\label{sec:trajectory-generation} 
-We neglect the cross-coupling term in \Cref{eq:equation-of-motion-translational} and can write the translational equation of motion expressed in the world frame $\mathcal{W}$ as
+\label{sec:trajectory-generation}
+
+The goal of the trajectory is to bring the vehicle from an initial state $\vehiclestate_0$ to a desired final state $\vehiclestate_{\text{f}}$, with the vehicle state being described by 
+\begin{equation}
+	\vehiclestate = 
+	\begin{bmatrix}
+		\pbo & \pbp & \pbpp
+	\end{bmatrix}^\top
+	.
+\end{equation}
+
+Similar to \cite{MuellerHehn15}, we define the state variable of the trajectory and its derivative as
+\begin{equation}
+	\label{eq:trajectory-state}
+	\sbo = 
+	\begin{bmatrix}
+		\pbo & \vb & \ab	
+	\end{bmatrix}
+	\quad
+	\text{and}
+	\quad
+	\sbp =
+	\begin{bmatrix}
+		\vb &
+		\ab &
+		\jb
+	\end{bmatrix}
+\end{equation}
+with
+\begin{equation}
+	\vb = \pbp
+	\quad
+	\text{and}
+	\quad
+	\ab = \pbpp
+	\quad
+	\text{and}
+	\quad
+	\jb = \pbppp
+\end{equation}
+being the velocity, acceleration and jerk.
+
+\subsection{Trajectory Dynamics}
+We neglect the cross-coupling term in \Cref{eq:eom-translational-with-input} and can write the translational equation of motion expressed in the world frame $\mathcal{W}$ as
 \begin{equation}
 	\label{eq:eom-world-without-cross-coupling}
 	\Rbodyworld \, \Mbs \, \Rbodyworld^\top \, \pworldddot = \Rbodyworld\Dadded\Rbodyworld^\top \pworlddot + u_1 \exbodyinworld.
 \end{equation}
-We further assume the \ac{uauv} is mainly moving in surge direction, which seems reasonable when taking the thruster configuration into account. Therefore, we approximate the inertia and damping matrix by
+We further assume the \ac{uauv} is mainly moving in surge direction, which seems reasonable when taking the thruster configuration into account. Therefore, we approximate the inertia matrix by
 \begin{equation}
 	\label{eq:added-mass-trajectory-simplification}
 	\Mbs = m\Ib + \text{diag}\left(X_{\dot{u}}, Y_{\dot{v}}, Z_{\dot{w}}\right)
 	=
 	m\Ib + X_{\dot{u}} \Ib
 \end{equation}
-and
+and the damping matrix by
 \begin{equation}
 	\label{eq:added-damping-trajectory-simplification}
 	\Dvadded = -\text{diag}\left(X_\text{u}, Y_\text{v}, Z_\text{w}\right)
 	= -X_\text{u} \Ib
+	.
 \end{equation}
+
 
 Using \Cref{eq:added-mass-trajectory-simplification,eq:added-damping-trajectory-simplification}, we rewrite \Cref{eq:eom-world-without-cross-coupling} as
 \begin{equation}
@@ -391,36 +547,6 @@ In the following all equations are expressed in the world-fixed frame $\mathcal{
 	\item Define the state variable consisting of translational variables and derivatives
 \end{itemize}
 
-
-\begin{equation}
-	\label{eq:trajectory-state}
-	\sbo = 
-	\begin{bmatrix}
-		\pbo & \vb & \ab	
-	\end{bmatrix}
-	\quad
-	\text{and}
-	\quad
-	\sbp =
-	\begin{bmatrix}
-		\vb &
-		\ab &
-		\jb
-	\end{bmatrix}
-\end{equation}
-with
-\begin{equation}
-	\vb = \pbp
-	\quad
-	\text{and}
-	\quad
-	\ab = \pbpp
-	\quad
-	\text{and}
-	\quad
-	\jb = \pbppp
-\end{equation}
-being the velocity, acceleration and jerk.
 
 \begin{equation}
 	\label{eq:trajectory-state-per-axis}
@@ -869,7 +995,7 @@ we formulate the feasibility criterion with respect to the body rates
 		\left\{\fmaxaxis^2, \fminaxis^2\right\}
 	}
 	\leq
-	\omegamax
+	\omegamaxsquare
 	.
 \end{equation}
 If \Cref{eq:body-rates-criterion-per-axis} does not hold, the tested section is split in half. The feasibility criterion is applied recursively on both sub intervals.
