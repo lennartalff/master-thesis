@@ -191,7 +191,8 @@ with
 		m \Ib_{3 \times 3} & \bm{0} \\
 		\bm{0} & \Jb
 	\end{bmatrix}
-\end{equation},
+	,
+\end{equation}
 where $\Mrigid$ is the rigid-body mass matrix, $\Crigid$ is the rigid-body Coriolis and centripetal matrix, and $\Jb$ the vehicle's inertia matrix with respect to its center of gravity.
 
 To account for hydrodynamic and hydrostatic effects, we extend \Cref{eq:rigid-body-equation-of-motion} by the corresponding terms, which yields in accordance with \cite{Fossen11}
@@ -234,12 +235,10 @@ and since the axes of inertia coincide with the body-fixed frame, the rigid-body
 	\Jb = \text{diag}(J_x, J_y, J_z)
 	.
 \end{equation}
-For uncoupled motions \cite{Fossen11} suggests assuming diagonal shape for $\Dadded$ as well. \todo{find a reference for assuming linear terms only. see hastedt}
+For uncoupled motions \cite{Fossen11} suggests assuming diagonal shape for $\Dadded$ as well. For high speeds, the damping is non-linear. But the speed of the HippoCampus \ac{uauv} is assumed to be small enough, that the linear terms are dominant. Therefore, the damping is approximated as linear function in terms of velocity.
+\todo{find a reference for assuming linear terms only. see hastedt}
 
-
-Since the vehicle is neutrally buoyant and the center of buoyancy and gravity are identical, the hydrostatic forces and moments vanish.
-
-With $\Madded = \text{diag}\left(\Mvadded, \Jadded\right)$ and $\Dadded = \text{diag}(\Dvadded, \Domegaadded)$, we introduce the following auxiliary variables
+Since the vehicle is neutrally buoyant and the center of buoyancy and gravity are identical, the hydrostatic forces and moments vanish. Based on these simplifications we rewrite \Cref{eq:6dof-equation-of-motion}. With $\Madded = \text{diag}\left(\Mvadded, \Jadded\right)$ and $\Dadded = \text{diag}(\Dvadded, \Domegaadded)$, we introduce the following auxiliary variables
 \begin{equation}
 	\Mbs = \left(m\Ib + \Mvadded\right),\text{ and }
 	\Jbs = \left(\Jb + \Jadded\right)
@@ -247,7 +246,10 @@ With $\Madded = \text{diag}\left(\Mvadded, \Jadded\right)$ and $\Dadded = \text{
 and write \Cref{eq:6dof-equation-of-motion} separated by the translational and rotational dynamics as
 \begin{equation}
 	\label{eq:equation-of-motion-translational}
-	\Mbs \vlinbodydot = \vlinbody \times \Mbs \vangbody - \Dvadded \vlinbody - \gb(\etab) + u_1 \eb_1
+	\Mbs \vlinbodydot =
+	\vlinbody \times \Mbs \vangbody
+	-\Dvadded \vlinbody
+	+ \prescript{\mathcal{B}}{}{\fb}
 \end{equation}\todo{Muss es nicht nur die obere Haelfte von $\gb$ sein? Muesste $\Mbs$ nicht vor $\vlinbody$ stehen?}
 and
 \begin{equation}
@@ -256,12 +258,10 @@ and
 	\vlinbody \times \Mbs \vangbody
 	- \vangbody \times \Jbs \vangbody
 	- \Domegaadded \vangbody
-	- \gb(\etab)
-	+ \begin{bmatrix}
-		u_2 & u_3 & u_4	
-	\end{bmatrix}^\top
+	+ \prescript{\mathcal{B}}{}{\mb}
 	.
 \end{equation}
+
 
 
 
