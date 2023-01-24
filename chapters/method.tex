@@ -453,14 +453,33 @@ and
 \section{Trajectory Generation}
 \label{sec:trajectory-generation}
 
-The goal of the trajectory is to bring the vehicle from an initial state $\vehiclestate_0$ to a desired final state $\vehiclestate_{\text{f}}$, with the vehicle state being described by 
+The goal of the generated trajectories is to bring the vehicle from an initial state $\vehiclestate_0$ at time $t=0$ to a desired final state $\vehiclestate_{\text{f}}$ at $t=T$, with the vehicle state being described by 
 \begin{equation}
 	\vehiclestate = 
 	\begin{bmatrix}
 		\pbo & \pbp & \pbpp
 	\end{bmatrix}^\top
+	,
+\end{equation}
+while being subject to the translational constraints
+\begin{equation}
+	\label{eq:translational-constraints}
+	\ab_j^\top \vehiclestate(t) \leq \bb_j
+	\text{ for }
+	t \in \left[0,T\right],
+	\quad
+	j=1,\dots,N_c
 	.
 \end{equation}
+We can interpret these constraints as bounds to the vehicle's position, velocity and acceleration. The positional constraints can be used to encode spatial constraints, such as a confined environment in which the \ac{uauv} is maneuvering. While for \acp{uav} constraints on the acceleration can be used to directly encode limits one the tilt, as presented in \cite{MuellerHehn15}, this is not the case for \acp{uauv}. This is caused by differences in the dynamic models used for \acp{uav} in \cite{MuellerHehn15} and \acp{uauv} as presented in this thesis. A more detailed explanation is given in the course of this section.
+
+In addition to the translational constraints, the trajectory has to respect the dynamic abilities of the vehicle, i.e. the trajectory bringing the vehicle from $\vehiclestate_0$ to $\vehiclestate_\text{f}$ has to be dynamically feasible. This includes respecting the simplified dynamic model we introduce in the following section, as well as bounds to the system input.
+
+For this section, we focus on the generation of the trajectories, before dealing with the feasibility constraints in the next section.
+
+\subsection{Trajectory Dynamics}
+\label{sec:trajectory-dynamics}
+In this section, we simplify the dynamic model described in \Cref{eq:eom-translational-with-input} and derive equations to calculate the system inputs for a given trajectory. In the following all equations are expressed in the world-fixed frame $\mathcal{W}$ and the corresponding indices are omitted in favor of readability, if unambiguous.
 
 Similar to \cite{MuellerHehn15}, we define the state variable of the trajectory and its derivative as
 \begin{equation}
@@ -493,11 +512,10 @@ with
 \end{equation}
 being the velocity, acceleration and jerk.
 
-\subsection{Trajectory Dynamics}
 We neglect the cross-coupling term in \Cref{eq:eom-translational-with-input} and can write the translational equation of motion expressed in the world frame $\mathcal{W}$ as
 \begin{equation}
 	\label{eq:eom-world-without-cross-coupling}
-	\Rbodyworld \, \Mbs \, \Rbodyworld^\top \, \pworldddot = \Rbodyworld\Dadded\Rbodyworld^\top \pworlddot + u_1 \exbodyinworld.
+	\Rbodyworld \, \Mbs \, \Rbodyworld^\top \, \pbpp = \Rbodyworld\Dadded\Rbodyworld^\top \pbp + u_1 \exbodyinworld.
 \end{equation}
 We further assume the \ac{uauv} is mainly moving in surge direction, which seems reasonable when taking the thruster configuration into account. Therefore, we approximate the inertia matrix by
 \begin{equation}
@@ -505,297 +523,42 @@ We further assume the \ac{uauv} is mainly moving in surge direction, which seems
 	\Mbs = m\Ib + \text{diag}\left(X_{\dot{u}}, Y_{\dot{v}}, Z_{\dot{w}}\right)
 	=
 	m\Ib + X_{\dot{u}} \Ib
-\end{equation}
+\end{equation} \todo[inline]{$\approx$ instead of $=$?}
 and the damping matrix by
 \begin{equation}
 	\label{eq:added-damping-trajectory-simplification}
 	\Dvadded = -\text{diag}\left(X_\text{u}, Y_\text{v}, Z_\text{w}\right)
 	= -X_\text{u} \Ib
 	.
-\end{equation}
+\end{equation} \todo[inline]{$\approx$ instead of $=$?}
 
 
 Using \Cref{eq:added-mass-trajectory-simplification,eq:added-damping-trajectory-simplification}, we rewrite \Cref{eq:eom-world-without-cross-coupling} as
 \begin{equation}
-	(m+X_{\dot{u}})\pworldddot
+	(m+X_{\dot{u}})\pbpp
 	=
-	-X_u \pworlddot
+	-X_u \pbp
 	+ u_1\exbodyinworld
 \end{equation}
 
 and reordering yields
 \begin{equation}
 	\label{eq:trajectory-acceleration-eom}
-	\pworldddot = \frac{\Rbodyworld \eb_1 f - X_u \pworlddot}{m + X_{\dot{u}}},
+	\pbpp = \frac{\Rbodyworld \exbodyinworld f - X_u \pbp}{m + X_{\dot{u}}},
 \end{equation}
 where $f=u_1$ denotes the thrust input of the system.
 
-The required thrust, given the acceleration $\pworldddot$ and the velocity $\pworlddot$, can be computed by applying the euclidean norm to \Cref{eq:trajectory-acceleration-eom}
+The required thrust, given the acceleration $\pbpp$ and the velocity $\pbp$, can be computed by applying the euclidean norm to \Cref{eq:trajectory-acceleration-eom}
 \begin{equation}
 	\label{eq:trajectory-thrust}
 	f =
 	\left\lVert
-	\left(m + X_{\dot{u}}\right) \pworldddot + X_u \pworlddot
+	\left(m + X_{\dot{u}}\right) \pbpp + X_u \pbp
 	\right\rVert.
 \end{equation}
 
-In the following all equations are expressed in the world-fixed frame $\mathcal{W}$ and the corresponding indices are omitted in favor of readability.
-
-\begin{itemize}
-	\color{red}
-	\item make clear, that we do not care for any constrains (affine translational or input) for now. refer to the next section.
-	\item Define the state variable consisting of translational variables and derivatives
-\end{itemize}
-
-
-\begin{equation}
-	\label{eq:trajectory-state-per-axis}
-	\sbo_{i} =
-	\begin{bmatrix}
-		p_{i} &
-		v_{i} &
-		a_{i}
-	\end{bmatrix}
-\end{equation}
-
-\begin{equation}
-	\label{eq:trajectory-state-derivative-per-axis}
-	\sbp_\text{i} =
-	\begin{bmatrix}
-		v_{i} &
-		a_{i} &
-		j_{i}
-	\end{bmatrix}
-\end{equation}
-
-\subsection{Kinematic Derivation of the jerk-optimal Trajectory}
-\begin{itemize}
-	\color{red}
-	\item Define the cost function
-	\item derive the minimum jerk solution per axis
-	\item 
-\end{itemize}
-
-\begin{equation}
-	\label{eq:cost-function}
-	J_\text{\Sigma} = \frac{1}{T} \int_{0}^{T}\left\lVert \jb(t)\right\rVert^2 \text{d}t
-\end{equation}
-
-\begin{equation}
-	\label{eq:cost-function-per-axis}
-	J_\text{\Sigma} = \sum_{i=1}^{3}J_\text{i}, \text{ where } J_{i} = \frac{1}{T}\int_{0}^{T}j_i(t)^2\text{d}t
-\end{equation}
-
-\begin{equation}
-	\label{eq:optimal-trajectory-per-axis}
-	\sbo^* = 
-	\begin{bmatrix}
-		\frac{\alpha}{120}t^5
-		+ \frac{\beta}{24}t^4
-		+ \frac{\gamma}{6}t^3
-		+ \frac{a_0}{2}t^2
-		+ v_0 t
-		+ p_0
-		\\
-		\frac{\alpha}{24} t^4
-		+ \frac{\beta}{6} t^3
-		+ \frac{\gamma}{2} t^2
-		+ a_0 t
-		+ v_0
-		\\
-		\frac{\alpha}{6} t^3
-		+ \frac{\beta}{2} t^2
-		+ \gamma t
-		+ a_0
-	\end{bmatrix}
-\end{equation}
-
-\begin{equation}
-	\label{eq:trajectory-coefficients}
-	\begin{bmatrix}
-		\alpha \\
-		\beta \\
-		\gamma
-	\end{bmatrix}
-	=
-	\begin{bmatrix}
-		720 & -360T & 60T^2 \\
-		-360T & 168T^2 * -24T^3 \\
-		60T^2 & -24T^3 & 3T^4
-
-	\end{bmatrix}
-	\begin{bmatrix}
-		\Delta p \\
-		\Delta v \\
-		\Delta a
-	\end{bmatrix}
-\end{equation}
-
-\begin{equation}
-	\label{eq:trajectory-delta-state}
-	\begin{bmatrix}
-		\Delta p \\
-		\Delta v \\
-		\Delta a
-	\end{bmatrix}
-	= 
-	\begin{bmatrix}
-		p_\text{f} - p_0 - v_0 T - \frac{1}{2}a_0 T^2 \\
-		v_\text{f} - v_0 - a_0 T \\
-		a_\text{f} - a_0
-	\end{bmatrix}
-\end{equation}
-
-
-\subsection{Sampling Strategy}
-\begin{itemize}
-	\color{red}
-	\item how to choose the final state to reach the high level goal, i.e. catching the ring as proposed scenario.
-	\begin{itemize}
-		\item vehicle tip position inside the ring
-		\item different final attitudes possible (sampling on a section of a sphere around final tip position)
-		\item calculate actual vehicle's position based on that
-	\end{itemize}
-	\item higher variety of final states increases chance to generate a feasible solution -> refer to following section
-	\item introduce additional rotated inertial system to specify axis components or let them unspecified
-	\item stress out the difference to MuellerHehn15, due to velocity dependency.
-\end{itemize}
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width=0.7\linewidth]{placeholders/generation_example.png}
-	\caption{Generated trajectories for different final states and time horizons.}
-\end{figure}
-\section{Feasibility of Trajectories}
-\label{sec:feasibility}
-
-
-
-\subsection{Input Feasibility}
-
-\begin{equation}
-	\label{eq:thrust-limits}
-	\unit[0]{N} \leq f_\text{min} \leq f \leq f_\text{max}
-\end{equation}
-
-\begin{equation}
-	\label{eq:body-rates-limit}
-	\left\lVert\omeb\right\rVert
-	\leq
-	\omega_\text{max}
-\end{equation}
-
-\subsubsection{Thrust Input Feasibility}
-\begin{itemize}
-	\color{red}
-	\item cubic instead of quadratic function is to be solved
-	\item stress out, that feasibility criterium is quite coarse -> feasible solution might be classified as indeterminable
-	\item following equations are per axis. Indies are omitted if unambiguous.
-\end{itemize}
-
-\begin{align}
-	\label{eq:thrust-feasibility-equivilency-max}
-	\max_{t \in \mathcal{T}} f(t)^2
-	&\leq
-	f_\text{max}^2 \\
-	\label{eq:thrust-feasibility-equivilency-min}
-	\min_{t \in \mathcal{T}} f(t)^2
-	&\geq
-	f_\text{min}^2
-\end{align}
-
-By suqaring \Cref{eq:trajectory-thrust}, we can write the squared thrust in per-axis notation
-\begin{equation}
-	\label{eq:thrust-squared-per-axis}
-	f^2 = 
-	\left\lVert
-	\left(m + X_{\dot{u}}\right) \pbpp + X_u \pbp
-	\right\rVert^2
-	= 
-	\sum_{k=1}^{3}
-	\left(\left(m + X_{\dot{u}}\right)\ppp_k + X_u \pp_k \right)^2
-\end{equation}
-and find the conservative thrust limits by summing the per axis extrema.
-\begin{align}
-	\label{eq:fmax-per-axis}
-	\max_{t \in \mathcal{T}} f(t)^2
-	&\leq
-	\sum_{k=1}^{3}
-	\max_{t \in \mathcal{T}}
-	\left(
-		\left(m + X_{\dot{u}}\right)
-		\ppp_k
-		+ X_u \pp_k
-	\right)^2 \\
-	\label{eq:fmin-per-axis}
-	\min_{t \in \mathcal{T}} f(t)^2
-	&\geq
-	\sum_{k=1}^{3}
-	\min_{t \in \mathcal{T}}
-	\left(
-		\left(m + X_{\dot{u}}\right)
-		\ppp_k
-		+ X_u \pp_k
-	\right)^2
-\end{align}
-
-We denote the maximum and minimum of the per axis thrust as \fmaxaxis and \fminaxis, respectively\todo{Hier ist im Unterschied zu Mueller eine kubische Funktion fuer die Nullstellen zu loesen} 
-and write the extrema in \Cref{eq:fmax-per-axis,eq:fmax-per-axis} as
-\begin{align}
-	\max_{t \in \mathcal{T}}
-	\left(
-		\left(m + X_{\dot{u}}\right)
-		\ppp_k
-		+ X_u \pp_k
-	\right)^2
-	&= 
-	\max\left\{\fmaxaxis^2, \fminaxis^2\right\} \\
-	\min_{t \in \mathcal{T}}
-	\left(
-		\left(m + X_{\dot{u}}\right)
-		\ppp_k
-		+ X_u \pp_k
-	\right)^2
-	&=
-	\begin{cases}
-		\min\left\{\fmaxaxis^2, \fminaxis^2\right\}
-		& \text{if } \fmaxaxis\cdot\fminaxis > 0 \\
-		0
-		& \text{otherwise}
-	\end{cases}
-\end{align}
-
-A sufficient criterion, rendering the trajectory infeasible, is
-\begin{equation}
-	\label{eq:sufficient-infeasible-thrust}
-	\max\left\{\fmaxaxis^2, \fminaxis^2\right\}
-	> \fmaxsquare
-	,
-\end{equation}
-whereas a sufficient criterion for feasibility with respect to the thrust input is if both
-\begin{align}
-	\label{eq:sufficient-feasible-thrust-max}
-	\sum_{k=1}^{3}
-	\max_{t \in \mathcal{T}}
-	\left\{\fmaxaxis^2, \fminaxis^2\right\}
-	& \leq
-	\fmaxsquare \\
-	\label{eq:sufficient-feasible-thrust-min}
-	\sum_{k=1}^{3}
-	\min_{t \in \mathcal{T}}
-	\left\{\fmaxaxis^2, \fminaxis^2\right\}
-	& \geq
-	\fminsquare
-\end{align}
-hold. Note that it might be the case, that neither \Cref{eq:sufficient-infeasible-thrust} nor \Cref{eq:sufficient-feasible-thrust-max,eq:sufficient-feasible-thrust-min} hold. In this case, the interval $\mathcal{T}$ is divided in half and the feasibility is tested recursively on both half intervals. This procedure is repeated until either at least one interval is infeasible, rendering the whole trajectory infeasible, all tested sub intervals yield feasibility, or the tested sub intervals become smaller than some defined minimum interval $\Delta\tau_{\text{min}}$. In the latter case the trajectory is declared indeterminable.
-
-
-\subsubsection{Body Rates Input Feasibility}
-\begin{itemize}
-	\color{red}
-	\item Insert dynamics into definition of jerk
-\end{itemize}
-
-In terms of the jerk \pbppp, the vehicle dynamics are 
+We formulate the dynamics in terms of $\pbppp$ to derive an expression for the body rates.
+We write the time derivative of \Cref{eq:trajectory-acceleration-eom} as
 \begin{equation}
 	\label{eq:jerk}
 	\pbppp = 
@@ -805,6 +568,7 @@ In terms of the jerk \pbppp, the vehicle dynamics are
 		+ \Rb \Sb(\omeb)\eb_1 f
 		- X_u \pbpp
 	\right)
+	.
 \end{equation}
 
 By squaring \Cref{eq:trajectory-thrust} and applying the first derivative, we get
@@ -854,9 +618,9 @@ We substitute \fp by \Cref{eq:fdot} in \Cref{eq:jerk} and simplify the equation
 		\end{bmatrix}
 		f
 		- X_u \pbpp
-	\right)
+	\right),
 \end{equation}
-
+and reordering yields
 \begin{equation}
 	\label{eq:jerk-vs-bodyrates}
 	\begin{bmatrix}
@@ -880,18 +644,20 @@ We substitute \fp by \Cref{eq:fdot} in \Cref{eq:jerk} and simplify the equation
 	\end{bmatrix}
 	\frac{X_u}{m + X_{\dot{u}}}
 	\pbpp
+	.
 \end{equation}
 We can observe, that the angular velocity about the roll axis $\omega_1$ has no influence on the translational dynamics. For the further course of this thesis we assume $\omega_1 = \unit[0]{\frac{rad}{s}}$.
 
-To find a criterion for input feasibility with respect to the body rates, we reorder \Cref{eq:jerk-vs-bodyrates} for the body rates
+By reordering \Cref{eq:jerk-vs-bodyrates}, we can recover the body rates based on the trajectory state
 \begin{equation}
+	\label{eq:body-rate-relation}
 	\begin{bmatrix}
 		0 \\
 		\omega_3 \\
 		- \omega_2
 	\end{bmatrix}
 	=
-	\frac{m + X_{\dot{u}}}{f}
+	\frac{1}{f}
 	\Rb^\top
 	\begin{bmatrix}
 		0 & 0 & 0 \\
@@ -899,42 +665,447 @@ To find a criterion for input feasibility with respect to the body rates, we reo
 		0 & 0 & 1
 	\end{bmatrix}
 	\left(
-		\pbppp + X_u \pbpp
-	\right),
-\end{equation}
-apply the vector induced euclidean norm
-\begin{equation}
-	\left\lVert\Rb\right\rVert \leq 1,
-\end{equation}
-and get the bound of the body rates 
-\begin{equation}
-	\label{eq:body-rates-bound}
-	\omega_3^2 + \omega_2^2 \leq
-	\frac{
 		\left(
 			m + X_{\dot{u}}
-		\right)^2
-	}{f^2}
-	\left\lVert
-		\pbppp + X_u \pbpp
-	\right\rVert^2
+		\right)
+		\pbppp
+		+ X_u \pbpp
+	\right)
 	.
 \end{equation}
 
+Since the jerk is related to the system inputs as stated in \Cref{eq:jerk-vs-bodyrates}, we can interpret the jerk as indicator for the required system input. Therefore, we use the jerk to formulate the cost function
+\todo[inline]{Problem: The acceleration term means, that we can not set an upper bound for the product of the system inputs as in \cite{MuellerHehn15}. Can I find a better reason why choosing a jerk optimal trajectory is still a good idea?}
+\begin{equation}
+	\label{eq:cost-function}
+	J_\text{\Sigma} = \frac{1}{T} \int_{0}^{T}\left\lVert \pbppp(t)\right\rVert^2 \text{d}t
+	,
+\end{equation}
+and use it to generate trajectories with minimal costs.
+
+% In per axis notation this becomes
+% \begin{equation}
+% 	\label{eq:trajectory-state-per-axis}
+% 	\sbo_{i} =
+% 	\begin{bmatrix}
+% 		p_{i} &
+% 		v_{i} &
+% 		a_{i}
+% 	\end{bmatrix}
+% 	\text{ and }
+% 	\sbp_\text{i} =
+% 	\begin{bmatrix}
+% 		v_{i} &
+% 		a_{i} &
+% 		j_{i}
+% 	\end{bmatrix}
+% \end{equation}
+
+\subsection{Kinematic Derivation of the jerk-optimal Trajectory}
+\begin{itemize}
+	\color{red}
+	\item Define the cost function
+	\item derive the minimum jerk solution per axis
+	\item 
+\end{itemize}
+In this section, we derive the jerk-minimal trajectory with respect to the cost function defined in \Cref{eq:cost-function}. This is done by decomposing the three-dimensional problem in a per axis notation and finding the optimal solution per axis.
+
+We write \Cref{eq:cost-function} in per axis notation
+\begin{equation}
+	\label{eq:cost-function-per-axis}
+	J_\text{\Sigma} = \sum_{k=1}^{3}J_\text{k}, \text{ where } J_{k} = \frac{1}{T}\int_{0}^{T}\pppp_k(t)^2\text{d}t
+	,
+\end{equation}
+and the state per axis reads
+\begin{equation}
+	\sbo_{k} = 
+	\begin{bmatrix}
+		p_k & \pp_k & \ppp_k
+	\end{bmatrix}^\top
+	.
+\end{equation}
+We interpret $\pppp_k$ as input and formulate the differential as the function $f_s$ of the state $\sbo_k$ and $\ppp_k$
+\begin{equation}
+	\sbp_k = 
+	f_s(\sbo_k, \pppp_k) = 
+	\begin{bmatrix}
+		\pp_k & \ppp_k & \pppp_k
+	\end{bmatrix}^\top
+	.
+\end{equation}
+
+We follow \cite{MuellerHehn15} and apply Pontryagin's minimum principle, by defining the costate
+\begin{equation}
+	\bm{\lambda} =
+	\begin{bmatrix}
+		\lambda_1 & \lambda_2 & \lambda_3
+	\end{bmatrix}^\top
+	,
+\end{equation}
+and the Hamiltonian as
+\begin{equation}
+	H(\sbo_k,\pppp_k, \bm{\lambda}) = \frac{1}{T} \pppp^2
+	+ \bm{\lambda}^\top f_s(\sbo_k, \pppp_k)
+	,
+\end{equation}
+with the costate differential equation
+\begin{equation}
+	\label{eq:costate-differential-equation}
+	\dot{\bm{\lambda}} = -\nabla_s H(\sbo_k^*, \pppp_k^*) = 
+	\begin{bmatrix}
+		0 & -\lambda_1 & -\lambda_2
+	\end{bmatrix}^\top
+	,
+\end{equation}
+where $\sbo_k^*$ and $\pppp_k^*$ denote the optimal state and input, respectively. The solution of \Cref{eq:costate-differential-equation} yields
+\begin{equation}
+	\bm{\lambda} = \frac{1}{T}
+	\begin{bmatrix}
+		- 2 \alpha \\
+		2 \alpha t + 2 \beta \\
+		- \alpha t^2 - 2 \beta t - 2\gamma
+	\end{bmatrix},
+\end{equation}
+where $\alpha$, $\beta$ and $\gamma$ are auxiliary constants.
+We can write down the solution for the optimal input trajectory
+\begin{equation}
+	\label{eq:input-optimal-trajectory}
+	\pppp_k^* = \arg\min_{\pppp}H(\sbo_k^*,\pppp_k, \bm{\lambda}) = 
+	\frac{1}{2}\alpha t^2 + \beta t + \gamma
+\end{equation}
+and get the optimal state trajectory by integrating \Cref{eq:input-optimal-trajectory}
+\begin{equation}
+	\label{eq:optimal-trajectory-per-axis}
+	\sbo^* = 
+	\begin{bmatrix}
+		\frac{\alpha}{120}t^5
+		+ \frac{\beta}{24}t^4
+		+ \frac{\gamma}{6}t^3
+		+ \frac{a_0}{2}t^2
+		+ v_0 t
+		+ p_0
+		\\
+		\frac{\alpha}{24} t^4
+		+ \frac{\beta}{6} t^3
+		+ \frac{\gamma}{2} t^2
+		+ a_0 t
+		+ v_0
+		\\
+		\frac{\alpha}{6} t^3
+		+ \frac{\beta}{2} t^2
+		+ \gamma t
+		+ a_0
+	\end{bmatrix}
+	,
+\end{equation}
+where $p_0$, $v_0$ and $a_0$ are the initial conditions 
+\begin{equation}
+	\sbo(0) = 
+	\begin{bmatrix}
+		p_0 & v_0 & a_0
+	\end{bmatrix}^\top
+	.
+\end{equation}
+We can now determine $\alpha$, $\beta$ and $\gamma$ by reordering \Cref{eq:optimal-trajectory-per-axis}
+\begin{equation}
+	\label{eq:trajectory-coefficients}
+	\begin{bmatrix}
+		\alpha \\
+		\beta \\
+		\gamma
+	\end{bmatrix}
+	=
+	\begin{bmatrix}
+		720 & -360T & 60T^2 \\
+		-360T & 168T^2 & -24T^3 \\
+		60T^2 & -24T^3 & 3T^4
+
+	\end{bmatrix}
+	\begin{bmatrix}
+		\Delta p \\
+		\Delta v \\
+		\Delta a
+	\end{bmatrix}
+	,
+\end{equation}
+with
+\begin{equation}
+	\label{eq:trajectory-delta-state}
+	\begin{bmatrix}
+		\Delta p \\
+		\Delta v \\
+		\Delta a
+	\end{bmatrix}
+	= 
+	\begin{bmatrix}
+		p_\text{f} - p_0 - v_0 T - \frac{1}{2}a_0 T^2 \\
+		v_\text{f} - v_0 - a_0 T \\
+		a_\text{f} - a_0
+	\end{bmatrix}
+	.
+\end{equation}
+We see, that the solution of the optimal state trajectory over the time horizon $T$ is constrained by the initial state $\sbo_0$ and the final state $\sbo_\text{f}$. Furthermore, we have seen in \Cref{sec:trajectory-dynamics}, that we can establish a relation between the state trajectory and the system inputs based on the system dynamics in \Cref{eq:trajectory-acceleration-eom}. Because we have not taken any feasibility constraints into account yet, we are able to generate trajectories in a highly efficient manner. For a given set of $T$, $\sbo_0$ and $\sbo_\text{f}$ only a matrix multiplication has to be performed to compute a trajectory. This enables us to generate an amount of trajectories in the magnitude of hundred thousands up to millions per second. A sampling strategy to choose appropriate final states to reach a high level goal is proposed in the following section.
+
+\subsection{Sampling Strategy}
+We consider the proposed high level goal of catching or moving through a ring in a spatially confined environment. The time dependent state of the ring is assumed to be known exactly at all times. In general, this is not strictly necessary, and the vehicle could have sensors to measure and estimate the current state of the ring and predict future states based on these observations, but this lies outside the scope of this thesis.
+
+
+\begin{itemize}
+	\color{red}
+	\item how to choose the final state to reach the high level goal, i.e. catching the ring as proposed scenario.
+	\begin{itemize}
+		\item vehicle tip position inside the ring
+		\item different final attitudes possible (sampling on a section of a sphere around final tip position)
+		\item calculate actual vehicle's position based on that
+	\end{itemize}
+	\item higher variety of final states increases chance to generate a feasible solution -> refer to following section
+	\item introduce additional rotated inertial system to specify axis components or let them unspecified
+	\item stress out the difference to MuellerHehn15, due to velocity dependency.
+\end{itemize}
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.7\linewidth]{placeholders/generation_example.png}
+	\caption{Generated trajectories for different final states and time horizons.}
+\end{figure}
+\section{Feasibility of Trajectories}
+\label{sec:feasibility}
+In the previous section, the trajectory generation approach was presented and the relation between the state trajectory and the system inputs has been established.
+Still, we have to ensure the trajectory is actually feasible regarding the translational constraints in \Cref{eq:translational-constraints}, as the constraints are generally neglected during the generation stage.
+The same applies to the input feasibility.
+Since these constraints are not inherent to the generation stage, they can be considered as feasibility tests, classifying the given trajectory as feasible or not. 
+
+\subsection{Input Feasibility}
+\label{sec:input-feasibility}
+
+We can split the problem of input feasibility into two subproblems, thrust feasibility and body rate feasibility. The thrust feasibility check ensures that the vehicle does not exceed its thrust capabilities denoted by $\fmin$ for the minimum and $\fmax$ for the maximum thrust it can generate.
+We formulate the thrust constraints as
+\begin{equation}
+	\label{eq:thrust-limits}
+	\unit[0]{N} \leq f_\text{min} \leq f \leq f_\text{max}
+	.
+\end{equation}
+The body rate feasibility check declares a given state trajectory feasible if
+\begin{equation}
+	\label{eq:body-rates-limit}
+	\left\lVert\omeb\right\rVert
+	\leq
+	\omega_\text{max}
+\end{equation}
+is guaranteed to be valid over the whole trajectory.
+
+Both checks are applied on the trajectory per axis with sufficient but not necessary criterions for both feasibility and infeasibility. As a consequence there might be feasible (as well as infeasible) trajectories that might be classified as indeterminable. The checks are applied recursively on subsections of the whole interval $\left[0,T\right]$ in case they can not classify the section as provably feasible or unfeasible.
+
+\subsubsection{Thrust Input Feasibility}
+\begin{itemize}
+	\color{red}
+	\item cubic instead of quadratic function is to be solved
+	\item stress out, that feasibility criterium is quite coarse -> feasible solution might be classified as indeterminable
+	\item following equations are per axis. Indies are omitted if unambiguous.
+\end{itemize}
+We consider the interval 
+\begin{equation}
+	\mathcal{T} = \left[\tau_1,\tau_2\right] \subseteq \left[0,T\right]
+	,
+\end{equation}
+for which the thrust feasibility criterion in \Cref{eq:thrust-limits} is fulfilled if and only if
+\begin{align}
+	\label{eq:thrust-feasibility-equivilency-max}
+	\max_{t \in \mathcal{T}} f(t)^2
+	&\leq
+	f_\text{max}^2 \\
+	\label{eq:thrust-feasibility-equivilency-min}
+	\min_{t \in \mathcal{T}} f(t)^2
+	&\geq
+	f_\text{min}^2
+	.
+\end{align}
+
+By squaring \Cref{eq:trajectory-thrust}, we can write the squared thrust in per-axis notation
+\begin{equation}
+	\label{eq:thrust-squared-per-axis}
+	f^2 = 
+	\left\lVert
+	\left(m + X_{\dot{u}}\right) \pbpp + X_u \pbp
+	\right\rVert^2
+	= 
+	\sum_{k=1}^{3}
+	\left(\left(m + X_{\dot{u}}\right)\ppp_k + X_u \pp_k \right)^2
+\end{equation}
+and bound the thrust conservatively by summation over the per axis extrema
+\begin{align}
+	\label{eq:fmax-per-axis}
+	\max_{t \in \mathcal{T}} f(t)^2
+	&\leq
+	\sum_{k=1}^{3}
+	\max_{t \in \mathcal{T}}
+	\left(
+		\left(m + X_{\dot{u}}\right)
+		\ppp_k
+		+ X_u \pp_k
+	\right)^2 \\
+	\label{eq:fmin-per-axis}
+	\min_{t \in \mathcal{T}} f(t)^2
+	&\geq
+	\sum_{k=1}^{3}
+	\min_{t \in \mathcal{T}}
+	\left(
+		\left(m + X_{\dot{u}}\right)
+		\ppp_k
+		+ X_u \pp_k
+	\right)^2
+	.
+\end{align}
+
+We denote the maximum and minimum of the per axis thrust as \fmaxaxis and \fminaxis, respectively \todo{Hier ist im Unterschied zu Mueller eine kubische Funktion fuer die Nullstellen zu loesen} 
+and write the extrema in \Cref{eq:fmax-per-axis,eq:fmin-per-axis} as
+\begin{align}
+	\max_{t \in \mathcal{T}}
+	\left(
+		\left(m + X_{\dot{u}}\right)
+		\ppp_k
+		+ X_u \pp_k
+	\right)^2
+	&= 
+	\max\left\{\fmaxaxis^2, \fminaxis^2\right\} \\
+	\min_{t \in \mathcal{T}}
+	\left(
+		\left(m + X_{\dot{u}}\right)
+		\ppp_k
+		+ X_u \pp_k
+	\right)^2
+	&=
+	\begin{cases}
+		\min\left\{\fmaxaxis^2, \fminaxis^2\right\}
+		& \text{if } \fmaxaxis\cdot\fminaxis > 0 \\
+		0
+		& \text{otherwise}
+	\end{cases}
+\end{align}
+
+A sufficient criterion, rendering the trajectory infeasible, is
+\begin{equation}
+	\label{eq:sufficient-infeasible-thrust}
+	\max\left\{\fmaxaxis^2, \fminaxis^2\right\}
+	> \fmaxsquare
+	,
+\end{equation}
+whereas a sufficient criterion for feasibility with respect to the thrust input is if both
+\begin{align}
+	\label{eq:sufficient-feasible-thrust-max}
+	\sum_{k=1}^{3}
+	\max_{t \in \mathcal{T}}
+	\left\{\fmaxaxis^2, \fminaxis^2\right\}
+	& \leq
+	\fmaxsquare \\
+	\label{eq:sufficient-feasible-thrust-min}
+	\sum_{k=1}^{3}
+	\min_{t \in \mathcal{T}}
+	\left\{\fmaxaxis^2, \fminaxis^2\right\}
+	& \geq
+	\fminsquare
+\end{align}
+hold. Note that it might be the case, that neither \Cref{eq:sufficient-infeasible-thrust} nor \Cref{eq:sufficient-feasible-thrust-max,eq:sufficient-feasible-thrust-min} hold. This does not necessarily mean, that the section has to be infeasible. Even though, the highest order term is $\pp_k$ of fourth order due to velocity dependent damping opposed to the \ac{uav} application in \cite{MuellerHehn15}, where it is of order three, we can still consider the per axis criteria as computationally efficient. Finding the extrema of a fourth order polynomial comes down to finding the roots of a third order polynomial, for which a closed form solution exists. Additionally, to find the extrema for the interval $\mathcal{T}$ it is sufficient to solve it once for the whole duration of the trajectory. Subsequently, we check for each interval $\mathcal{T}$, if the candidate for a local extremum lies within $\mathcal{T}$ and find the global extrema for $\mathcal{T}$ by comparing the thrusts of the respective candidate with the thrust values on the boundaries of $\mathcal{T}$. We can conclude, that in the best case, i.e. no local extremum candidate lies within $\mathcal{T}$, two function evaluations of a quartic polynomial are required. Whereas, for the worst case, i.e. all local extremum candidates lie within $\mathcal{T}$, five evaluations are required.
+
+To obtain the thrust function in terms of the state trajectory parameters $\alpha$, $\beta$ and $\gamma$, we plug \Cref{eq:optimal-trajectory-per-axis} into \Cref{eq:trajectory-thrust}, which yields
+\begin{equation}
+	\begin{aligned}
+		f ={}
+		&\frac{X_u \alpha}{24} t^4
+		+ \frac{X_u \beta + \left(m+X_{\dot{u}}\right)}{6} t^3
+		+ \frac{X_u \gamma + \left(m + X_{\dot{u}}\right)}{2} t^2 \\
+		& + \left(
+			X_u a_0 + \left(m + X_{\dot{u}}\right) \gamma
+		\right) t
+		+ X_u v_0
+		+ \left(m + X_{\dot{u}}\right) a_0
+\end{aligned}
+\end{equation}
+per axis.
+
+\begin{algorithm}
+    \caption{CheckThrustFeasibility}
+    \label{alg:thrust-feasibility}
+	\begin{algorithmic}[1]
+		\Function{CheckThrustFeasibility}{$\fmin$, $\fmax$, $\tau_1$, $\tau_2$}
+		\If{$\tau_2 - \tau_1 < \tau_{\min}$}
+		\Comment{Termination criterion to limit recursion depth}
+			\State \textbf{return} indeterminable
+		\EndIf
+		% \LeftComment check the boundaries of the interval explicitly
+		% \State $f_1 \gets$ \Call{Max}{\Call{Thrust}{$\tau_1$}, \Call{Thrust}{$\tau_2$}}
+		% \State $f_2 \gets$ \Call{Min}{\Call{Thrust}{$\tau_1$}, \Call{Thrust}{$\tau_2$}}
+		% \If{$f_1 > \fmax$}
+		% 	\State \textbf{return} infeasible
+		% \ElsIf{$f_2 < \fmin$}
+		% 	\State \textbf{return} infeasible
+		% \EndIf
+		\State $\Sigma_{\min}^2 \gets 0$
+		\Comment{Sum of $\min(f^2)$ over all axes}
+		\State $\Sigma_{\max}^2 \gets 0$
+		\Comment{Sum of $\max(f^2)$ over all axes}
+		\For{all axes}
+			\State $f_1, f_2 \gets \Call{MinMaxThrustOfAxis}{\tau_1, \tau_2}$
+			\If{\Call{Max}{$f_1^2,f_2^2$} $> \fmax$} \Comment{a single axis exceeds $\fmax$}
+				\State \textbf{return} infeasible
+			\EndIf
+			\If{$f_1 \cdot f_2 < 0$}
+				\State $\Sigma_{\min}^2 \gets \Sigma_{\min}^2$
+			\Else
+				\State $\Sigma_{\min}^2 \gets \Sigma_{\min}^2 + \Call{Min}{f_1^2, f_2^2}$
+			\EndIf
+			\State $\Sigma_{\max}^2 \gets \Sigma_{\max}^2 + \Call{Max}{f_1^2, f_2^2}$
+		\EndFor
+		\If{$\Sigma_{\max}^2 < \fminsquare$}
+		\Comment{Apply the infeasibility criterion}
+			\State \textbf{return} infeasible
+		\ElsIf{$\Sigma_{\min}^2 > \fmaxsquare$}
+			\State \textbf{return} infeasible
+		\EndIf
+		\If{$\Sigma_{\max}^2 \leq \fmaxsquare$ and $\Sigma_{\min}^2 \geq \fminsquare$}
+		\Comment{Apply the feasibility criterion}
+			\State \textbf{return} feasible
+		\Else \Comment{Test feasibility recursively on subintervals}
+			\State $\tau_{\text{m}} \gets (\tau_1 + \tau_2) / 2$
+			\If {\Call{CheckThrustFeasibility}{$\fmin,\fmax,\tau_1,\tau_{\text{m}}$} $=$ feasible}
+				\State \textbf{return} \Call{CheckThrustFeasibility}{$\fmin,\fmax,\tau_{\text{m}},\tau_2$}
+			\Else
+				\State \textbf{return} infeasible
+			\EndIf
+		\EndIf
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
+
+\subsubsection{Body Rates Input Feasibility}
+\begin{itemize}
+	\color{red}
+	\item Insert dynamics into definition of jerk
+\end{itemize}
+We can formulate an upper bound on the body rates by applying the vector induced euclidean norm $\left\lVert\Rb\right\rVert \leq 1$ on \Cref{eq:body-rate-relation}
+\begin{equation}
+	\label{eq:body-rates-bound}
+	\omega_3^2 + \omega_2^2 \leq
+	\frac{1}{f^2}
+	\left\lVert
+		\left(
+			m + X_{\dot{u}}
+		\right) \pbppp + X_u \pbpp
+	\right\rVert^2
+	.
+\end{equation}
 A conservative upper bound of \Cref{eq:body-rates-bound} in per axis notation denoted as $\bar{\omega}^2$ can be written with \Cref{eq:thrust-squared-per-axis} as
 \begin{equation}
 	\omega_2^2 + \omega_3^2
 	\leq
 	\bar{\omega}^2
 	=
-	\left(
-		m + X_{\dot{u}}
-	\right)^2
 	\frac{
 		\sum_{k=1}^{3}
 		\max_{t \in \mathcal{T}}
 		\left(
-			\dddot{p}_k + X_u \ddot{p}
+			\left(
+				m + X_{\dot{u}}
+			\right)\dddot{p}_k + X_u \ddot{p}
 		\right)^2
 	}{
 		\sum_{k=1}^{3}
@@ -947,12 +1118,9 @@ A conservative upper bound of \Cref{eq:body-rates-bound} in per axis notation de
 	,
 \end{equation}
 
-and simplified with \Cref{eq:sufficient-feasible-thrust-min} and defining $\xi_k = \dddot{p}_k + X_u \ddot{p}$
+and simplified with \Cref{eq:sufficient-feasible-thrust-min} and defining $\xi_k = \left(m + X_{\dot{u}}\right)\dddot{p}_k + X_u \ddot{p}$ so it reads
 \begin{equation}
 	\bar{\omega}^2 =
-	\left(
-		m + X_{\dot{u}}
-	\right)^2
 	\frac{
 		\sum_{k=1}^{3}
 		\max_{t \in \mathcal{T}}
@@ -962,11 +1130,15 @@ and simplified with \Cref{eq:sufficient-feasible-thrust-min} and defining $\xi_k
 		\min_{t \in \mathcal{T}}
 		\left\{\fmaxaxis^2, \fminaxis^2\right\}
 	}
+	.
 \end{equation}
 The minimum and maximum of $\xi_k$ is denoted as \ximaxaxis and \ximinaxis, respectively. With
 \begin{equation}
 	\max_{t \in \mathcal{T}}
 	\left(
+		\left(
+			m + X_{\dot{u}}
+		\right)
 		\dddot{p}_k + X_u \ddot{p}
 	\right)^2 =
 	\max_{t \in \mathcal{T}}
@@ -980,9 +1152,6 @@ we formulate the feasibility criterion with respect to the body rates
 	\label{eq:body-rates-criterion-per-axis}
 	\bar{\omega}^2
 	=
-	\left(
-		m + X_{\dot{u}}
-	\right)^2
 	\frac{
 		\sum_{k=1}^{3}
 		\max_{t \in \mathcal{T}}
@@ -998,18 +1167,145 @@ we formulate the feasibility criterion with respect to the body rates
 	\omegamaxsquare
 	.
 \end{equation}
-If \Cref{eq:body-rates-criterion-per-axis} does not hold, the tested section is split in half. The feasibility criterion is applied recursively on both sub intervals.
+This body rate feasibility criterion is analogous to the upper bound criterion for the thrust feasibility in \Cref{eq:sufficient-feasible-thrust-max}. If \Cref{eq:body-rates-criterion-per-axis} does not hold, the tested interval $\mathcal{T}$ is split in half and the feasibility criterion is applied recursively on both subintervals, subsequently.
 
 
-\subsection{Position Feasibility}
+\subsection{Translational Constraints Feasibility}
+At this stage we can check if a trajectory meets the requirements for being classified as input feasible as presented in \Cref{sec:input-feasibility}. Still there is no guarantee, the trajectory will not violate the translational constraints formulated in \Cref{eq:translational-constraints}.
+
+\subsubsection{Position Feasibility}
+\label{sec:position-feasibility}
+We can formulate position constraints as planes. We define the allowable side of the plane by a normal vector $\nb_{\text{p}}$. We call this kind of positional constraints wall constraints. These wall constraints can be used to encode the constraints due to local conditions, such as the water surface or the walls of a confined environment, the vehicle is not allowed or able to cross. Feasibility has to be tested for critical points only. The critical points are those meeting the sufficient criterion for being at a minimal distance to the plane encoding the wall constraint. We find the critical points by finding the roots of $\pp_{\text{n}}(t) = \nb_{\text{p}}^\top \, \pbp(t)$.
+\begin{equation}
+	\mathcal{C}_{\text{crit}} =
+	\left\{
+		t \in \left[ 0, T \right]
+		\,\mid\, \pp_{\text{n}}(t) = 0
+	\right\}
+	\cup
+	\left\{0,T\right\}
+\end{equation}
+
+The trajectory is feasible with respect to the position constraints if and only if
+\begin{equation}
+	\label{eq:position-feasibility-criterion}
+	\nb_\text{p}^\top
+	\left(
+		\pbo(t) - \pbo_{\text{p}}
+	\right)
+	> 0
+	\,\forall\, t \in \mathcal{C}_{\text{crit}}
+	,
+\end{equation}
+with $\pbo_{\text{W}}$ denoting an arbitrary point on the plane defining the wall constraint. Geometrically interpreted, we can regard $\pp_{\text{n}}$ as the velocity projected onto the normal direction of the plane given by $\nb_{\text{W}}$.
+
+The position is a quintic polynomial, as we can see in \Cref{eq:optimal-trajectory-per-axis}. Thus, computing $\mathcal{C}_{\text{crit}}$ is done by solving the roots of the fourth order polynomial $\pp_{\text{n}}$. The feasibility check is carried out by evaluating the left-hand side of \Cref{eq:position-feasibility-criterion} at least twice and most six times per axis. This is similar to the input feasibility checks presented in \Cref{sec:input-feasibility} with the difference that no recursion is needed, though.
+
+\subsubsection{Velocity Feasibility}
+
+\todo{optional}
 
 \section{Obstacle/Collision Avoidance}
+
 \begin{itemize}
 	\color{red}
 	\item Make clear, that obstacle avoidance is not built into the trajectory generation itself. 
 	\item can be seen as subsequent feasibility check. 
 \end{itemize}
 
+\todo[inline]{Reference \cite{Bucki19}}
+As for the translational constraints and the input feasibility, collision avoidance is not inherent to the generation of trajectories, but is applied as a test afterwards. Trajectories failing the test are discarded.
+Obstacle avoidance can be added to the trajectory planning straightforwardly by extending the position feasibility test in \Cref{sec:position-feasibility}.
+Instead of checking for a collision with a single predefined plane, the position check is performed recursively on subintervals of $\left[0, T\right]$.
+For each recursion, a plane separating the section of the trajectory from the convex obstacle $\mathcal{O}$ is defined.
+The position feasibility check is performed and if the whole section lies on the allowable side of separating plane, i.e. in the direction away from the object, the section is declared feasible.
+Otherwise, the check is performed recursively on the subinterval including the intersection with the separating plane.
+The interested reader may refer to \cite{Bucki19} for an exhaustive analysis of such a collision avoidance algorithm in the domain of aerial vehicles.
+The pseudocode describing an algorithm performing the collision feasibility test can be seen in \Cref{alg:collision-detection}.
+\begin{algorithm}
+    \caption{Collision Detection based on \cite{Bucki19}}
+    \label{alg:collision-detection}
+	\begin{algorithmic}[1]
+		\Require $\pbo(0),\pbo(T) \notin \mathcal{O}$
+		\Function{CollisionFeasibility}($\tau_{\min}$)
+			\If{not $\pbo(0),\pbo(T) \notin \mathcal{O}$}
+				\State \textbf{return} infeasible
+			\EndIf
+			\State \textbf{return}
+			\Call{CollisionCheck}{$0, T$}
+		\EndFunction
+		\Function{CollisionCheck}{$\tau_1, \tau_2$}
+		\State $\tau_{\text{mid}} \gets (\tau_1 + \tau_2) / 2$
+		\If{$\pbo(\tau_{\text{mid}}) \in \mathcal{O}$}
+			\State \textbf{return} infeasible
+		\ElsIf{$\tau_2 - \tau_1 < \tau_{\min}$}
+			\State \textbf{return} indeterminable
+		\EndIf
+		\State $\pbo_{\text{p}}, \nb_{\text{p}} \gets$
+		\Call{GetSeparatingPlane}{$\pbo(\tau_{\text{mid}}),\mathcal{O}$}
+		\State $\mathcal{C}_{\text{crit}} \gets
+		\left\{
+			t \in \left[ \tau_{\text{mid}}, \tau_2 \right]
+			\,\mid\, \pp_{\text{n}}(t) = 0
+		\right\}$ in ascending order
+		\For{$t_i$ in $\mathcal{C}_{\text{crit}}$, skipping $\tau_{\text{mid}}$}
+			\If{$\nb_\text{p}^\top
+				\left(
+					\pbo(t_i) - \pbo_{\text{p}}
+				\right)
+				\leq 0$}
+				\State result $\gets$ \Call{CollisionCheck}{$t_{i-1},\tau_2$}
+				\If{result = feasible}
+					\State \textbf{break}
+				\Else
+					\State \textbf{return} result
+					\Comment{either infeasible or indeterminable}
+				\EndIf
+			\EndIf
+		\EndFor
+		\State $\mathcal{C}_{\text{crit}} \gets
+		\left\{
+			t \in \left[ \tau_1, \tau_{\text{mid}}\right]
+			\,\mid\, \pp_{\text{n}}(t) = 0
+		\right\}$ in descending order
+		\For{$t_i$ in $\mathcal{C}_{\text{crit}}$, skipping $\tau_{\text{mid}}$}
+			\If{$\nb_\text{p}^\top
+			\left(
+				\pbo(t_i) - \pbo_{\text{p}}
+			\right)
+			\leq 0$}
+				\State \textbf{return} \Call{CollisionCheck}{$\tau_1, \tau_{\text{mid}}$}
+			\EndIf
+		\EndFor
+		\State \textbf{return} feasible
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
+
+The recursion depth of \Cref{alg:collision-detection} is limited by $\tau_{\min}$.
+If an examined section of the trajectory bounded by the time interval $\left[\tau_1, \tau_2\right]$ becomes small enough that $\tau_2 - \tau_1 < \tau_{\min}$, the trajectory is declared indeterminable.
+Computation time wise, we can expect the choice of $\tau_{\min}$ to have a significant influence for indeterminable trajectories.
+This is, because $\tau_{\min}$ limits the recursion depth in case no subinterval has been declared infeasible yet, nor could feasibility be guaranteed for the whole interval $\left[0, T\right]$.
+Choosing $\tau_{\min}$ larger reduces the time required in case feasibility could not be decided upon before splitting the interval in smaller sections than $\tau_{\min}$.
+On the other hand, choosing $\tau_{\min}$ smaller could result in trajectories being declared as feasible, that would have been discarded as indeterminable otherwise.
+
+Note that we are not restricted to static obstacles by this approach of obstacle avoidance. We define the trajectory of the relative position of the vehicle to the obstacle as
+\begin{equation}
+	\pbs(t) = \pbo(t) - \pbo_{\mathcal{O}}(t)
+	,
+\end{equation}
+where $\pbo_{\mathcal{O}}(t)$ denotes the obstacle's trajectory. Instead of performing the collision check for $\pbo$, we do it for $\pbs$. In general, $\pbo_{\mathcal{O}}$ and consequently $\pbs$ could be arbitrary functions of time.
+But choosing them not to be a polynomial of order at most five, would render the collision avoidance significantly less computational efficient. Hence, we assume the trajectories being of at most order five, and the collision avoidance being performable by solving roots of quartic polynomials.
+
+\begin{tikzpicture}
+    \begin{axis}[
+            xmin=-2,xmax=1,
+            ymin=-3,ymax=3,
+            grid=both,
+            ]
+            \addplot [domain=-0.5:3.5,samples=50]({-1.083 * x^3 + 5.25 * x^2 -6.67*x + 1},{0.167 * x^3 - 0.25 * x^2 + 0.583 *x - 2}); 
+    \end{axis}
+\end{tikzpicture}
 \section{Control}
 \label{sec:control}
 \begin{itemize}
@@ -1018,6 +1314,7 @@ If \Cref{eq:body-rates-criterion-per-axis} does not hold, the tested section is 
 	\item computational efficiency and real-time capability of approach enables trajectory generation to be used for implicit feedback. Regenerate trajectories in each control time step.
 	\item body rates will change rather slowly compared to quadrocopters -> instead of using body rates as in MuellerHehn15, use target attitude and attitude control (actually the body rates are derived from a target attitude anyway)
 \end{itemize}
+While we dealt with the generation and planning of trajectories and the question of feasibility regarding vehicle dynamics, translational constraints and collision avoidance in the previous sections, this section is about the tracking the obtained trajectories.
 
 \section{Implementation}
 \label{sec:implementation}

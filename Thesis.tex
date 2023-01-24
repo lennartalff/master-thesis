@@ -81,6 +81,8 @@
 \usepackage{esvect}
 
 \usepackage{algpseudocode}
+\MakeRobust{\Call}
+\algnewcommand{\LeftComment}[1]{\Statex \(\triangleright\) #1}
 
 % tell TeX that it's infinitely bad to have widows and orphans
 \widowpenalty10000
@@ -145,7 +147,7 @@
 % Aufruf mit \begin{algorithmus}[zusatz]  text  \end{algorithmus}
 \floatstyle{ruled}
 \newfloat{algorithm}{thp}{alg} 
-\floatname{algorithm}{Algorithmus}
+% \floatname{algorithm}{Algorithmus}
 
 %##########################################################################
 % Kopfzeilen definieren
