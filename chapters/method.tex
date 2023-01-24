@@ -271,7 +271,7 @@ and
 The HippoCampus \ac{uauv} has four thrusters mounted in parallel to its forward axis depicted in \Cref{fig:free-body-diagram}.
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=0.7\linewidth]{placeholders/free_body.png}
+	\input{images/inkscape_pdf/free-body-diagram.pdf_tex}
 	\caption{Free body diagram of the HippoCampus \mu AUV with buoyancy force $\bm{f}_\textrm{B}$, gravitational force $\bm{f}_\textrm{G}$, thruster forces $\bm{f}_\textrm{1:4}$, and thruster torques $\bm{m}_{1:4}$.}
 	\label{fig:free-body-diagram}
 \end{figure}
@@ -421,6 +421,7 @@ we rewrite \Cref{eq:equation-of-motion-translational,eq:equation-of-motion-rotat
 \end{equation}
 and
 \begin{equation}
+	\label{eq:eom-rotational-with-input}
 	\Jbs \vangbodydot =
 	\vlinbody \times \Mbs \vangbody
 	- \vangbody \times \Jbs \vangbody
@@ -1314,7 +1315,105 @@ But choosing them not to be a polynomial of order at most five, would render the
 	\item computational efficiency and real-time capability of approach enables trajectory generation to be used for implicit feedback. Regenerate trajectories in each control time step.
 	\item body rates will change rather slowly compared to quadrocopters -> instead of using body rates as in MuellerHehn15, use target attitude and attitude control (actually the body rates are derived from a target attitude anyway)
 \end{itemize}
-While we dealt with the generation and planning of trajectories and the question of feasibility regarding vehicle dynamics, translational constraints and collision avoidance in the previous sections, this section is about the tracking the obtained trajectories.
+While we attended to the generation and planning of trajectories and the question of feasibility regarding vehicle dynamics, translational constraints and collision avoidance in the previous sections, this section is about tracking the obtained trajectories.
+
+\subsection{Implicit Feedback Control}
+
+One advantage of the presented trajectory generation approach is, that it is computationally cheap. Hence, we can use the trajectory generation for implicit feedback control, due to the real-time capability of the trajectory planning. We are able to resample thousands of trajectories per control update step and choose the one best suited to accomplish a certain high level task.
+Subsequently, we need to recover the required thrust vector and commands for the rotational dynamics of the vehicle.
+
+First, we compute the thrust vector $\thrustdesiredworld$ of the current trajectory at $t+\Delta T_\text{s}$, where $\Delta T_{\text{s}}$ is the update interval for the trajectory sampling, by applying the relation in \Cref{eq:trajectory-acceleration-eom} on the current trajectory.
+We compute the axis of rotation $\kb$ and the corresponding angle of rotation $\alpha$ required for aligning the current forward axis of the vehicle $\exbodyinworld$ with $\thrustdesiredworld$ by
+\begin{equation}
+	\label{eq:rotation-to-desired-thrust-vector}
+	\kb = \frac{
+		\exbodyinworld \times \thrustdesiredworld
+	}{
+		\left\lVert
+			\exbodyinworld \times \thrustdesiredworld
+		\right\rVert}
+	\quad
+	\text{and}
+	\quad
+	\alpha = \arccos\left(
+		\exbodyinworld \cdot
+		\frac{\thrustdesiredworld}{\left\lVert\thrustdesiredworld\right\rVert}
+	\right)
+	.
+\end{equation}
+In general, it is also possible to rotate $\exbodyinworld$ by $-\alpha$ around $-\kb$ to align it with $\thrustdesiredworld$. Hence, we invert the signs of $\alpha$ and $\kb$ in case $\lvert\alpha\rvert > \pi$, so we always get the shortest rotation. \todo{not necessary, since we multiply $\alpha$ and $\kb$?}
+
+From \Cref{eq:rotation-to-desired-thrust-vector} we compute the body rates required to align $\exbodyinworld$ with $\thrustdesiredworld$ in time $\Delta T_{\text{s}}$ directly
+\begin{equation}
+	\vangdesiredworld = \frac{\alpha}{\Delta T_{\text{s}}} \kb
+\end{equation}
+
+We define the error of the angular velocity in $\mathcal{B}$
+\begin{equation}
+	\eb_{\omega} = \vangbody - \vangdesiredbody
+	.
+\end{equation}
+and the proportional feedback control law for controlling $\vangbody$, reading
+\begin{equation}
+	\begin{bmatrix}
+		u_2 \\ u_3 \\ u_4
+	\end{bmatrix}
+	=
+	-\Kb_{\omega} \eb_{\omega}
+	\underbrace{+
+		\vangbody \times \Jbs \vangbody
+		+ \Domegaadded \vangbody
+		- \vlinbody \times \Mbs \vangbody
+	}_{\text{feed forward}}
+	,
+\end{equation}
+where the feed forward terms are based on vehicle dynamics in \Cref{eq:eom-rotational-with-input}.
+
+We close the feedback loop for the trajectory tracking implicitly, i.e. we compute $\thrustdesiredworld$ and $\vangdesiredworld$ in each control loop for a newly generated trajectory.
+Therefore, disturbances and model inaccuracies can be compensated, because the new initial state of the generated trajectories is the actual state of the \ac{uauv}.
+
+\subsection{Trajectory Tracking Feedback Control}
+There might be cases, for those it is desirable or even necessary to track a given trajectory for a longer period then $\Delta T_{\text{s}}$ before being given a new trajectory to track.
+For example, when all newly generated trajectories become infeasible. According to \cite{MuellerHehn15} this is to be expected, when the duration of the sampled trajectories becomes small.
+As a consequence input feasibility checks will fail and render all trajectories infeasible.
+But even for sufficiently large durations, the feasibility still depends on the combination of the initial state and the desired final state.
+While we can try to choose appropriate final states, to increase the probability of getting feasible trajectories, there is no way we can influence the initial state, as it is the actual state of the \ac{uauv}.
+In this case, there is no trajectory available and the implicit feedback control from the previous section can not be applied.
+
+Theoretically, we could simply compute $\thrustdesiredworld$ and $\vangdesiredworld$ over the remainder of the last planned feasible trajectory.
+In practice, model inaccuracies and external disturbances will cause the actual trajectory to diverge from the planned desired trajectory over time.
+We tackle this issue by extending the architecture by a trajectory tracking feedback controller.
+
+For the trajectory tracking, we will design a control law based on the one proposed in \cite{MellingerKumar11} for a quadrocopter tracking minimum snap trajectories.
+
+Given a desired trajectory $\bm{\sigma}_{\text{des}}(t) = \left[\pbo(t), \phi(t)\right]^\top$, we define the position and velocity error as
+\begin{equation}
+	\eb_{p} = \pbo - \pbo_{\text{des}}
+\end{equation}
+and
+\begin{equation}
+	\eb_{v} = \pbp = \pbp_{\text{des}}
+	,
+\end{equation}
+respectively.
+
+Considering the translational dynamics of the \ac{uauv} in \Cref{eq:eom-translational-with-input}, we formulate the control law
+\begin{equation}
+	u_1 = \exbodyinworld^\top \thrustdesiredworld
+\end{equation}
+with
+\begin{equation}
+	\thrustdesiredworld =
+	-\Kb_p \eb_p
+	- \Kb_v \eb_v
+	+ \hat{\bm{M}} \pbpp
+	+ \hat{\bm{D}} \pbp
+	,
+\end{equation}
+where $\Kb_p$ and $\Kb_v$ denote diagonal gain matrices and $\hat{\bm{M}} \pbpp$ and $\hat{\bm{D}}\pbp$ represent feed forward terms. Note that $u_1$ is scaled by the projection of $\thrustdesiredworld$ onto the current body axis $\exbodyinworld$.
+
+
+
 
 \section{Implementation}
 \label{sec:implementation}
