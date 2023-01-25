@@ -1399,6 +1399,7 @@ respectively.
 
 Considering the translational dynamics of the \ac{uauv} in \Cref{eq:eom-translational-with-input}, we formulate the control law
 \begin{equation}
+	\label{eq:translational-control-law-short}
 	u_1 = \exbodyinworld^\top \thrustdesiredworld
 \end{equation}
 with
@@ -1411,6 +1412,15 @@ with
 	,
 \end{equation}
 where $\Kb_p$ and $\Kb_v$ denote diagonal gain matrices and $\hat{\bm{M}} \pbpp$ and $\hat{\bm{D}}\pbp$ represent feed forward terms. Note that $u_1$ is scaled by the projection of $\thrustdesiredworld$ onto the current body axis $\exbodyinworld$.
+
+The advantages of this are two-fold. First, the closer $\thrustdesiredworld$ and $\exbodyinworld$ get of becoming perpendicular, the smaller $u_1$ will become. Therefore, more of the available thruster output can be allocated to minimize the attitude error. Second, for $\thrustdesiredworld$ and $\exbodyinworld$ we can see that $u_1$ can become negative. While usually not useful in the typical application of \acp{uav}, where the thrusters' direction of rotation is not reversible, \acp{uauv} can make use of backward directed thrust to minimize the translational errors $\eb_p$ and $\eb_v$. In case this should not be desired, though, we can still set $u_1=0$ if $\exbodyinworld^\top \thrustdesiredworld < 0$. Accordingly, we reformulate \Cref{eq:translational-control-law-short}
+\begin{equation}
+	u_1 = 
+	\begin{cases}
+		\exbodyinworld^T \thrustdesiredworld & \text{if } \exbodyinworld^T \thrustdesiredworld > 0 \\
+		0 & \text{else.}
+	\end{cases}
+\end{equation}
 
 
 
