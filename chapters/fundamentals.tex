@@ -3,11 +3,42 @@
 
 \section{Platform Overview}
 
-\section{Review on Path Planning}
-\label{sec:review-path-planning}
-\subsection{Underwater Path Planning}
-\label{sec:underwater-path-planning}
+\section{Review on Motion Planning}
+\label{sec:review-motion-planning}
+\subsection{Underwater Motion Planning}
+\begin{itemize}
+    \color{red}
+    \item \cite{Panda20} for review on auv path planning
+\end{itemize}
+\label{sec:underwater-motion-planning}
+We refer to motion planning as either path planning or trajectory planning. Path planning only considers the spatial aspect of motion, while for trajectories there is a relation between the geomteric path and time. Often, it is convenient to decouple the path planning aspect from the temporal planning.
+
+\cite{Gomez15} classifies different path planning methods, geometric methods, graph- and tree-based methods and artificial potential fields methods. By assigning a velocity profile to the planned path, a trajectory is obtained.
+
+\subsubsection{Graph- and tree-based Methods}
+According to \cite{Gomez15}, methods falling in this category are subject of the highest research effort during recent years. Well known and often used algorithms belong to this group of path planning methods, such as A*, \ac{rrt} or \ac{fmm}.
+
+For grid-based approaches like A* or \ac{fmm}, the vehicle states are discretized and encoded as nodes in a graph, building the search space. Costs are assigned to the edges connecting the nodes. Depending on the used algorithm, a path is searched, that connects the initial state with a desired goal state.
+To obtain, for example, the shortest path, the costs can be defined as the euclidean distance between the nodes.
+Subsequently, a search algorithm guaranteeing optimality can be deployed to find the path with the lowest costs, if one exists. Due to dicretization, accuracy is decreassed. A smaller grid size counteracts this problem, but increases the search space and therefore the computational costs for finding a solution.
+
+The authors in \cite{Fernandes2015TowardsAO} declare A* in its generic form as general not suitable for mobile robots with time constraints. Still, there exist various publications applying variants of A* in the context of path planning for mobile robots and \acp{auv} in particular.
+
+Applications of A* in the domain of \acp{auv} go back to the 90s \cite{Carroll92}, while still being extended in recent works \cite{zhang20}. Common to these approaches is the application for oceanic environments, where obstacles are assumed to be static, traveled distances to be large, and vehicle dynamics not to be relevant.
+
+A typical representative of sampling-based methods is \ac{rrt}. Even though, the original version of \ac{rrt} does not provide optimality, it compensates for that with being able to efficiently solve complex planning problems, that are possibly high-dimensional.\cite{Devaurs16}
+In \cite{Young13} the authors present a path planning approach based on \ac{rrt} for \acp{auv} in the presence of obstacles. Kinematic constraints, such that the vehicle can only move with certain velocity limits are respected. A kinetic model is not considered, though.
+
+
+
 \subsubsection{A*}
+\subsubsection{FM*}
+\cite{Petres09}
+\begin{itemize}
+    \color{red}
+    \item Combination of Fast Marching and A*
+    \item can constrain curvature (useful for traditional/torpedo shaped uuvs.)
+\end{itemize}
 \subsubsection{Potential Fields}
 \subsubsection{Rapidly-exploring Random Tree}
 \subsubsection{Model Predictive Control}

@@ -1373,6 +1373,9 @@ We close the feedback loop for the trajectory tracking implicitly, i.e. we compu
 Therefore, disturbances and model inaccuracies can be compensated, because the new initial state of the generated trajectories is the actual state of the \ac{uauv}.
 
 \subsection{Trajectory Tracking Feedback Control}
+\begin{itemize}
+	\item \cite{Maurya09} suggests inner-outer-loop. slow-fast, dynamic-kinematic. -> i want to go with this.
+\end{itemize}
 There might be cases, for those it is desirable or even necessary to track a given trajectory for a longer period then $\Delta T_{\text{s}}$ before being given a new trajectory to track.
 For example, when all newly generated trajectories become infeasible. According to \cite{MuellerHehn15} this is to be expected, when the duration of the sampled trajectories becomes small.
 As a consequence input feasibility checks will fail and render all trajectories infeasible.
