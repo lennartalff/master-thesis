@@ -11,7 +11,7 @@
 \subsection{Choice of Reference Frames}
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=0.7\linewidth]{placeholders/reference_frames.png}
+	\input{images/03/free-body-diagram.pdf_tex}
 	\caption{Definition of the world-fixed inertial frame of reference $\mathcal{W}$ and the body-fixed frame $\mathcal{B}$.}
 \end{figure}
 \subsubsection{World-fixed Frame}
@@ -268,10 +268,11 @@ and
 \end{equation}
 
 \subsection{Thruster Model}
+\label{sec:thruster-model}
 The HippoCampus \ac{uauv} has four thrusters mounted in parallel to its forward axis depicted in \Cref{fig:free-body-diagram}.
 \begin{figure}[h!]
 	\centering
-	\input{images/inkscape_pdf/free-body-diagram.pdf_tex}
+	\input{images/03/free-body-diagram.pdf_tex}
 	\caption{Free body diagram of the HippoCampus \mu AUV with buoyancy force $\bm{f}_\textrm{B}$, gravitational force $\bm{f}_\textrm{G}$, thruster forces $\bm{f}_\textrm{1:4}$, and thruster torques $\bm{m}_{1:4}$.}
 	\label{fig:free-body-diagram}
 \end{figure}
@@ -865,7 +866,7 @@ We consider the proposed high level goal of catching or moving through a ring in
 \end{itemize}
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=0.7\linewidth]{placeholders/generation_example.png}
+	\includegraphics[width=0.7\linewidth]{generation_example.png}
 	\caption{Generated trajectories for different final states and time horizons.}
 \end{figure}
 \section{Feasibility of Trajectories}
@@ -1307,11 +1308,8 @@ But choosing them not to be a polynomial of order at most five, would render the
             \addplot [domain=-0.5:3.5,samples=50]({-1.083 * x^3 + 5.25 * x^2 -6.67*x + 1},{0.167 * x^3 - 0.25 * x^2 + 0.583 *x - 2}); 
     \end{axis}
 \end{tikzpicture}
+
 \section{Control}
-\begin{figure}[h!]
-	\includegraphics[width=0.8\textwidth]{placeholders/inner-outer-loop}
-	\caption{Overview of the control loops.}
-\end{figure}
 \label{sec:control}
 \begin{itemize}
 	\color{red}
@@ -1321,11 +1319,77 @@ But choosing them not to be a polynomial of order at most five, would render the
 \end{itemize}
 While we attended to the generation and planning of trajectories and the question of feasibility regarding vehicle dynamics, translational constraints and collision avoidance in the previous sections, this section is about tracking the obtained trajectories.
 
+The general control architecture implements the inner-outer loop control scheme as depicted in \Cref{fig:inner-outer-loop-feedback-control}.
+\begin{figure}
+	\includegraphics[width=0.8\textwidth]{inner-outer-loop}
+	\caption{Overview of the control loops.}
+	\label{fig:inner-outer-loop-feedback-control}
+\end{figure}
+The authors in \cite{Maurya09} demonstrated the viability of this approach for marine vehicles. The basic idea is to divide the problem of trajectory into easier to solve sub problems. By inner loops we refer to the low-level dynamic control loops consisting of attitude or body rate controllers. The design and tuning of these inner loops are highly dependent on the vehicle dynamics. The outer control loops, for example a position, path, or trajectory tracking controller, can be considered as kinematic control loops. They are by design decoupled from vehicle dynamics under the assumption, that the inner control loops are fast enough to reach the target value instantaneously from the perspective of the outer loop. This is equivalent to the assumption in \Cref{sec:thruster-model}, that the thruster dynamics compared to the \ac{uauv} dynamics are sufficiently fast to be negligible. As a result, we have a fast-slow separation from inner to outer loop, i.e. the inner loops run with a significantly higher frequency than the outer ones.
+
+\subsection{Body Rate Control}
+The body rate controller represents the innermost control loop.
+
+We define the error of the angular velocity and acceleration in the body-fixed frame $\mathcal{B}$
+\begin{equation}
+	\vangerror = \vangbody - \vangdesiredbody \quad \text{and }
+	\aangerror = \aangbody - \aangdesiredbody
+	,
+\end{equation}
+and the control law for controlling $\vangbody$, reading
+\begin{equation}
+	\begin{bmatrix}
+		u_2 \\ u_3 \\ u_4
+	\end{bmatrix}
+	=
+	\KpBodyRate \vangerror
+	+ \KiBodyRate \int_{}^{t} \vangerror(\tau)\text{d}\tau
+	+ \KdBodyRate \aangerror
+	+\underbrace{
+		\vangdesiredbody \times \Jbs \vangdesiredbody
+		+ \Domegaadded \vangdesiredbody
+		- \vlinbody \times \Mbs \vangdesiredbody
+	}_{\text{feed forward}}
+	,
+\end{equation}
+\todo{add p and d term and we have pid with feedfoward. }
+where the feed forward terms are based on vehicle dynamics in \Cref{eq:eom-rotational-with-input}. The control law displays a PID-Controller with feed forward term, where $\KpBodyRate$, $\KiBodyRate$ and $\KdBodyRate$ are diagonal matrices denoting the proportional, integral and derivative gain, respectively.
+
+We set $\aangdesiredbody = \unit[0]{rad/s^2}$ and observe that the input for the body rate controller is $\vangdesiredbody$. We will see in \Cref{sec:implicit-feedback-control} the usefulness of this for the implicit feedback control scheme in the context of the trajectory generation system, given the inner-outer loop assumptions hold.
+
+\subsection{Attitude Control}
+The attitude controller is the next controller upstream of the body rate controller. Hence, we consider it to be a kinematic controller with a desired body rate $\vangdesiredbody$ as output, instead of the vehicle's system inputs $\inputbody$. We define the desired thrust axis as the controller's input 
+\begin{equation}
+	\exdesiredbodyinworld =
+	\frac{\thrustdesiredworld}{
+		\left\lVert\thrustdesiredworld\right\rVert
+	}
+\end{equation}
+and the current thrust axis, that is equivalent to 
+\begin{equation}
+	\exbodyinworld = \qactual \odot \eb_1
+\end{equation},
+where $\qactual \odot \eb_1$ denotes the rotation of the vector $\eb_1$ by the quaternion $\qactual$ and $\qactual$ is the current attitude of the vehicle.
+
+The euler parameter representation of the rotation aligning $\exbodyinworld$ and $\exdesiredbodyinworld$ is given by
+\begin{equation}
+	\kb = \frac{
+		\exbodyinworld \times \exdesiredbodyinworld
+	}{
+		\left\lVert
+			\exbodyinworld \times \exdesiredbodyinworld
+		\right\rVert
+	}
+	\quad \text{and} \quad
+	\alpha = \arccos\left(\exbodyinworld \exdesiredbodyinworld\right)
+\end{equation}
+
 \subsection{Implicit Feedback Control}
+\label{sec:implicit-feedback-control}
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=0.8\textwidth]{placeholders/trajectory-replanning}
+	\includegraphics[width=0.8\textwidth]{trajectory-replanning}
 	\caption{Implicit feedback control by regenerating new trajectories and selecting the best in each step.}
 \end{figure}
 
@@ -1358,28 +1422,6 @@ From \Cref{eq:rotation-to-desired-thrust-vector} we compute the body rates requi
 	\vangdesiredworld = \frac{\alpha}{\Delta T_{\text{s}}} \kb
 \end{equation}
 
-We define the error of the angular velocity in $\mathcal{B}$
-\begin{equation}
-	\eb_{\omega} = \vangbody - \vangdesiredbody
-	.
-\end{equation}
-and the proportional feedback control law for controlling $\vangbody$, reading
-\begin{equation}
-	\begin{bmatrix}
-		u_2 \\ u_3 \\ u_4
-	\end{bmatrix}
-	=
-	-\Kb_{\omega} \eb_{\omega}
-	\underbrace{+
-		\vangbody \times \Jbs \vangbody
-		+ \Domegaadded \vangbody
-		- \vlinbody \times \Mbs \vangbody
-	}_{\text{feed forward}}
-	,
-\end{equation}
-\todo{add p and d term and we have pid with feedfoward. }
-where the feed forward terms are based on vehicle dynamics in \Cref{eq:eom-rotational-with-input}.
-
 We close the feedback loop for the trajectory tracking implicitly, i.e. we compute $\thrustdesiredworld$ and $\vangdesiredworld$ in each control loop for a newly generated trajectory.
 Therefore, disturbances and model inaccuracies can be compensated, because the new initial state of the generated trajectories is the actual state of the \ac{uauv}.
 
@@ -1406,7 +1448,7 @@ Given a desired trajectory $\bm{\sigma}_{\text{des}}(t) = \left[\pbo(t), \phi(t)
 \end{equation}
 and
 \begin{equation}
-	\eb_{v} = \pbp = \pbp_{\text{des}}
+	\eb_{v} = \pbp - \pbp_{\text{des}}
 	,
 \end{equation}
 respectively.
@@ -1442,6 +1484,6 @@ The advantages of this are two-fold. First, the closer $\thrustdesiredworld$ and
 \section{Implementation}
 \begin{figure}
 	\centering
-	\includegraphics[width=0.5\textwidth]{placeholders/gazebo-ros-interaction}
+	\includegraphics[width=0.5\textwidth]{gazebo-ros-interaction}
 \end{figure}
 \label{sec:implementation}
