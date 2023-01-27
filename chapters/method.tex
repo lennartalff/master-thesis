@@ -1642,13 +1642,7 @@ The desired roll angle $\rolldesired$ and the desired thrust $\thrustdesiredworl
 	\includegraphics[width=0.5\textwidth]{gazebo-ros-interaction}
 \end{figure}
 The control architecture presendet in \Cref{sec:control} is implemented in a modular design in \ac{ros2}. While being the successor of \ac{ros}, \ac{ros2} is developed independently from \ac{ros}.
-Consequently, the migration implies severe changes of the framework already existing for the HippoCampus platform. Nonetheless, this drawback is outweighed by the advantages this design decision entails. The interested reader may refer to \cite{ros2} for an exhaustive overview of the design and architecture of \ac{ros2}. Main aspects making \ac{ros2} the better choice for the HippoCampus platform are mentioned below.
-
-Embedded systems are well integrated into the \ac{ros2} framework. A \ac{ros2} stack specifically designed for microcontrollers, called micro-ROS, allows the direct communication between computers and microcontrollers. With regard to HippoCampus, this means the \ac{fcu} running PX4 and the onboard computer can communicate directly without the abstraction layers introduced by MAVROS and MAVLink. This enables high rate data streams between the devices.
-
-Furthermore, \ac{ros2} introduces the concept of \ac{qos} as it relies on \ac{dds} for communication. Hence, data streams transporting sensor data can be declared to be transmitted with \emph{best effort}. As a result, the loss of messages is accepted, while the latency can be reduced. This especially useful for sensor data, where it is of interest to receive the most recent measurements as fast as possible. For message sizes of up to \unit[1]{MB} latencies below \unit[1]{ms} can be achieved for communication between different processes \cite[ros2]. High latencies impose delays on control loops and state estimation with possibly severe negative influence on their performance.
-
-Though not required for this thesis, it should be noted, that \ac{ros2} is suitable for real-time systems. In contrast to its predecessor, \ac{ros2} can be configured for deterministic scheduling to enforce real-time constraints \cite{ros-realtime20}. This can be a critical property for the field of mobile robotics, where deterministic execution times can be safety critical.
+Consequently, the migration implies severe changes of the framework already existing for the HippoCampus platform. Nonetheless, this drawback is outweighed by the advantages this design decision entails. 
 
 \ac{ros2} comes with a new generation of the simulator Gazebo, hence requiring a new implementation of the simulation setup for the HippoCampus \ac{uauv}. The dynamic behavior of a model in the simulation can be replicated via plugins. The vehicle dynamics and the thruster forces and moments are modeled based on  \Cref{eq:thruster-load-vs-uesc,eq:eom-translational-with-input,eq:eom-rotational-with-input}.
 

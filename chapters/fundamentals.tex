@@ -3,30 +3,57 @@
 
 \section{HippoCampus $\mu$AUV Platform}
 
+The HippoCampus \ac{uauv} is an agile underwater robot developed at the Institute for Mechanics and Ocean Engineering. It is a representative of the recently evolved class of underwater vehicles called hydrobatic \cite{hydrobatic}. In this chapter an overview over the hard- and software architecture is given.
+
 \subsection{Hardware}
+The iteration of the HippoCampus \ac{uauv} designed for this thesis is depicted in \Cref{fig:new-vehicle-design} is \unit[30]{cm} in length and \unit[8]{cm} in diameter.
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.4\textwidth]{hippo_picture}
     \quad\quad
-    \includegraphics[width=0.4\textwidth]{hippo_picture}
+    \includegraphics[width=0.4\textwidth]{hippo3_picture}
     \caption{\textcolor{blue}{HippoCampus $\mu$AUV in its heavy configuration (\textit{left}) and redesigned version based on BlueRobotics off-the-shelf components (\textit{right}).} \textcolor{red}{reference in text}}
-    \label{}
+    \label{fig:new-vehicle-design}
 \end{figure}
-\subsection{Software-Architecture}
+In contrast to its predecessor it is built from off-the shelf components, with exception to the 3d-printed mounts for the electric components and motors. It weighs \unit[2.31]{kg} including additional ballast weight of approximately \unit[150]{g} to neutralize buoyancy.
+
+Essential hardware components are the four thrusters, the \ac{fcu} and the onboard computer. The thruster configuration resembles those of quadrocopters. The x-configuration enables direct actuation of forward thrust and all three rotational degrees of freedom. Hence, HippoCampus is an underactuated but still highly agile underwater robot, due to its small size and low weight.
+
+The \ac{fcu} is a PixRacer, usually used as flight controller \acp{auv}. It has an \ac{imu}, including an accelerometer, gyroscope and magnetometer, used for onboard state estimation. Low-level control loops are usually executed on the \ac{fcu}. High-level controls and mission planning tasks, as well as computational heavy operations such as image processing, are the responsibility of the onboard computer. The onboard computer is a Raspberry Pi 4B with an ARM A72 quad-core processor.
+
+\subsection{Software Architecture}
+The present general software architecture of the HippoCampus platform is shown in \Cref{fig:software-architecture-overview}. For a detailed description the reader may refer to \cite{duecker-phd}. 
 \begin{figure}[h!]
 	\centering
      \def\svgwidth{12cm}  
 	\input{images/02/03_hippo_system_architecture_draft.pdf_tex}
 	\caption{System architecture of the HippoCampus $\mu$AUV.}
+    \label{fig:software-architecture-overview}
 \end{figure}
-
+The modular design is divided into modules assigned to the \ac{fcu} and modules assigned to the onboard computer.
+Two different frameworks are deployed, PX4 \cite{PX4} and \ac{ros} \cite{ros}.
+Both are similar from the perspective that both frameworks implement a publish-subscribe pattern.
+The interconnection between PX4's \ac{uorb} running on the \ac{fcu} and \ac{ros} on the onboard computer is realized via a combination of \ac{mavlink} \cite{mavlink} and MAVROS.
+Since \ac{uorb} is restricted to intra-process communication, communication with external devices is done via \ac{mavlink}.
+\ac{mavlink} is a communication protocol for \acp{uav}.
+The interface between \ac{mavlink} and \ac{ros} is MAVROS. It is a bidirectional bridge, translating messages from \ac{mavlink} to corresponding \acs{ros}-messages and vice versa. This whole setup is depicted in \Cref{fig:ros-px4-communication}.
 \begin{figure}[h!]
 	\centering
     \def\svgwidth{12cm}  
 	\input{images/02/03_sw_layer.pdf_tex}
 	\caption{Software-Architecture with multiple layers of abstraction facilitating vertical
 and horizontal extensions. \textcolor{red}{adapt and say something about MAVROS / uORB etc pp}}
+    \label{fig:ros-px4-communication}
 \end{figure}
+It is clear, that the communication between the onboard computer and the \ac{fcu} involves several layers of abstraction on multiple conversions of messages. This renders the communication more complex and less efficient. This can be overcome by migrating from \ac{ros} to its successor \ac{ros2}, that enables direct communication between the \ac{fcu} and the onboard computer via \ac{dds}. Hence, all software modules developed in the scope of this thesis are implemented using \ac{ros2}.
+
+The interested reader may refer to \cite{ros2} for an exhaustive overview of the design and architecture of \ac{ros2}. The main aspects relevant for this thesis are listed below.
+
+Embedded systems are well integrated into the \ac{ros2} framework. A \ac{ros2} stack specifically designed for microcontrollers, called micro-ROS, allows the direct communication between computers and microcontrollers. With regard to HippoCampus, this means the \ac{fcu} running PX4 and the onboard computer can communicate directly without the abstraction layers introduced by MAVROS and MAVLink. This enables high rate data streams between the devices.
+
+Furthermore, \ac{ros2} introduces the concept of \ac{qos} as it relies on \ac{dds} for communication. Hence, data streams transporting sensor data can be declared to be transmitted with \emph{best effort}. As a result, the loss of messages is accepted, while the latency can be reduced. This especially useful for sensor data, where it is of interest to receive the most recent measurements as fast as possible. For message sizes of up to \unit[1]{MB} latencies below \unit[1]{ms} can be achieved for communication between different processes \cite{ros2}. High latencies impose delays on control loops and state estimation with possibly severe negative influence on their performance.
+
+Though not required for this thesis, it should be noted, that \ac{ros2} is suitable for real-time systems. In contrast to its predecessor, \ac{ros2} can be configured for deterministic scheduling to enforce real-time constraints \cite{ros-realtime20}. This can be a critical property for the field of mobile robotics, where deterministic execution times can be safety critical.
 
 \section{Review on Motion Planning}
 \label{sec:review-motion-planning}
@@ -55,7 +82,11 @@ Subsequently, a search algorithm guaranteeing optimality can be deployed to find
 
 The authors in \cite{Fernandes2015TowardsAO} declare A* in its generic form as general not suitable for mobile robots with time constraints, due to the performance costs associated with traversing the state space if replanning is required. Still, there exist various publications applying variants of A* in the context of path planning for mobile robots and \acp{auv} in particular.
 
-Applications of A* in the domain of \acp{auv} go back to the 90s \cite{Carroll92}, while still being extended in recent works \cite{zhang20}. Common to these approaches is the application for oceanic environments, where obstacles are assumed to be static, traveled distances to be large, and vehicle dynamics not to be relevant.
+Applications of A* in the domain of \acp{auv} go back to the 90s \cite{Carroll92}, while still being extended in recent works \cite{zhang20}. Common to these approaches is the application for oceanic environments, where obstacles are assumed to be static, traveled distances to be large, and vehicle dynamics not to be relevant. The main focus often lies on considering ocean currents for path planning.
+
+Another algorithm used for grid-based search is \ac{fmm}. The principle of \acs{fmm}-based path planning is based on simulated wave propagation in order to obtain distance fields. Obstacles in the environment can be taken into account and in case of constant propagation the optimal path between start and goal position in terms of distance can be found. Modifications to the wave propagation can be used to compute paths with different requirements.
+
+The authors in \cite{Petres09} present a modification of \ac{fmm} called \acs{fmm}*. They exploit the reduced computation due to an appropriate heuristic function to solve path planning problems in dynamic environments, i.e. the environment changes or is partially unknown. They observe improved performance regarding computation time compared to A*. Additionally, they were able to enforce curvature constraints for the planned path.
 
 \paragraph{Sampling-based Search}
 
@@ -67,18 +98,11 @@ The problem of non-optimality is addressed in \cite{Karaman11} with a modificati
 
 An informed variant of \ac{rrt}, called RRT*, is used in \cite{Ma18} for terrain-aided navigation for long range navigation of \acp{auv}.
 
+\subsubsection{Artifical Potential Fields}
+It the basic idea of path planning is to model the robot as electric charge \cite{Gomez15}. Obstacles are represented by charges with the same sign. Hence, the robot is repelled from the obstacles. The goal state is modeled as charge with opposite sign and therefore attracts the robot. To find a way to the goal, the path minimizing the energy of the robot is searched, which can be accomplished by following the steepest gradient. The main drawback of this method is, that it is not guaranteed, that the robot is not trapped inside a local minimum. 
 
+An improvement over the basic method of potential fields in the context of path planning for \acp{auv} is presented in \cite{Fu-guang05}. The authors suggest a heuristic to escape the local minimum in the vicinity of concave obstacles.
 
-\subsubsection{A*}
-\subsubsection{FM*}
-\cite{Petres09}
-\begin{itemize}
-    \color{red}
-    \item Combination of Fast Marching and A*
-    \item can constrain curvature (useful for traditional/torpedo shaped uuvs.)
-\end{itemize}
-\subsubsection{Potential Fields}
-\subsubsection{Model Predictive Control}
 \subsubsection{Discussion}
 \begin{itemize}
     \color{red}
