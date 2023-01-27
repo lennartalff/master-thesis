@@ -40,6 +40,10 @@
 \newcommand{\eybody}{\eb_{y\mathcal{B}}}
 \newcommand{\ezbody}{\eb_{z\mathcal{B}}}
 
+\newcommand{\exinterinworld}{\prescript{\mathcal{W}}{}{\eb}_{x\mathcal{C}}}
+\newcommand{\eyinterinworld}{\prescript{\mathcal{W}}{}{\eb}_{y\mathcal{C}}}
+\newcommand{\ezinterinworld}{\prescript{\mathcal{W}}{}{\eb}_{z\mathcal{C}}}
+
 \newcommand{\bodyframeorigin}{O_{\mathcal{B}}}
 
 \newcommand{\inputesci}{u_{\text{ESC},i}}
@@ -71,11 +75,21 @@
 \newcommand{\aangerror}{\eb_{\dot{\omega}}}
 \newcommand{\aangdesiredbody}{\prescript{\mathcal{B}}{}{\omebp_{\text{des}}}}
 \newcommand{\thrustdesiredworld}{\prescript{\mathcal{W}}{}{\fb_{\text{des}}}}
+\newcommand{\rotationaxis}{\kb}
+\newcommand{\rotationaxisbody}{\prescript{\mathcal{B}}{}{\kb}}
+\newcommand{\rotationaxisworld}{\prescript{\mathcal{W}}{}{\kb}}
 
 \newcommand{\qdesired}{\qb_{\text{des}}}
+\newcommand{\qmix}{\qb_{\text{mix}}}
+\newcommand{\qdesiredfull}{\qb_{\text{des,full}}}
+\newcommand{\qdesiredPY}{\qb_{\text{des},\theta\psi}}
+\newcommand{\dqactual}{\qbp}
 \newcommand{\qactual}{\qb}
 \newcommand{\qerror}{\qb_{\text{e}}}
 \newcommand{\qerrorPY}{\qb_{\text{e,\theta\psi}}}
+\newcommand{\anglemix}{\alpha_{\text{des}}}
+
+\newcommand{\rolldesired}{\phi_{\text{des}}}
 
 
 \newcommand{\KpBodyRate}{\Kb_{\text{P},\omega}}

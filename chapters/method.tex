@@ -448,6 +448,7 @@ and
 \end{itemize}
 
 \subsection{Differential Flatness (Optional)}
+\label{sec:differential-flatness}
 {\color{red}
 	show diff. flatness and motivate it by highlighting that it is useful for the trajectory-generation section
 }
@@ -1368,12 +1369,31 @@ The attitude controller is the next controller upstream of the body rate control
 and the current thrust axis, that is equivalent to 
 \begin{equation}
 	\exbodyinworld = \qactual \odot \eb_1
-\end{equation},
+	,
+\end{equation}
 where $\qactual \odot \eb_1$ denotes the rotation of the vector $\eb_1$ by the quaternion $\qactual$ and $\qactual$ is the current attitude of the vehicle.
 
-The euler parameter representation of the rotation aligning $\exbodyinworld$ and $\exdesiredbodyinworld$ is given by
+It is the task of the controller to compute a desired attitude given by the quaternion $\qdesired$ and compute the required body rates $\vangdesiredbody$, that rotate the vehicle to desired attitude. We define the error of the attitude as
 \begin{equation}
-	\kb = \frac{
+	\qerror = \qactual^{-1} \cdot \qdesired
+	.
+\end{equation}
+
+The alignment of $\exdesiredbodyinworld$ and $\exbodyinworld$ constraints two of the three rotational degrees of freedom of the vehicle, namely pitch and yaw.
+The rotation around the roll axis $\exbodyinworld$ can be chosen freely.
+
+The quaternion-based control law
+\begin{equation}
+	\vangdesiredbody = 
+	\frac{2}{\tau}
+	\text{sgn}(q_{\text{e},0})
+	\qb_{\text{e},1:3}
+\end{equation}
+is globally asymptotically stable and fits the architecture of inner-outer loops \cite{Mayhew11,Brescianini13}, which is desirable in the context of agile maneuvering. The parameter $\tau$ can be interpreted as first-order time constant of the attitude controller. In practice, too small or too large values may lead to bad control performance \cite{Brescianini13} and an appropriate value has to be determined by tuning of the controller.
+
+The axis-angle representation of the rotation aligning $\exbodyinworld$ and $\exdesiredbodyinworld$ is given by
+\begin{equation}
+	\rotationaxisworld = \frac{
 		\exbodyinworld \times \exdesiredbodyinworld
 	}{
 		\left\lVert
@@ -1381,8 +1401,80 @@ The euler parameter representation of the rotation aligning $\exbodyinworld$ and
 		\right\rVert
 	}
 	\quad \text{and} \quad
-	\alpha = \arccos\left(\exbodyinworld \exdesiredbodyinworld\right)
+	\alpha = \arccos
+	\left(
+		\exbodyinworld^\top \exdesiredbodyinworld
+	\right)
+	.
 \end{equation}
+We construct the error quaternion for pitch and yaw straightforwardly from the angle-axis representation 
+\begin{equation}
+	\qerrorPY = 
+	\begin{cases}
+		\begin{bmatrix}
+			\cos(\frac{\alpha}{2}) \\
+			\sin(\frac{\alpha}{2}) \rotationaxisworld
+		\end{bmatrix} &\text{if } \alpha \neq 0 \\
+		\begin{bmatrix}
+			1 & 0 & 0 & 0
+		\end{bmatrix}^\top
+		& \text{else.}
+	\end{cases}
+\end{equation}
+Note that the way we construct the rotation axis, it will never cause a rotation around the vehicle's roll axis as $\exdesiredbodyinworld \perp \exbodyinworld \times \exdesiredbodyinworld$ per definition of the cross product. 
+
+The desired attitude aligning $\exdesiredbodyinworld$ and $\exbodyinworld$ reads
+\begin{equation}
+	\qdesiredPY = \qactual \cdot \qerrorPY
+	.
+\end{equation}
+
+Recall the coordinate frame $\mathcal{C}$ from \Cref{sec:differential-flatness}
+\begin{equation}
+	\eyinterinworld =
+	\begin{bmatrix}
+		0 & \cos(\rolldesired) & \sin(\rolldesired)
+	\end{bmatrix}^\top
+	\quad \text{and} \quad
+	\ezinterinworld =
+	\begin{bmatrix}
+		0 & -\cos(\rolldesired) & \sin(\rolldesired)
+	\end{bmatrix}
+	.
+\end{equation}
+\todo[line]{write some text here}
+From this it follows
+\begin{align}
+	\eydesiredbodyinworld = 
+	\frac{\ezinterinworld \times \exdesiredbodyinworld}{
+		\left\lVert
+			\ezinterinworld \times \exdesiredbodyinworld
+		\right\rVert
+	}\quad \text{and}
+	\ezdesiredbodyinworld =
+	\exdesiredbodyinworld \times \eydesiredbodyinworld.
+\end{align}
+We can construct $\qdesiredfull$ from the three desired body axes and define
+\begin{equation}
+	\qmix = \qdesiredPY^{-1} \cdot \qdesiredfull =
+	\begin{bmatrix}
+		\cos\left(\frac{\anglemix}{2}\right) \\
+		\sin\left(\frac{\anglemix}{2}\right) \\
+		0 \\
+		0
+	\end{bmatrix},
+\end{equation}
+as the rotation between $\qdesiredPY$ and $\qdesiredfull$ with $\anglemix$ being the rotation angle. We can scale $\anglemix$ by $p \in \left[0,1\right]$ to determine the fraction of $\rolldesired$ to consider for the desired attitude
+\begin{equation}
+	\qdesired = \qdesiredPY
+	\begin{bmatrix}
+		\cos\left(p\frac{\anglemix}{2}\right) \\
+		\sin\left(p\frac{\anglemix}{2}\right) \\
+		0 \\
+		0
+	\end{bmatrix}
+\end{equation}
+
 
 \subsection{Implicit Feedback Control}
 \label{sec:implicit-feedback-control}
