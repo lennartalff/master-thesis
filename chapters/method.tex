@@ -408,6 +408,7 @@ and by substituting with \Cref{eq:thrust-function-hastedt,eq:moment-function} th
 \end{equation}
 and as sum over all thrusters
 \begin{equation}
+	\label{eq:thruster-load-vs-uesc}
 	\taub = 
 	\sum_{i=1}^{4}
 	\begin{bmatrix}
@@ -1429,6 +1430,7 @@ where $\qactual \odot \eb_1$ denotes the rotation of the vector $\eb_1$ by the q
 
 It is the task of the controller to compute a desired attitude given by the quaternion $\qdesired$ and compute the required body rates $\vangdesiredbody$, that rotate the vehicle to desired attitude. We define the error of the attitude as
 \begin{equation}
+	\label{eq:qerror}
 	\qerror = \qactual^{-1} \cdot \qdesired
 	.
 \end{equation}
@@ -1438,6 +1440,7 @@ The rotation around the roll axis $\exbodyinworld$ can be chosen freely.
 
 The quaternion-based control law
 \begin{equation}
+	\label{eq:control-law-attitude}
 	\vangdesiredbody = 
 	\frac{2}{\tau}
 	\text{sgn}(q_{\text{e},0})
@@ -1520,6 +1523,7 @@ We can construct $\qdesiredfull$ from the three desired body axes and define
 \end{equation}
 as the rotation between $\qdesiredPY$ and $\qdesiredfull$ with $\anglemix$ being the rotation angle. We can scale $\anglemix$ by $p \in \left[0,1\right]$ to determine the fraction of $\rolldesired$ to consider for the desired attitude
 \begin{equation}
+	\label{eq:qdesired}
 	\qdesired = \qdesiredPY
 	\begin{bmatrix}
 		\cos\left(p\frac{\anglemix}{2}\right) \\
@@ -1527,7 +1531,10 @@ as the rotation between $\qdesiredPY$ and $\qdesiredfull$ with $\anglemix$ being
 		0 \\
 		0
 	\end{bmatrix}
+	.
 \end{equation}
+We plug \Cref{eq:qdesired} in \Cref{eq:qerror} to apply the control law in \Cref{eq:control-law-attitude}.
+
 
 
 \subsection{Implicit Feedback Control}
@@ -1546,7 +1553,7 @@ First, we compute the thrust vector $\thrustdesiredworld$ of the current traject
 We compute the axis of rotation $\kb$ and the corresponding angle of rotation $\alpha$ required for aligning the current forward axis of the vehicle $\exbodyinworld$ with $\thrustdesiredworld$ by
 \begin{equation}
 	\label{eq:rotation-to-desired-thrust-vector}
-	\kb = \frac{
+	\rotationaxisworld = \frac{
 		\exbodyinworld \times \thrustdesiredworld
 	}{
 		\left\lVert
@@ -1565,7 +1572,7 @@ In general, it is also possible to rotate $\exbodyinworld$ by $-\alpha$ around $
 
 From \Cref{eq:rotation-to-desired-thrust-vector} we compute the body rates required to align $\exbodyinworld$ with $\thrustdesiredworld$ in time $\Delta T_{\text{s}}$ directly
 \begin{equation}
-	\vangdesiredworld = \frac{\alpha}{\Delta T_{\text{s}}} \kb
+	\vangdesiredworld = \frac{\alpha}{\Delta T_{\text{s}}} \rotationaxisworld
 \end{equation}
 
 We close the feedback loop for the trajectory tracking implicitly, i.e. we compute $\thrustdesiredworld$ and $\vangdesiredworld$ in each control loop for a newly generated trajectory.
@@ -1588,7 +1595,7 @@ We tackle this issue by extending the architecture by a trajectory tracking feed
 
 For the trajectory tracking, we will design a control law based on the one proposed in \cite{MellingerKumar11} for a quadrocopter tracking minimum snap trajectories.
 
-Given a desired trajectory $\bm{\sigma}_{\text{des}}(t) = \left[\pbo(t), \phi(t)\right]^\top$, we define the position and velocity error as
+Given a desired trajectory $\bm{\sigma}_{\text{des}}(t) = \left[\pbo_{\text{des}}(t), \rolldesired(t)\right]^\top$, we define the position and velocity error as
 \begin{equation}
 	\eb_{p} = \pbo - \pbo_{\text{des}}
 \end{equation}
@@ -1624,6 +1631,8 @@ The advantages of this are two-fold. First, the closer $\thrustdesiredworld$ and
 	\end{cases}
 \end{equation}
 
+The desired roll angle $\rolldesired$ and the desired thrust $\thrustdesiredworld$ are sent to the lower level control loops.
+
 
 
 
@@ -1632,4 +1641,15 @@ The advantages of this are two-fold. First, the closer $\thrustdesiredworld$ and
 	\centering
 	\includegraphics[width=0.5\textwidth]{gazebo-ros-interaction}
 \end{figure}
+The control architecture presendet in \Cref{sec:control} is implemented in a modular design in \ac{ros2}. While being the successor of \ac{ros}, \ac{ros2} is developed independently from \ac{ros}.
+Consequently, the migration implies severe changes of the framework already existing for the HippoCampus platform. Nonetheless, this drawback is outweighed by the advantages this design decision entails. The interested reader may refer to \cite{ros2} for an exhaustive overview of the design and architecture of \ac{ros2}. Main aspects making \ac{ros2} the better choice for the HippoCampus platform are mentioned below.
+
+Embedded systems are well integrated into the \ac{ros2} framework. A \ac{ros2} stack specifically designed for microcontrollers, called micro-ROS, allows the direct communication between computers and microcontrollers. With regard to HippoCampus, this means the \ac{fcu} running PX4 and the onboard computer can communicate directly without the abstraction layers introduced by MAVROS and MAVLink. This enables high rate data streams between the devices.
+
+Furthermore, \ac{ros2} introduces the concept of \ac{qos} as it relies on \ac{dds} for communication. Hence, data streams transporting sensor data can be declared to be transmitted with \emph{best effort}. As a result, the loss of messages is accepted, while the latency can be reduced. This especially useful for sensor data, where it is of interest to receive the most recent measurements as fast as possible. For message sizes of up to \unit[1]{MB} latencies below \unit[1]{ms} can be achieved for communication between different processes \cite[ros2]. High latencies impose delays on control loops and state estimation with possibly severe negative influence on their performance.
+
+Though not required for this thesis, it should be noted, that \ac{ros2} is suitable for real-time systems. In contrast to its predecessor, \ac{ros2} can be configured for deterministic scheduling to enforce real-time constraints \cite{ros-realtime20}. This can be a critical property for the field of mobile robotics, where deterministic execution times can be safety critical.
+
+\ac{ros2} comes with a new generation of the simulator Gazebo, hence requiring a new implementation of the simulation setup for the HippoCampus \ac{uauv}. The dynamic behavior of a model in the simulation can be replicated via plugins. The vehicle dynamics and the thruster forces and moments are modeled based on  \Cref{eq:thruster-load-vs-uesc,eq:eom-translational-with-input,eq:eom-rotational-with-input}.
+
 \label{sec:implementation}
