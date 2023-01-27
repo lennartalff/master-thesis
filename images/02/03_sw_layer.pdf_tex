@@ -1,0 +1,107 @@
+%% Creator: Inkscape inkscape 0.92.3, www.inkscape.org
+%% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
+%% Accompanies image file '03_sw_layer.pdf' (pdf, eps, ps)
+%%
+%% To include the image in your LaTeX document, write
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics{<filename>.pdf}
+%% To scale the image, write
+%%   \def\svgwidth{<desired width>}
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics[width=<desired width>]{<filename>.pdf}
+%%
+%% Images with a different path to the parent latex file can
+%% be accessed with the `import' package (which may need to be
+%% installed) using
+%%   \usepackage{import}
+%% in the preamble, and then including the image with
+%%   \import{<path to file>}{<filename>.pdf_tex}
+%% Alternatively, one can specify
+%%   \graphicspath{{<path to file>/}}
+%% 
+%% For more information, please see info/svg-inkscape on CTAN:
+%%   http://tug.ctan.org/tex-archive/info/svg-inkscape
+%%
+\begingroup%
+  \makeatletter%
+  \providecommand\color[2][]{%
+    \errmessage{(Inkscape) Color is used for the text in Inkscape, but the package 'color.sty' is not loaded}%
+    \renewcommand\color[2][]{}%
+  }%
+  \providecommand\transparent[1]{%
+    \errmessage{(Inkscape) Transparency is used (non-zero) for the text in Inkscape, but the package 'transparent.sty' is not loaded}%
+    \renewcommand\transparent[1]{}%
+  }%
+  \providecommand\rotatebox[2]{#2}%
+  \newcommand*\fsize{\dimexpr\f@size pt\relax}%
+  \newcommand*\lineheight[1]{\fontsize{\fsize}{#1\fsize}\selectfont}%
+  \ifx\svgwidth\undefined%
+    \setlength{\unitlength}{713.25621117bp}%
+    \ifx\svgscale\undefined%
+      \relax%
+    \else%
+      \setlength{\unitlength}{\unitlength * \real{\svgscale}}%
+    \fi%
+  \else%
+    \setlength{\unitlength}{\svgwidth}%
+  \fi%
+  \global\let\svgwidth\undefined%
+  \global\let\svgscale\undefined%
+  \makeatother%
+  \begin{picture}(1,0.46904925)%
+    \lineheight{1}%
+    \setlength\tabcolsep{0pt}%
+    \put(0,0){\includegraphics[width=\unitlength,page=1]{03_sw_layer.pdf}}%
+    \put(0.61052893,0.42717739){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Flight Computing Unit\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=2]{03_sw_layer.pdf}}%
+    \put(0.10534353,0.31992271){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}HippoC-ROS\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=3]{03_sw_layer.pdf}}%
+    \put(0.66563213,0.18096418){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}PX4-Middleware\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=4]{03_sw_layer.pdf}}%
+    \put(0.75816453,0.10104944){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}NuttX\end{tabular}}}}%
+    \put(0.74030869,0.38188746){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}(FCU)\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=5]{03_sw_layer.pdf}}%
+    \put(0.63236483,0.05869187){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\scr{Sensor}\end{tabular}}}}%
+    \put(0.62470675,0.03543052){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\scr{Drivers}\end{tabular}}}}%
+    \put(0.75013365,0.05869187){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\scr{Actuator}\end{tabular}}}}%
+    \put(0.75719681,0.03543052){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\scr{Drivers}\end{tabular}}}}%
+    \put(0.88682884,0.05869187){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\scr{others}\end{tabular}}}}%
+    \put(0.91281901,0.03543052){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\scr{...}\end{tabular}}}}%
+    \put(0.030092,0.42717739){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Single Board Computer\end{tabular}}}}%
+    \put(0.17459387,0.38188746){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}(SBC)\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=6]{03_sw_layer.pdf}}%
+    \put(0.09188604,0.27740469){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\scr{Self-}\end{tabular}}}}%
+    \put(0.04427033,0.25414298){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\scr{Localization}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=7]{03_sw_layer.pdf}}%
+    \put(0.26433357,0.27740469){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\scr{Field-}\end{tabular}}}}%
+    \put(0.22513004,0.25414298){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\scr{Exploration}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=8]{03_sw_layer.pdf}}%
+    \put(0.06875268,0.21010781){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\scr{Mission-}\end{tabular}}}}%
+    \put(0.0674037,0.18684628){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\scr{Planner}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=9]{03_sw_layer.pdf}}%
+    \put(0.26433161,0.21010769){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\scr{others}\end{tabular}}}}%
+    \put(0.28821878,0.1868461){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\scr{...}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=10]{03_sw_layer.pdf}}%
+    \put(0.05403102,0.05869187){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\scr{Sensor}\end{tabular}}}}%
+    \put(0.04637294,0.03543052){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\scr{Drivers}\end{tabular}}}}%
+    \put(0.17180066,0.05869187){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\scr{Further}\end{tabular}}}}%
+    \put(0.17886394,0.03543052){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\scr{Drivers}\end{tabular}}}}%
+    \put(0.30849773,0.05869187){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\scr{others}\end{tabular}}}}%
+    \put(0.3344883,0.03543052){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\scr{...}\end{tabular}}}}%
+    \put(0.15880179,0.10104956){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Ubuntu\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=11]{03_sw_layer.pdf}}%
+    \put(0.66983823,0.31976385){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}HippoC-Firmware\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=12]{03_sw_layer.pdf}}%
+    \put(0.60923156,0.27740544){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\scr{Low-Level}\end{tabular}}}}%
+    \put(0.62680978,0.25414406){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\scr{Control}\end{tabular}}}}%
+    \put(0.79009071,0.27740544){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\scr{State}\end{tabular}}}}%
+    \put(0.75719681,0.25414406){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\scr{Estimation}\end{tabular}}}}%
+    \put(0.93174604,0.26255622){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\scr{...}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=13]{03_sw_layer.pdf}}%
+    \put(0.44827443,0.23707238){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\scr{Mavlink}\end{tabular}}}}%
+    \put(0.45360714,0.18487207){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\scr{UART-}\end{tabular}}}}%
+    \put(0.44174299,0.15950781){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\scr{Interface}\end{tabular}}}}%
+  \end{picture}%
+\endgroup%

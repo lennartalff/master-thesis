@@ -1,0 +1,119 @@
+%% Creator: Inkscape 1.0.2-2 (e86c870879, 2021-01-15), www.inkscape.org
+%% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
+%% Accompanies image file '03_hippo_system_architecture_draft.pdf' (pdf, eps, ps)
+%%
+%% To include the image in your LaTeX document, write
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics{<filename>.pdf}
+%% To scale the image, write
+%%   \def\svgwidth{<desired width>}
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics[width=<desired width>]{<filename>.pdf}
+%%
+%% Images with a different path to the parent latex file can
+%% be accessed with the `import' package (which may need to be
+%% installed) using
+%%   \usepackage{import}
+%% in the preamble, and then including the image with
+%%   \import{<path to file>}{<filename>.pdf_tex}
+%% Alternatively, one can specify
+%%   \graphicspath{{<path to file>/}}
+%% 
+%% For more information, please see info/svg-inkscape on CTAN:
+%%   http://tug.ctan.org/tex-archive/info/svg-inkscape
+%%
+\begingroup%
+  \makeatletter%
+  \providecommand\color[2][]{%
+    \errmessage{(Inkscape) Color is used for the text in Inkscape, but the package 'color.sty' is not loaded}%
+    \renewcommand\color[2][]{}%
+  }%
+  \providecommand\transparent[1]{%
+    \errmessage{(Inkscape) Transparency is used (non-zero) for the text in Inkscape, but the package 'transparent.sty' is not loaded}%
+    \renewcommand\transparent[1]{}%
+  }%
+  \providecommand\rotatebox[2]{#2}%
+  \newcommand*\fsize{\dimexpr\f@size pt\relax}%
+  \newcommand*\lineheight[1]{\fontsize{\fsize}{#1\fsize}\selectfont}%
+  \ifx\svgwidth\undefined%
+    \setlength{\unitlength}{625.29590517bp}%
+    \ifx\svgscale\undefined%
+      \relax%
+    \else%
+      \setlength{\unitlength}{\unitlength * \real{\svgscale}}%
+    \fi%
+  \else%
+    \setlength{\unitlength}{\svgwidth}%
+  \fi%
+  \global\let\svgwidth\undefined%
+  \global\let\svgscale\undefined%
+  \makeatother%
+  \begin{picture}(1,0.57095725)%
+    \lineheight{1}%
+    \setlength\tabcolsep{0pt}%
+    \put(0,0){\includegraphics[width=\unitlength,page=1]{03_hippo_system_architecture_draft.pdf}}%
+    \put(0.82219207,0.15666951){\color[rgb]{0,0,0}\rotatebox{90}{\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\fs{mixer}\end{tabular}}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=2]{03_hippo_system_architecture_draft.pdf}}%
+    \put(0.70239898,0.26001736){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\fs{roll}\end{tabular}}}}%
+    \put(0.70304332,0.17673993){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\fs{yaw}\end{tabular}}}}%
+    \put(0.70258288,0.13471458){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\fs{thrust}\end{tabular}}}}%
+    \put(0.70318011,0.21830487){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\fs{pitch}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=3]{03_hippo_system_architecture_draft.pdf}}%
+    \put(0.75098344,0.37526623){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\fs{IMU}\end{tabular}}}}%
+    \put(0.6674425,0.45869554){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\fs{FCU}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=4]{03_hippo_system_architecture_draft.pdf}}%
+    \put(0.59042634,0.37149689){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\fs{EKF}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=5]{03_hippo_system_architecture_draft.pdf}}%
+    \put(0.64372607,0.31386591){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\fs{attitude}\end{tabular}}}}%
+    \put(0.5671308,0.22239653){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\fs{low-level}\end{tabular}}}}%
+    \put(0.62644028,0.18881239){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}\fs{attitude}\end{tabular}}}}%
+    \put(0.62887743,0.15762713){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}\fs{control}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=6]{03_hippo_system_architecture_draft.pdf}}%
+    \put(0.55708537,0.53474467){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\fs{depth sensor}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=7]{03_hippo_system_architecture_draft.pdf}}%
+    \put(0.01614234,0.33563849){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\fs{external} \end{tabular}}}}%
+    \put(0.01766601,0.30886844){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\fs{sensors}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=8]{03_hippo_system_architecture_draft.pdf}}%
+    \put(0.09517418,0.5346202){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\fs{telemetry}\end{tabular}}}}%
+    \put(0.54674049,0.01439758){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\fs{LiPo battery}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=9]{03_hippo_system_architecture_draft.pdf}}%
+    \put(0.7728531,0.53462021){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\fs{telemetry}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=10]{03_hippo_system_architecture_draft.pdf}}%
+    \put(0.8888616,0.18233004){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\fs{ESCs}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=11]{03_hippo_system_architecture_draft.pdf}}%
+    \put(0.87895077,0.27448699){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\fs{motors}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=12]{03_hippo_system_architecture_draft.pdf}}%
+    \put(0.89752342,0.39781218){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\fs{base}\end{tabular}}}}%
+    \put(0.89189405,0.3667916){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\fs{station}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=13]{03_hippo_system_architecture_draft.pdf}}%
+    \put(0.3295571,0.50200058){\color[rgb]{0.50196078,0.50196078,0.50196078}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\fs{SBC II}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=14]{03_hippo_system_architecture_draft.pdf}}%
+    \put(0.46662523,0.29053459){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}\fs{position,}\end{tabular}}}}%
+    \put(0.46819559,0.25350204){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}\fs{orientation}\end{tabular}}}}%
+    \put(0.45356597,0.16868722){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}\fs{attitude}\end{tabular}}}}%
+    \put(0.45242826,0.13510309){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}\fs{setpoint}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=15]{03_hippo_system_architecture_draft.pdf}}%
+    \put(0.02193784,0.42300027){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\fs{other}\end{tabular}}}}%
+    \put(0.01390949,0.39197968){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\fs{vehicles}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=16]{03_hippo_system_architecture_draft.pdf}}%
+    \put(0.19791816,0.40816345){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\fs{localization}\end{tabular}}}}%
+    \put(0.21194643,0.33979574){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\ffs{$\cdot$visual}\end{tabular}}}}%
+    \put(0.21194643,0.36738279){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\ffs{$\cdot$EM}\end{tabular}}}}%
+    \put(0.21202847,0.31340828){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\ffs{$\cdot$acoustic}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=17]{03_hippo_system_architecture_draft.pdf}}%
+    \put(0.28317908,0.22608227){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}\fs{high-level}\end{tabular}}}}%
+    \put(0.28164615,0.19249814){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}\fs{planner}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=18]{03_hippo_system_architecture_draft.pdf}}%
+    \put(0.24366459,0.46100161){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\fs{SBC}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=19]{03_hippo_system_architecture_draft.pdf}}%
+    \put(0.38796622,0.42919475){\color[rgb]{0.50196078,0.50196078,0.50196078}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\fs{extra} \end{tabular}}}}%
+    \put(0.3785132,0.39237891){\color[rgb]{0.50196078,0.50196078,0.50196078}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l} \fs{modules}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=20]{03_hippo_system_architecture_draft.pdf}}%
+    \put(0.00343779,0.24504061){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\ffs{$\cdot$hydrophone}\end{tabular}}}}%
+    \put(0.00343779,0.27502653){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\ffs{$\cdot$camera}\end{tabular}}}}%
+    \put(0.00350507,0.21385549){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\ffs{$\cdot$temperature}\end{tabular}}}}%
+    \put(0.03709132,0.19219913){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}\ffs{...}\end{tabular}}}}%
+  \end{picture}%
+\endgroup%
