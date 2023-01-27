@@ -103,6 +103,18 @@
 \patchcmd{\tableofcontents}{\MakeUppercase\contentsname}{\contentsname}{}{}
 \patchcmd{\tableofcontents}{\MakeUppercase\contentsname}{\contentsname}{}{} %needs to be used twice to work!
 
+
+
+% Nathalies Änderungen für schöne Tabellen:
+\usepackage{lscape}  % Einzelne Seiteninhalte im landscape modues
+\usepackage{tabularx}
+\usepackage{booktabs}   % vertical lines for fancy tables
+\usepackage{multirow}
+\usepackage{nicematrix}   % better multirow options
+
+
+
+
 % ############################################################################
 % Inverse Suche mit xdvi und kile:
 %

@@ -3,7 +3,34 @@
 \chapter{An Approach to Agile Maneuvering}
 \label{sec:approach-to-agile-maneuvering}
 
-\section{Overview}
+\section{Concept}
+\textcolor{red}{
+\begin{itemize}
+    \item briefly describe the general concept
+    \begin{itemize}
+        \item What do we do here?
+        \item how is the planning suppose to work
+        \item what modules/step do we need to take to make this work
+    \end{itemize} 
+    \item brief intro that we now use ROS2
+    \begin{itemize}
+        \item what is getting better?
+        \item compare with corresponding figure in chapter 2
+    \end{itemize}
+\end{itemize}}
+
+\begin{figure}[tb]
+    \centering
+    %\includegraphics{}
+    \caption{\textcolor{red}{Proposed Concept}}
+    \label{fig:my_label}
+\end{figure}
+\begin{figure}[tb]
+    \centering
+    %\includegraphics{}
+    \caption{\textcolor{red}{Architecture using ROS2}}
+    \label{fig:my_label1}
+\end{figure}
 
 \section{System Dynamics}
 \label{sec:system-dynamics}
@@ -16,6 +43,33 @@
 \end{figure}
 \subsubsection{World-fixed Frame}
 \subsubsection{Body-fixed Frame}
+
+
+% In order to describe the 6\,DOF motion of an underwater vehicle we define two main geographic reference frames.
+
+% \paragraph{World-fixed Frame $\wfr$}
+% Following the standard notation for marine crafts introduced by Fossen~\cite{Fossen2011} it is common to define a \textit{North-East-Down}\,(NED) coordinate system  with its origin $\p{O}{W}$  relative to the earth's reference ellipsoid (World Geodetic System, 1984). 
+% Its axes are defined through the unit vectors $\bm{x}_\nfr$, $\bm{y}_\nfr$, and $\bm{z}_\nfr$ pointing towards true north, east, and in downward direction, respectively.
+% However, given our focus application field of confined environments, it is often convenient to use a more flexible definition of the inertial reference frame to which we refer to as world frame $\wfr$.
+% We define this world frame by the unit vectors $\bm{x}_\wfr$, $\bm{y}_\wfr$, and $\bm{z}_\wfr$ and the origin $\p{O}{W}$.
+% This coordinate system is specific to the facility the vehicle is deployed in.
+% Using this facility specific reference frame facilitates vehicle deployment within restricted volumes.
+% For instance in housed industry tanks where robust measurements of the true north/east directions are not available. 
+% Hence, a convenient approach is to define the $x_\wfr$- and $y_\wfr$- axis along the volume dimensions, \eg along the walls of a rectangular tank while the $z_\wfr$- axis points in downward direction.
+% For the sake of simplicity, we use the world frame throughout the remainder of this dissertation.
+% During outdoor experiments, however, our world frame definition coincides with the NED convention.
+
+% \paragraph{Body-fixed Frame $\bfr$}
+% Moreover, we define a moving \textit{body} frame $\bfr$ which is fixed to the vehicle of interest, \ie the HippoCampus \muAUV{}.
+% By definition the body frame's origin $\p{O}{B}$ coincidences with the vehicles center of gravity\,(CG).
+% We choose its axes $x_\bfr$, $y_\bfr$, and $z_\bfr$ such that they align with the vehicles \textit{principal axes of inertia}. 
+% For the design of the HippoCampus \muAUV{} we define
+% \begin{itemize}
+%     \item $x_\bfr$: longitudinal axis (directed from aft to fore)
+%     \item $y_\bfr$: transversal axis (directed to starboard)
+%     \item $z_\bfr$: normal axis (directed from top to bottom)
+% \end{itemize}
+% as depicted in Figure\,\ref{fig:def_reference_frames}.
 
 \subsection{Kinematics}
 

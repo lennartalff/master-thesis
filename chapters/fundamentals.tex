@@ -1,11 +1,31 @@
 % !TeX root = ../Thesis.tex
 \chapter{Fundamentals}
 
-\section{Platform Overview}
+\section{HippoCampus $\mu$AUV Platform}
 
+\subsection{Hardware}
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.8\textwidth]{hippo_picture}
+    \includegraphics[width=0.4\textwidth]{hippo_picture}
+    \quad\quad
+    \includegraphics[width=0.4\textwidth]{hippo_picture}
+    \caption{\textcolor{blue}{HippoCampus $\mu$AUV in its heavy configuration (\textit{left}) and redesigned version based on BlueRobotics off-the-shelf components (\textit{right}).} \textcolor{red}{reference in text}}
+    \label{}
+\end{figure}
+\subsection{Software-Architecture}
+\begin{figure}[h!]
+	\centering
+     \def\svgwidth{12cm}  
+	\input{images/02/03_hippo_system_architecture_draft.pdf_tex}
+	\caption{System architecture of the HippoCampus $\mu$AUV.}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+    \def\svgwidth{12cm}  
+	\input{images/02/03_sw_layer.pdf_tex}
+	\caption{Software-Architecture with multiple layers of abstraction facilitating vertical
+and horizontal extensions. \textcolor{red}{adapt and say something about MAVROS / uORB etc pp}}
 \end{figure}
 
 \section{Review on Motion Planning}
@@ -72,3 +92,44 @@ An informed variant of \ac{rrt}, called RRT*, is used in \cite{Ma18} for terrain
     \item Natural to look at quadrocopters to transfer solutions to the underwater domain because of the similarity of the design.
 \end{itemize}
 \subsection{Discussion}
+
+
+\begin{landscape}
+\begin{table}[]
+%\renewcommand{\arraystretch}{1.0}
+    \caption{Overview on ....}
+		%\hspace*{-1.5cm}  % move table down (left in landscape) - tabular width: 
+		\centering
+		% change column width: >{\hsize=1.5\hsize\linewidth=\hsize}
+		% >{\hsize=0.5\hsize\linewidth=\hsize}
+		\begin{NiceTabular}
+            {
+            %%%%% Leider scheint die beste Methode wirklich hardgecodete Spaltenbreiten zu sein - hier am Ende rumspielen
+            >{\scriptsize\centering\arraybackslash}m{1.7cm} % Method
+            >{\scriptsize\centering\arraybackslash}m{1.2cm} % 
+            >{\centering\scriptsize\arraybackslash}m{3cm}   %
+            >{\centering\scriptsize\arraybackslash}m{3cm}   % 
+            >{\centering\scriptsize\arraybackslash}m{3.2cm} % 
+            }
+            \toprule
+            %%%%%%%%%%% Top row - names of each columns
+            Method
+            &  Spalte 2
+            &  Spalte 3
+            & Spalte 4
+            & Spalte 5 \\  
+            \midrule 
+            
+            %%%%%%%% Beispiel
+            Bla bla \cite{MuellerHehn15}
+            & test
+            & bla 
+            & bla 
+            & test
+            \\ 
+            \bottomrule
+		\end{NiceTabular}
+		\label{tab:state_of_the_art}
+\end{table}
+\end{landscape}
+
