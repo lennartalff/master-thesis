@@ -27,7 +27,7 @@ The present general software architecture of the HippoCampus platform is shown i
 	\centering
      \def\svgwidth{12cm}  
 	\input{images/02/03_hippo_system_architecture_draft.pdf_tex}
-	\caption{System architecture of the HippoCampus $\mu$AUV.}
+	\caption{System architecture of the HippoCampus $\mu$AUV \cite{duecker-phd}.}
     \label{fig:software-architecture-overview}
 \end{figure}
 The modular design is divided into modules assigned to the \ac{fcu} and modules assigned to the onboard computer.
@@ -41,15 +41,14 @@ The interface between \ac{mavlink} and \ac{ros} is MAVROS. It is a bidirectional
 	\centering
     \def\svgwidth{12cm}  
 	\input{images/02/03_sw_layer.pdf_tex}
-	\caption{Software-Architecture with multiple layers of abstraction facilitating vertical
-and horizontal extensions. \textcolor{red}{adapt and say something about MAVROS / uORB etc pp}}
+	\caption{HippoCampus software architecture with multiple layers of abstraction according to \cite{duecker-phd}. Communication between \acs{ros} (left) and PX4 (right) via \acs{mavlink} and MAVROS.}
     \label{fig:ros-px4-communication}
 \end{figure}
 It is clear, that the communication between the onboard computer and the \ac{fcu} involves several layers of abstraction on multiple conversions of messages. This renders the communication more complex and less efficient. This can be overcome by migrating from \ac{ros} to its successor \ac{ros2}, that enables direct communication between the \ac{fcu} and the onboard computer via \ac{dds}. Hence, all software modules developed in the scope of this thesis are implemented using \ac{ros2}.
 
 The interested reader may refer to \cite{ros2} for an exhaustive overview of the design and architecture of \ac{ros2}. The main aspects relevant for this thesis are listed below.
 
-Embedded systems are well integrated into the \ac{ros2} framework. A \ac{ros2} stack specifically designed for microcontrollers, called micro-ROS, allows the direct communication between computers and microcontrollers. With regard to HippoCampus, this means the \ac{fcu} running PX4 and the onboard computer can communicate directly without the abstraction layers introduced by MAVROS and MAVLink. This enables high rate data streams between the devices.
+Embedded systems are well integrated into the \ac{ros2} framework. A \ac{ros2} stack specifically designed for microcontrollers, called micro-ROS, allows the direct communication between computers and microcontrollers. With regard to HippoCampus, this means the \ac{fcu} running PX4 and the onboard computer can communicate directly without the abstraction layers introduced by MAVROS and \ac{mavlink}. This enables high rate data streams between the devices.
 
 Furthermore, \ac{ros2} introduces the concept of \ac{qos} as it relies on \ac{dds} for communication. Hence, data streams transporting sensor data can be declared to be transmitted with \emph{best effort}. As a result, the loss of messages is accepted, while the latency can be reduced. This especially useful for sensor data, where it is of interest to receive the most recent measurements as fast as possible. For message sizes of up to \unit[1]{MB} latencies below \unit[1]{ms} can be achieved for communication between different processes \cite{ros2}. High latencies impose delays on control loops and state estimation with possibly severe negative influence on their performance.
 
@@ -103,6 +102,13 @@ It the basic idea of path planning is to model the robot as electric charge \cit
 
 An improvement over the basic method of potential fields in the context of path planning for \acp{auv} is presented in \cite{Fu-guang05}. The authors suggest a heuristic to escape the local minimum in the vicinity of concave obstacles.
 
+\subsubsection{Model Predictive Control}
+
+Though, actually a control and not a path planning method, model predictive control can still be used for path planning problems, as will be presented below. In model predictive control methods the future state of a robot is predicted, based on a dynamic model of the robot. The future states depend on system inputs. By defining a cost function, an optimal solution regarding the control inputs to reach a desired state can be computed. To close the feedback loop, this optimization is performed at every time step. Hence, external disturbances and model inaccuracies are considered. But this implies one of the major disadvantages of this method, as the computation of the optimal solution in each time step is usually computational expensive.
+
+Model predictive control in the area of path tracking for \acp{auv} has been presented in \cite{Shen16}. The authors use a multi-objective model predictive control framework and prove the validity of their approach in a simulation of the Saab SeaEye Falcon. In \cite{Heshmati18} a waypoint-tracking controller, implemented as nonlinear model predictive control, is proposed. The presented control scheme considers ocean currents, thruster saturation, velocity limits and incorporates obstacle avoidance. The latter proves this approach to be a promising for low level maneuvering. The waypoints can be provided by a high level mission planner and the model predictive controller is responsible for reaching them without violating the constraints.
+
+
 \subsubsection{Discussion}
 \begin{itemize}
     \color{red}
@@ -110,7 +116,31 @@ An improvement over the basic method of potential fields in the context of path 
     \item Have more computational power or algorithm in general not real timecapable.
 \end{itemize}
 
+We observe, that the problem of path planning for \acp{auv} has usually been examined for traditional \acp{auv}, operating in ocean environments.
+Hence, the publications often focus problems characteristic for the marine domain.
+Ocean currents are considered of higher priority than accounting for the vehicle dynamics.
+Since traditional \acp{auv} are very heavy and slow in relation to their size, it is questionable whether path planning approaches for this type of vehicles would be directly transferrable to the domain of hydrobatic \acp{uauv}, anyway \cite{hydrobatic}.
+
+Furthermore, many approaches solve the problem for static environments, as it is usually assumed when deploying A*-based concepts. This is reasonable, if mainly the geometric restrictions caused by the coastal line and constant ocean currents are of concern. As a consequence, these algorithms cope with dynamic changes and replanning rather badly.
+
 \subsection{Review on Agile Path Planning Methods}
+In this section a brief review on agile path planning methods is given. As the previous section on path planning for \acp{auv} indicated, the problem of \emph{agile} path planning is underrepresented in the literature. Hence, in this section the review is extended on the aerial domain. Due to the similarity in the design of small-scale \acp{uav} and \acp{uauv}, it is likely that findings in the aerial domain can be transferred to the area of hydrobatic \acp{uauv}.
+
+In \cite{MellingerKumar11} the authors present a minimum snap trajectory generation method for quadrocopters. This approach is demonstrated to be real-time capable. The trajectory is defined by \emph{keyframes}, i.e. a position and a yaw angle, and corridor constraints between keyframes, as seen in \Cref{fig:mellinger}.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/02/mellinger.png}
+    \caption{$xy$-plot of a minimum snap trajectory with keyframes depicted as crosses. On the left the trajectory has no corridor constraints, on the right the corridor constraint is visualized as dotted rectangle \cite{MellingerKumar11}.}
+    \label{fig:mellinger}
+\end{figure}
+The capability of this approach is demonstrated in experiments, where the quadrocopter was able to fly through a thrown circular hoop, reaching velocities of \unit[3.6]{m/s}.
+
+A combination of minimum snap trajectories and \ac{rrt} is presented in \cite{Richter16} and \cite{Shi20}.
+\ac{rrt} is used as a high-level planner whereas the minimum snap trajectory generator is used to compute smooth trajectories suitable for the dynamics of \acp{uav}. 
+The authors try to deal with the challenges of indoor navigation and use \ac{rrt} to generate waypoints as piecewise linear path to reach a goal position in presence of a cluttered environment. Subsequently, the waypoints are connected smoothly by minimum jerk trajectories.
+The implementation sacrifices the asymptotical optimality of \ac{rrt}* in favor of dynamically more suitable paths and reduced computation time. Even tough, the computation time could be reduced by a factor of 40, the remaining computation time is still in the magnitude of several seconds. Hence, the approach is not able to account for dynamic obstacles.
+
+
 \begin{itemize}
     \color{red}
     \item Natural to look at quadrocopters to transfer solutions to the underwater domain because of the similarity of the design.
@@ -118,7 +148,7 @@ An improvement over the basic method of potential fields in the context of path 
 \subsection{Discussion}
 
 
-\begin{landscape}
+% \begin{landscape}
 \begin{table}[]
 %\renewcommand{\arraystretch}{1.0}
     \caption{Overview on ....}
@@ -129,31 +159,106 @@ An improvement over the basic method of potential fields in the context of path 
 		\begin{NiceTabular}
             {
             %%%%% Leider scheint die beste Methode wirklich hardgecodete Spaltenbreiten zu sein - hier am Ende rumspielen
-            >{\scriptsize\centering\arraybackslash}m{1.7cm} % Method
+            >{\scriptsize\arraybackslash}m{1.7cm} % Method
             >{\scriptsize\centering\arraybackslash}m{1.2cm} % 
-            >{\centering\scriptsize\arraybackslash}m{3cm}   %
+            >{\centering\scriptsize\arraybackslash}m{1cm}   %
             >{\centering\scriptsize\arraybackslash}m{3cm}   % 
+            >{\centering\scriptsize\arraybackslash}m{2cm}   % 
             >{\centering\scriptsize\arraybackslash}m{3.2cm} % 
             }
             \toprule
             %%%%%%%%%%% Top row - names of each columns
-            Method
-            &  Spalte 2
-            &  Spalte 3
-            & Spalte 4
-            & Spalte 5 \\  
+            Example
+            &  Domain
+            &  Method
+            & Optimality
+            & Obstacle Avoidance
+            & Comment \\  
             \midrule 
             
             %%%%%%%% Beispiel
-            Bla bla \cite{MuellerHehn15}
-            & test
-            & bla 
-            & bla 
-            & test
+            \cite{Carroll92}
+            & underwater
+            & A*
+            & yes (cost not defined)
+            & static
+            & Considers static ocean currents and static spatial constraints.
             \\ 
+
+            \cite{zhang20}
+            & underwater
+            & A*
+            & distance
+            & static
+            & Improvement of computation efficiency for real-time path planning.
+            \\
+
+            \cite{Petres09}
+            & underwater
+            & \ac{fmm}*
+            & yes (implementation dependent)
+            & dynamic
+            & Combination of A* and \ac{fmm}. Path curvature can be constrained and partially replanning in case of dynamic changes is possible.
+            \\
+
+            \cite{Young13}
+            & underwater
+            & \ac{rrt} and A*
+            & no
+            & dynamic
+            & \ac{rrt} generates obstacle free path with kinematic constraints. Shortest available path searched with A*. Not optimal, though.
+            \\
+
+            \cite{Karaman11}
+            & land
+            & anytime \ac{rrt}*
+            & distance (asymptotically)
+            & static
+            & Obstacles are considered static. Solution is dynamically refined during movement after initial solution has been found.
+            \\
+
+            \cite{Ma18}
+            & underwater
+            & \ac{rrt}*
+            & distance (asymptotically)
+            & static
+            & The terrain is considered as obstacle and therefore static. Online replanning is possible.
+            \\
+
+            \cite{Fu-guang05}
+            & underwater
+            & Potential Fields
+            & none
+            & dynamic
+            & Avoids local minima problem inherent to the potential fields method for concave obstacles.
+            \\
+
+            \cite{Heshmati18}
+            & underwater
+            & \acs{mpc}
+            & energy
+            & static
+            & Exploits ocean currents to minimize energy consumption.
+            \\
+
+            \cite{MellingerKumar11}
+            & aerial
+            & minimum snap polynomial
+            & snap
+            & dynamic (indirect)
+            & Highly aggressive maneuvers possible. Obstacle avoidance can be accomplished indirectly by setting appropriate constraints.
+            \\
+            
+            \cite{Richter16}\cite{Shi20}
+            & aerial
+            & \ac{rrt} + minimum snap
+            & not globally
+            & static
+            & No global optimality in favour of computation time, reduced from minutes to seconds. Respecting vehicle dynamics.
+            \\
             \bottomrule
 		\end{NiceTabular}
 		\label{tab:state_of_the_art}
 \end{table}
-\end{landscape}
+% \end{landscape}
 
