@@ -19,6 +19,96 @@
     \end{itemize}
 \end{itemize}}
 
+
+\begin{figure}
+	\centering
+	\begin{tikzpicture}
+
+    %\scriptsize
+
+    \def\blockheight{4cm}
+    \def\blockwidth{4.5cm}
+    \def\smallblockheight{0.7cm}
+    \def\smallblockwidth{4cm}
+    \def\smallyshift{0.8cm}
+    \def\labelyshift{-0.8cm}
+    \def\xshiftrightblocks{2cm}
+    
+        % Blocks
+        % Trajectory System
+        \node[draw, fill=mumblue, fill opacity=0.1, semithick, rectangle, rounded corners=0.2cm, densely dashed, minimum width=\blockwidth, minimum height=\blockheight, align=center, label={[label distance=\labelyshift]90:Trajectory Module}] (trajectoryblock) at (0,0) {};
+        \node[draw, fill=white, semithick, rectangle, minimum width=\smallblockwidth, minimum height=\smallblockheight, align=center] (generation) at (0,\smallyshift) {Generation};
+        \node[draw, fill=white, semithick, rectangle, minimum width=\smallblockwidth, minimum height=\smallblockheight, align=center, below= of generation, yshift=\smallyshift] (tracking) {Tracking controller};
+        \node[draw, fill=white, semithick, rectangle, minimum width=\smallblockwidth, minimum height=\smallblockheight, align=center, below= of tracking, yshift=\smallyshift] (feasibility) {Feasibility tests};
+        \node[draw, fill=white, semithick, rectangle, minimum width=\smallblockwidth, minimum height=\smallblockheight, align=center, below= of feasibility, yshift=\smallyshift] (obstacles) {Obstacle avoidance};
+
+        % Low Level Controller
+        \node[draw, fill=mumpurple, fill opacity=0.1, semithick, rectangle, rounded corners=0.2cm, densely dashed, minimum width=\blockwidth, minimum height=\blockheight, align=center, label={[label distance=\labelyshift]90:Low Level Controller}, right= of trajectoryblock, xshift=\xshiftrightblocks] (lowlevelcontrolblock) {};
+        \node[draw, fill=white, semithick, rectangle, minimum width=\smallblockwidth, minimum height=\smallblockheight, align=center, below= of lowlevelcontrolblock, yshift=3cm] (ratecontroller) {Rate controller};
+        \node[draw, fill=white, semithick, rectangle, minimum width=\smallblockwidth, minimum height=\smallblockheight, align=center, below= of ratecontroller, yshift=\smallyshift] (thrust) {Thrust controller};
+
+
+
+        % High level Planner
+        \node[draw, fill=lightgray, semithick, rectangle, rounded corners=0.2cm, densely dashed, minimum width=\blockwidth, minimum height=\blockheight-1cm, align=center, above= of trajectoryblock, label={[label distance=\labelyshift]90:High Level Planner}] (plannerblock) {\includegraphics[width=.25\textwidth]{images/03/high_level_planner.png}};  % high_level_planner3.png ist scharf aber kein so geeigneter Zeitpunkt
+
+        % Trajectory 
+
+        
+        % \node[draw, fill=white, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center] (thrustermodel) at (0,0.5*\gazeboblockheight-1cm) {thruster model};
+        % \node[draw, fill=white, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center, below= of thrustermodel, yshift=\yshiftbetweenblocks] (hydrodynamics) {hydrodynamics};
+        % \node[minimum width=\blockwidth, minimum height=\blockheight, align=center, below= of hydrodynamics, yshift=\yshiftbetweenblocks] (rigidbody) {$+$\\rigid body\\(built in)};
+        
+        % % ROS2
+        % \node[draw, fill=lightgray, semithick, rectangle, loosely dashed, minimum width=\gazeboblockwidth, minimum height=\rosblockheight, align=center, label=above:{ROS2}, right= of gazebo] (ros) {};
+        % \node[draw, fill=white, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center] (controlloops) at ([yshift=\yshiftrosblocks]ros.center) {control loops};
+        % \node[draw, fill=white, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center] (mixer) at ([yshift=-\yshiftrosblocks]ros.center) {mixer};
+
+  %       \draw[-stealth] (controlloops.south) -- (mixer.north);
+  %       \draw[-stealth] (mixer.south) -- ++(0, -2.5cm);
+		% \node[draw, fill=lightgray, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center] (generator) at (0,0) {Trajectory\\Generator};
+		% \node[draw, fill=lightgray, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center, right= of generator, xshift=\xshiftblocks] (trackingcontroller) {Trajectory\\Tracking\\Controller};
+		% \node[draw, fill=lightgray, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center, right= of trackingcontroller, xshift=\xshiftblocks] (attitudecontroller) {Attitude\\Controller};
+  %       \node[draw, fill=lightgray, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center, right= of attitudecontroller, xshift=\xshiftblocks] (ratecontroller)  {Rate\\Controller};
+  %       \node[draw, fill=lightgray, semithick, rectangle, minimum width=\blockwidth-0.5cm, minimum height=2cm, align=center, right= of ratecontroller, xshift=\xshiftblocks] (mixer)  {Mixer};
+  %       \node[draw, fill=lightgray, semithick, rectangle, minimum width=\blockwidth-0.3cm, minimum height=\blockheight, align=center, right= of mixer, xshift=\xshiftblocks+0.7cm] (vehicle)  {Vehicle};
+		
+  %       % trajectory generator - trajectory tracking controller
+		% \draw[-stealth] (generator.east) -- (trackingcontroller.west) node[midway, above] {$\bm{\sigma}_{\text{des}}$};
+
+  %       % trajectory tracking controller - attitude controller
+  %       \draw[-stealth] ([yshift=\yshifttwolines]trackingcontroller.east) -- ([yshift=\yshifttwolines]attitudecontroller.west) node[midway, above] {$\bm{f}_{\text{des}}$};
+  %       \draw[-stealth] ([yshift=-\yshifttwolines]trackingcontroller.east) -- ([yshift=-\yshifttwolines]attitudecontroller.west) node[midway, above] {$\bm{\phi}_{\text{des}}$};
+        
+  %       % attitude controller - rate controller
+  %       \draw[-stealth] (attitudecontroller.east) -- (ratecontroller.west) node[midway, above] {$\bm{\omega}_{\text{des}}$};
+
+  %       % rate controller - mixer
+		% \draw[-stealth] ([yshift=\yshiftthreelines]ratecontroller.east) -- ([yshift=\yshiftthreelines]mixer.west) node[midway, above] {$u_2$};
+  %       \draw[-stealth] ([yshift=0cm]ratecontroller.east) -- ([yshift=0cm]mixer.west) node[midway, above] {$u_3$};
+  %       \draw[-stealth] ([yshift=-\yshiftthreelines]ratecontroller.east) -- ([yshift=-\yshiftthreelines]mixer.west) node[midway, above] {$u_4$};
+
+  %       % mixer - vehicle
+  %       \draw[-stealth] ([yshift=\yshiftfourlines]mixer.east) -- ([yshift=\yshiftfourlines]vehicle.west) node[midway, above, align=center] {ESC\\commands};
+  %       \draw[-stealth] ([yshift=1/3*\yshiftfourlines]mixer.east) -- ([yshift=1/3*\yshiftfourlines]vehicle.west) node[midway, above] {};
+  %       \draw[-stealth] ([yshift=-1/3*\yshiftfourlines]mixer.east) -- ([yshift=-1/3*\yshiftfourlines]vehicle.west) node[midway, above] {};
+  %       \draw[-stealth] ([yshift=-\yshiftfourlines]mixer.east) -- ([yshift=-\yshiftfourlines]vehicle.west) node[midway, below] {};
+
+  %       % vehicle - below all other blocks
+  %       \draw[-stealth] ([xshift=-0.2cm]vehicle.south) -- ++(0, \yshiftbelowvehiclefirst) -- ([yshift=\yshiftbelowvehiclefirst]ratecontroller.south) -- (ratecontroller.south) node[midway, right] {$\omeb, \omebp$};
+  %       \draw[-stealth] ([xshift=-0cm]vehicle.south) -- ++(0, \yshiftbelowvehiclefirst+\yshiftbelowvehicleoffset) -- ([yshift=\yshiftbelowvehiclefirst+\yshiftbelowvehicleoffset]attitudecontroller.south) -- (attitudecontroller.south) node[midway, right] {$\qb$};
+  %       \draw[-stealth] ([xshift=0.2cm]vehicle.south) -- ++(0, \yshiftbelowvehiclefirst+2*\yshiftbelowvehicleoffset) -- ([yshift=\yshiftbelowvehiclefirst+2*\yshiftbelowvehicleoffset]trackingcontroller.south) -- (trackingcontroller.south) node[midway, right] {$\pbo,\pbp$};
+  %       \draw[-stealth] ([yshift=\yshiftbelowvehiclefirst+2*\yshiftbelowvehicleoffset]trackingcontroller.south) -- ([yshift=\yshiftbelowvehiclefirst+2*\yshiftbelowvehicleoffset]generator.south) -- (generator.south) node[midway, right] {$\pbo,\pbp,\pbpp$};
+
+  %       % trajectory tracking controller - mixer (above blocks)
+  %       \draw[-stealth] ([xshift=0.3cm]trackingcontroller.north) -- ++(0, \yshiftaboveblocks) -- ([xshift=\xshiftfirstuintomixer, yshift=\yshiftaboveblocks+0.5*\blockheight]mixer.west) -- ([xshift=\xshiftfirstuintomixer, yshift=2*\yshiftthreelines]mixer.west) -- ([yshift=2*\yshiftthreelines]mixer.west) node[midway, above] {$u_1$};
+
+	\end{tikzpicture}
+	\caption{\textcolor{blue}{Software modules / Software architecture. Hier auch auf ROS2 eingehen?} \textcolor{orange}{Farblich markieren, welches die hier entwickelten Module sind? }}
+	\label{fig:software_modules}
+\end{figure}
+
+
 \begin{figure}[tb]
     \centering
     %\includegraphics{}
@@ -28,7 +118,7 @@
 \begin{figure}[tb]
     \centering
     %\includegraphics{}
-    \caption{\textcolor{red}{Architecture using ROS2}}
+    \caption{\textcolor{red}{Architecture using ROS2 \textcolor{blue}{Eigentlich sollte das in Implementierung - dort vllt nodegraph?}}}
     \label{fig:my_label1}
 \end{figure}
 
