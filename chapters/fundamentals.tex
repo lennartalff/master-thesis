@@ -83,7 +83,14 @@ The authors in \cite{Fernandes2015TowardsAO} declare A* in its generic form as g
 
 Applications of A* in the domain of \acp{auv} go back to the 90s \cite{Carroll92}, while still being extended in recent works \cite{zhang20}. Common to these approaches is the application for oceanic environments, where obstacles are assumed to be static, traveled distances to be large, and vehicle dynamics not to be relevant. The main focus often lies on considering ocean currents for path planning.
 
-Another algorithm used for grid-based search is \ac{fmm}. The principle of \acs{fmm}-based path planning is based on simulated wave propagation in order to obtain distance fields. Obstacles in the environment can be taken into account and in case of constant propagation the optimal path between start and goal position in terms of distance can be found. Modifications to the wave propagation can be used to compute paths with different requirements.
+Another algorithm used for grid-based search is \ac{fmm}. The principle of \acs{fmm}-based path planning is based on simulated wave propagation in order to obtain distance fields. The procedure is depicted in \Cref{fig:fmm}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/02/fmm.png}
+    \caption{Visualization of path planning with \ac{fmm} \cite{Gomez15}.}
+    \label{fig:fmm}
+\end{figure}
+Obstacles in the environment can be taken into account and in case of constant propagation the optimal path between start and goal position in terms of distance can be found. Modifications to the wave propagation can be used to compute paths with different requirements.
 
 The authors in \cite{Petres09} present a modification of \ac{fmm} called \acs{fmm}*. They exploit the reduced computation due to an appropriate heuristic function to solve path planning problems in dynamic environments, i.e. the environment changes or is partially unknown. They observe improved performance regarding computation time compared to A*. Additionally, they were able to enforce curvature constraints for the planned path.
 
@@ -133,13 +140,24 @@ In \cite{MellingerKumar11} the authors present a minimum snap trajectory generat
     \caption{$xy$-plot of a minimum snap trajectory with keyframes depicted as crosses. On the left the trajectory has no corridor constraints, on the right the corridor constraint is visualized as dotted rectangle \cite{MellingerKumar11}.}
     \label{fig:mellinger}
 \end{figure}
+The corridor constraints can be used, to navigate the vehicle through narrow gaps. A general obstacle avoidance is not possible with this method, though.
 The capability of this approach is demonstrated in experiments, where the quadrocopter was able to fly through a thrown circular hoop, reaching velocities of \unit[3.6]{m/s}.
+
+The authors in \cite{Hehn11} propose a trajectory generation framework for minimal time trajectories. They consider the dynamic model of the \ac{uav} and solve for the optimal trajectory for each degree of freedom separately, by decoupling the translational degrees of freedom. The trajectory generation system is used in a closed-loop control scheme similar to \ac{mpc}. The authors face problems with respect to the tracking performance, when decelerating quickly from high velocities, caused by aerodynamic effects. They highlight the advantage of computational efficiency.
 
 A combination of minimum snap trajectories and \ac{rrt} is presented in \cite{Richter16} and \cite{Shi20}.
 \ac{rrt} is used as a high-level planner whereas the minimum snap trajectory generator is used to compute smooth trajectories suitable for the dynamics of \acp{uav}. 
 The authors try to deal with the challenges of indoor navigation and use \ac{rrt} to generate waypoints as piece wise linear path to reach a goal position in presence of a cluttered environment. Subsequently, the waypoints are connected smoothly by minimum jerk trajectories.
 The implementation sacrifices the asymptotic optimality of \ac{rrt}* in favor of dynamically more suitable paths and reduced computation time. Even tough, the computation time could be reduced by a factor of 40, the remaining computation time is still in the magnitude of several seconds. Hence, the approach is not able to account for dynamic obstacles.
 
+In \cite{Mueller13} a state-to-state trajectory generation method for quadrocopters is presented. The focus is computational efficiency of the algorithms.
+Instead of regarding the constraints during the trajectory planning phase, thousands of trajectories are generated based on appropriately chosen target states.
+Afterwards, their feasibility with respect to the vehicle dynamics is verified.
+All trajectories resulting in infeasible solutions are discarded.
+This way, the computation time can be significantly reduced in comparison to other methods.
+The authors suggest using the trajectory generation system in a control scheme resembling \ac{mpc} and similar to \cite{Hehn11}, i.e. the trajectories are recomputed in each control step and the first input of the selected trajectory is used as input command. 
+The trajectories are polynomials of order five and are optimal regarding jerk.
+The authors demonstrate the performance of their approach in the scenario of a quadrocopter equipped with a racket to hit a ball towards a target. The same algorithm is used in \cite{MuellerHehn15} applied to the problem of catching a thrown ball and extended in \cite{Bucki19} by an obstacle avoidance method, handling dynamic convex obstacles.
 
 \begin{itemize}
     \color{red}
@@ -248,6 +266,14 @@ The implementation sacrifices the asymptotic optimality of \ac{rrt}* in favor of
             & dynamic (indirect)
             & Highly aggressive maneuvers possible. Obstacle avoidance can be accomplished indirectly by setting appropriate constraints.
             \\
+
+            \cite{Hehn11}
+            & aerial
+            & 
+            & time
+            & none
+            & Environment is not considered. Real-time capable to be executed as part of the control scheme.
+            \\
             
             \cite{Richter16}\cite{Shi20}
             & aerial
@@ -255,6 +281,22 @@ The implementation sacrifices the asymptotic optimality of \ac{rrt}* in favor of
             & not globally
             & static
             & No global optimality in favour of computation time, reduced from minutes to seconds. Respecting vehicle dynamics.
+            \\
+
+            \cite{Mueller13}
+            & aerial
+            & minimum jerk
+            & jerk
+            & none
+            & Separating construction and feasibility constraints to increase computational efficiency.
+            \\
+
+            \cite{Bucki19}
+            & aerial
+            & minimum jerk
+            & jerk
+            & dynamic
+            & Extends \cite{Mueller13} by avoidance of dynamic obstacles without sacrificing real-time capability.
             \\
             \bottomrule
 		\end{NiceTabular}
