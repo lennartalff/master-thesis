@@ -45,6 +45,7 @@
 \subsubsection{Body-fixed Frame}
 
 
+
 % In order to describe the 6\,DOF motion of an underwater vehicle we define two main geographic reference frames.
 
 % \paragraph{World-fixed Frame $\wfr$}
@@ -1377,11 +1378,71 @@ While we attended to the generation and planning of trajectories and the questio
 
 The general control architecture implements the inner-outer loop control scheme as depicted in \Cref{fig:inner-outer-loop-feedback-control}.
 \begin{figure}
-	\includegraphics[width=0.8\textwidth]{inner-outer-loop}
-	\caption{Overview of the control loops.}
+	\centering
+	\begin{tikzpicture}
+
+    \scriptsize
+
+    \def\blockheight{1.5cm}
+    \def\blockwidth{1.5cm}
+    \def\xshiftblocks{0cm}
+    \def\yshifttwolines{0.3cm}  % yshift for connecting lines between blocks when two lines above each other are used
+    \def\yshiftthreelines{0.4cm}  % yshift for connecting lines between blocks when three lines above each other are used
+    \def\yshiftfourlines{0.4cm}
+    \def\yshiftbelowvehiclefirst{-0.5cm}
+    \def\yshiftbelowvehicleoffset{-0.2cm}
+    \def\yshiftaboveblocks{0.5cm}
+    \def\xshiftfirstuintomixer{-0.8cm}    
+
+        % Blocks
+		\node[draw, fill=lightgray, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center] (generator) at (0,0) {Trajectory\\Generator};
+		\node[draw, fill=lightgray, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center, right= of generator, xshift=\xshiftblocks] (trackingcontroller) {Trajectory\\Tracking\\Controller};
+		\node[draw, fill=lightgray, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center, right= of trackingcontroller, xshift=\xshiftblocks] (attitudecontroller) {Attitude\\Controller};
+        \node[draw, fill=lightgray, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center, right= of attitudecontroller, xshift=\xshiftblocks] (ratecontroller)  {Rate\\Controller};
+        \node[draw, fill=lightgray, semithick, rectangle, minimum width=\blockwidth-0.5cm, minimum height=2cm, align=center, right= of ratecontroller, xshift=\xshiftblocks] (mixer)  {Mixer};
+        \node[draw, fill=lightgray, semithick, rectangle, minimum width=\blockwidth-0.3cm, minimum height=\blockheight, align=center, right= of mixer, xshift=\xshiftblocks+0.7cm] (vehicle)  {Vehicle};
+		
+        % trajectory generator - trajectory tracking controller
+		\draw[-stealth] (generator.east) -- (trackingcontroller.west) node[midway, above] {$\bm{\sigma}_{\text{des}}$};
+
+        % trajectory tracking controller - attitude controller
+        \draw[-stealth] ([yshift=\yshifttwolines]trackingcontroller.east) -- ([yshift=\yshifttwolines]attitudecontroller.west) node[midway, above] {$\bm{f}_{\text{des}}$};
+        \draw[-stealth] ([yshift=-\yshifttwolines]trackingcontroller.east) -- ([yshift=-\yshifttwolines]attitudecontroller.west) node[midway, above] {$\bm{\phi}_{\text{des}}$};
+        
+        % attitude controller - rate controller
+        \draw[-stealth] (attitudecontroller.east) -- (ratecontroller.west) node[midway, above] {$\bm{\omega}_{\text{des}}$};
+
+        % rate controller - mixer
+		\draw[-stealth] ([yshift=\yshiftthreelines]ratecontroller.east) -- ([yshift=\yshiftthreelines]mixer.west) node[midway, above] {$u_2$};
+        \draw[-stealth] ([yshift=0cm]ratecontroller.east) -- ([yshift=0cm]mixer.west) node[midway, above] {$u_3$};
+        \draw[-stealth] ([yshift=-\yshiftthreelines]ratecontroller.east) -- ([yshift=-\yshiftthreelines]mixer.west) node[midway, above] {$u_4$};
+
+        % mixer - vehicle
+        \draw[-stealth] ([yshift=\yshiftfourlines]mixer.east) -- ([yshift=\yshiftfourlines]vehicle.west) node[midway, above, align=center] {ESC\\commands};
+        \draw[-stealth] ([yshift=1/3*\yshiftfourlines]mixer.east) -- ([yshift=1/3*\yshiftfourlines]vehicle.west) node[midway, above] {};
+        \draw[-stealth] ([yshift=-1/3*\yshiftfourlines]mixer.east) -- ([yshift=-1/3*\yshiftfourlines]vehicle.west) node[midway, above] {};
+        \draw[-stealth] ([yshift=-\yshiftfourlines]mixer.east) -- ([yshift=-\yshiftfourlines]vehicle.west) node[midway, below] {};
+
+        % vehicle - below all other blocks
+        \draw[-stealth] ([xshift=-0.2cm]vehicle.south) -- ++(0, \yshiftbelowvehiclefirst) -- ([yshift=\yshiftbelowvehiclefirst]ratecontroller.south) -- (ratecontroller.south) node[midway, right] {$\omeb, \omebp$};
+        \draw[-stealth] ([xshift=-0cm]vehicle.south) -- ++(0, \yshiftbelowvehiclefirst+\yshiftbelowvehicleoffset) -- ([yshift=\yshiftbelowvehiclefirst+\yshiftbelowvehicleoffset]attitudecontroller.south) -- (attitudecontroller.south) node[midway, right] {$\qb$};
+        \draw[-stealth] ([xshift=0.2cm]vehicle.south) -- ++(0, \yshiftbelowvehiclefirst+2*\yshiftbelowvehicleoffset) -- ([yshift=\yshiftbelowvehiclefirst+2*\yshiftbelowvehicleoffset]trackingcontroller.south) -- (trackingcontroller.south) node[midway, right] {$\pbo,\pbp$};
+        \draw[-stealth] ([yshift=\yshiftbelowvehiclefirst+2*\yshiftbelowvehicleoffset]trackingcontroller.south) -- ([yshift=\yshiftbelowvehiclefirst+2*\yshiftbelowvehicleoffset]generator.south) -- (generator.south) node[midway, right] {$\pbo,\pbp,\pbpp$};
+
+        % trajectory tracking controller - mixer (above blocks)
+        \draw[-stealth] ([xshift=0.3cm]trackingcontroller.north) -- ++(0, \yshiftaboveblocks) -- ([xshift=\xshiftfirstuintomixer, yshift=\yshiftaboveblocks+0.5*\blockheight]mixer.west) -- ([xshift=\xshiftfirstuintomixer, yshift=2*\yshiftthreelines]mixer.west) -- ([yshift=2*\yshiftthreelines]mixer.west) node[midway, above] {$u_1$};
+
+	\end{tikzpicture}
+	\caption{\textcolor{blue}{Overview of the control loops.}}
 	\label{fig:inner-outer-loop-feedback-control}
 \end{figure}
 The authors in \cite{Maurya09} demonstrated the viability of this approach for marine vehicles. The basic idea is to divide the problem of trajectory into easier to solve sub problems. By inner loops we refer to the low-level dynamic control loops consisting of attitude or body rate controllers. The design and tuning of these inner loops are highly dependent on the vehicle dynamics. The outer control loops, for example a position, path, or trajectory tracking controller, can be considered as kinematic control loops. They are by design decoupled from vehicle dynamics under the assumption, that the inner control loops are fast enough to reach the target value instantaneously from the perspective of the outer loop. This is equivalent to the assumption in \Cref{sec:thruster-model}, that the thruster dynamics compared to the \ac{uauv} dynamics are sufficiently fast to be negligible. As a result, we have a fast-slow separation from inner to outer loop, i.e. the inner loops run with a significantly higher frequency than the outer ones.
+
+
+
+
+
+
 
 \subsection{Body Rate Control}
 The body rate controller represents the innermost control loop.
@@ -1546,6 +1607,59 @@ We plug \Cref{eq:qdesired} in \Cref{eq:qerror} to apply the control law in \Cref
 	\caption{Implicit feedback control by regenerating new trajectories and selecting the best in each step.}
 \end{figure}
 
+\begin{figure}
+	\centering
+	\begin{tikzpicture}
+
+    \scriptsize
+
+    \def\blockheight{1.5cm}
+    \def\blockwidth{1.5cm}
+    \def\xshiftblocks{0cm}
+    \def\yshifttwolines{0.3cm}  % yshift for connecting lines between blocks when two lines above each other are used
+    \def\yshiftthreelines{0.4cm}  % yshift for connecting lines between blocks when three lines above each other are used
+    \def\yshiftfourlines{0.4cm}
+    \def\yshiftbelowvehiclefirst{-0.5cm}
+    \def\yshiftbelowvehicleoffset{-0.2cm}
+    \def\yshiftaboveblocks{0.5cm}
+    \def\xshiftfirstuintomixer{-0.8cm}    
+
+        % Blocks
+		\node[draw, fill=lightgray, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center] (generator) at (0,0) {Trajectory\\Generator};
+        \node[draw, fill=lightgray, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center, right= of generator, xshift=\xshiftblocks] (ratecontroller)  {Rate\\Controller};
+        \node[draw, fill=lightgray, semithick, rectangle, minimum width=\blockwidth-0.3cm, minimum height=2cm, align=center, right= of ratecontroller, xshift=\xshiftblocks] (mixer)  {Mixer};
+        \node[draw, fill=lightgray, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center, right= of mixer, xshift=\xshiftblocks+0.7cm] (vehicle)  {Vehicle};
+		
+        % generator controller - rate controller
+        \draw[-stealth] (generator.east) -- (ratecontroller.west) node[midway, above] {$\bm{\omega}_{\text{des}}$};
+
+        % rate controller - mixer
+		\draw[-stealth] ([yshift=\yshiftthreelines]ratecontroller.east) -- ([yshift=\yshiftthreelines]mixer.west) node[midway, above] {$u_2$};
+        \draw[-stealth] ([yshift=0cm]ratecontroller.east) -- ([yshift=0cm]mixer.west) node[midway, above] {$u_3$};
+        \draw[-stealth] ([yshift=-\yshiftthreelines]ratecontroller.east) -- ([yshift=-\yshiftthreelines]mixer.west) node[midway, above] {$u_4$};
+
+        % mixer - vehicle
+        \draw[-stealth] ([yshift=\yshiftfourlines]mixer.east) -- ([yshift=\yshiftfourlines]vehicle.west) node[midway, above, align=center] {ESC\\commands};
+        \draw[-stealth] ([yshift=1/3*\yshiftfourlines]mixer.east) -- ([yshift=1/3*\yshiftfourlines]vehicle.west) node[midway, above] {};
+        \draw[-stealth] ([yshift=-1/3*\yshiftfourlines]mixer.east) -- ([yshift=-1/3*\yshiftfourlines]vehicle.west) node[midway, above] {};
+        \draw[-stealth] ([yshift=-\yshiftfourlines]mixer.east) -- ([yshift=-\yshiftfourlines]vehicle.west) node[midway, below] {};
+
+        % vehicle - below all other blocks
+        \draw[-stealth] ([xshift=-0.2cm]vehicle.south) -- ++(0, \yshiftbelowvehiclefirst) -- ([yshift=\yshiftbelowvehiclefirst]ratecontroller.south) -- (ratecontroller.south) node[midway, right] {$\omeb, \omebp$};
+        \draw[-stealth] ([xshift=0.2cm]vehicle.south) -- ++(0, \yshiftbelowvehiclefirst+2*\yshiftbelowvehicleoffset) -- ([yshift=\yshiftbelowvehiclefirst+2*\yshiftbelowvehicleoffset]trackingcontroller.south) -- ([yshift=\yshiftbelowvehiclefirst+2*\yshiftbelowvehicleoffset]generator.south) -- (generator.south) node[midway, right] {$\pbo,\pbp,\pbpp$};
+
+        % u1 -  trajectory generator - mixer (above blocks)
+        \draw[-stealth] ([xshift=0.3cm]generator.north) -- ++(0, \yshiftaboveblocks) -- ([xshift=\xshiftfirstuintomixer, yshift=\yshiftaboveblocks+0.5*\blockheight]mixer.west) -- ([xshift=\xshiftfirstuintomixer, yshift=2*\yshiftthreelines]mixer.west) -- ([yshift=2*\yshiftthreelines]mixer.west) node[midway, above] {$u_1$};
+
+	\end{tikzpicture}
+	\caption{\textcolor{blue}{Overview of the control loops using implicit feedback. Note that ...}}
+	\label{fig:control_architecture}
+\end{figure}
+
+
+
+
+
 One advantage of the presented trajectory generation approach is, that it is computationally cheap. Hence, we can use the trajectory generation for implicit feedback control, due to the real-time capability of the trajectory planning. We are able to resample thousands of trajectories per control update step and choose the one best suited to accomplish a certain high level task.
 Subsequently, we need to recover the required thrust vector and commands for the rotational dynamics of the vehicle.
 
@@ -1641,6 +1755,56 @@ The desired roll angle $\rolldesired$ and the desired thrust $\thrustdesiredworl
 	\centering
 	\includegraphics[width=0.5\textwidth]{gazebo-ros-interaction}
 \end{figure}
+
+\begin{figure}
+	\centering
+	\begin{tikzpicture}
+
+    % \scriptsize
+
+    \def\gazeboblockheight{5.5cm}
+    \def\rosblockheight{4cm}
+    \def\gazeboblockwidth{4cm}
+    \def\blockheight{0.8cm}
+    \def\blockwidth{3cm}
+    \def\yshiftbetweenblocks{0.5cm}
+    \def\yshiftrosblocks{0.8cm}
+
+        % Blocks
+		
+        % Gazebo
+        \node[draw, fill=lightgray, semithick, rectangle, loosely dashed, minimum width=\gazeboblockwidth, minimum height=\gazeboblockheight, align=center, label=above:{Gazebo}] (gazebo) at (0,0) {};
+        \node[draw, fill=white, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center] (thrustermodel) at (0,0.5*\gazeboblockheight-1cm) {thruster model};
+        \node[draw, fill=white, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center, below= of thrustermodel, yshift=\yshiftbetweenblocks] (hydrodynamics) {hydrodynamics};
+        \node[minimum width=\blockwidth, minimum height=\blockheight, align=center, below= of hydrodynamics, yshift=\yshiftbetweenblocks] (rigidbody) {$+$\\rigid body\\(built in)};
+        
+        % ROS2
+        \node[draw, fill=lightgray, semithick, rectangle, loosely dashed, minimum width=\gazeboblockwidth, minimum height=\rosblockheight, align=center, label=above:{ROS2}, right= of gazebo] (ros) {};
+        \node[draw, fill=white, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center] (controlloops) at ([yshift=\yshiftrosblocks]ros.center) {control loops};
+        \node[draw, fill=white, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center] (mixer) at ([yshift=-\yshiftrosblocks]ros.center) {mixer};
+
+        \draw[-stealth] (controlloops.south) -- (mixer.north);
+        \draw[-stealth] (mixer.south) -- ++(0, -2.5cm);
+  
+        % \draw[] ([yshift=\yshiftthreelines]gazebo.north) {$u_2$};
+        % \node[align=center, above= of gazebo]  (gazebo_label) {Gazebo};
+        
+		% \node[draw, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center, right= of generator, xshift=\xshiftblocks] (trackingcontroller) {Trajectory\\Tracking\\Controller};
+
+		
+        % trajectory generator - trajectory tracking controller
+		%\draw[-stealth] (generator.east) -- (trackingcontroller.west) node[midway, above] {$\bm{\sigma}_{\text{des}}$};
+        % trajectory tracking controller - mixer (above blocks)
+        % \draw[-stealth] ([xshift=0.3cm]trackingcontroller.north) -- ++(0, \yshiftaboveblocks) -- ([xshift=\xshiftfirstuintomixer, yshift=\yshiftaboveblocks+0.5*\blockheight]mixer.west) -- ([xshift=\xshiftfirstuintomixer, yshift=2*\yshiftthreelines]mixer.west) -- ([yshift=2*\yshiftthreelines]mixer.west) node[midway, above] {$u_1$};
+
+	\end{tikzpicture}
+	\caption{\textcolor{blue}{Work in progress - Was genau wollen wir hier überhaupt zeigen? Solver bei Gazebo noch eintragen? Zusätzlich / Alternativ ROS node graph?}}
+	\label{fig:control_architecture}
+\end{figure}
+
+
+
+
 The control architecture presendet in \Cref{sec:control} is implemented in a modular design in \ac{ros2}. While being the successor of \ac{ros}, \ac{ros2} is developed independently from \ac{ros}.
 Consequently, the migration implies severe changes of the framework already existing for the HippoCampus platform. Nonetheless, this drawback is outweighed by the advantages this design decision entails. 
 
