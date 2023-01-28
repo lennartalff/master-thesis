@@ -137,8 +137,8 @@ The capability of this approach is demonstrated in experiments, where the quadro
 
 A combination of minimum snap trajectories and \ac{rrt} is presented in \cite{Richter16} and \cite{Shi20}.
 \ac{rrt} is used as a high-level planner whereas the minimum snap trajectory generator is used to compute smooth trajectories suitable for the dynamics of \acp{uav}. 
-The authors try to deal with the challenges of indoor navigation and use \ac{rrt} to generate waypoints as piecewise linear path to reach a goal position in presence of a cluttered environment. Subsequently, the waypoints are connected smoothly by minimum jerk trajectories.
-The implementation sacrifices the asymptotical optimality of \ac{rrt}* in favor of dynamically more suitable paths and reduced computation time. Even tough, the computation time could be reduced by a factor of 40, the remaining computation time is still in the magnitude of several seconds. Hence, the approach is not able to account for dynamic obstacles.
+The authors try to deal with the challenges of indoor navigation and use \ac{rrt} to generate waypoints as piece wise linear path to reach a goal position in presence of a cluttered environment. Subsequently, the waypoints are connected smoothly by minimum jerk trajectories.
+The implementation sacrifices the asymptotic optimality of \ac{rrt}* in favor of dynamically more suitable paths and reduced computation time. Even tough, the computation time could be reduced by a factor of 40, the remaining computation time is still in the magnitude of several seconds. Hence, the approach is not able to account for dynamic obstacles.
 
 
 \begin{itemize}
