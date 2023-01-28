@@ -1,5 +1,23 @@
 % !TeX root = ../Thesis.tex
 \chapter{Analysis}
+
+% \definecolor{darkgray176}{RGB}{176,176,176}
+% \definecolor{lightblue158218229}{RGB}{158,218,229}
+
+% \begin{groupplot}[group style={group size=1 by 2}]
+% \nextgroupplot[
+% xlabel={$y$[m]},
+% grid=both,
+% xmin=1, xmax=3,
+% ymin=0, ymax=1.5,
+% y dir=reverse,
+% ylabel={$x$ [m]},
+% axis equal,
+% legend entries={Actual Position,
+%                 Replanned Target Path},
+% ]
+% \addlegendimage{no markers,red, thick}
+% \addlegendimage{no markers,lightblue158218229, thick}
 \begin{itemize}
 	\color{red}
 	\item Test the dynamic behavior of the body rates to assess whether the assumptions that they are reached slowly and by far not instantaneously holds.
@@ -47,6 +65,25 @@
 
 
 \section{Body Rates Analysis}
+\begin{figure}
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[
+			no markers,
+			width=0.9\textwidth,
+			height=7cm,
+			grid=both,
+			% ymax=1.5,
+			xmax=0.7,
+			enlarge x limits=false,
+			xlabel={Time [s]},
+			ylabel={Angular rate [\unit{rad/s}]},
+			]
+			\addplot+[thick] table [x=t, y=v_ang, col sep=comma] {data/lab/rates_saturation.csv};
+		\end{axis}
+	\end{tikzpicture}
+	\caption{Angular rate for thrusters in saturation around the vehicle's vertical axis $\ezbody$. Maximum rate is ca. \unit[6.15]{rad/s}}. \unit[63]{\%} of the maximum is reached around $\tau \approx \unit[0.3]{s}$.
+\end{figure}
 
 \begin{itemize}
 	\color{red}
@@ -74,3 +111,16 @@
 
 
 \section{Implicit Feedback}
+
+\input{plots/sim/implicit/replanning_xy_perfect.tex}
+\input{plots/sim/implicit/replanning_xy_damping_4.9.tex}
+\input{plots/sim/implicit/replanning_xy_damping_4.4.tex}
+\input{plots/sim/implicit/replanning_xy_damping_5.9.tex}
+\input{plots/sim/implicit/replanning_xy_damping_6.4.tex}
+\begin{figure}
+	\centering
+	\input{plots/sim/implicit/ring_all.tex}
+	\caption{Intersections with the plane of the target object. The target object is visualized as black circle. High repeatability and accuracy as long as damping is not overestimated.}
+\end{figure}
+
+
