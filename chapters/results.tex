@@ -26,7 +26,7 @@
 	\item Multi Trajectory/Implicit Feedback should show the full capability of the approach. Collision avoidance can be added optionally
 \end{itemize}
 
-\textcolor{blue}{
+
 \section{Analysis Setup}
 The following section provides details on the simulation and the experimental testbed used for the analysis of the proposed methodology.
 \subsection{Simulation Environment}
@@ -41,7 +41,7 @@ The simulation parameters are summarized in \Cref{tab:sim_parameters}.
     \item where do the parameter come from?
     \item what else to consider here? 
 \end{itemize}}
-}
+
 \textcolor{red}{
 \begin{table}[]
         \caption{Overview on Model Parameters for the Gazebo Simulation.}
@@ -89,12 +89,11 @@ The tank is filled with fresh water that is continuously filtered and provides g
 Furthermore, the tank floor is equipped with an array of AprilTag markers (Tag-Family 36h11, size $7.5$\,cm, $25$\,cm spacing in $X$-direction, $30$\,cm in $Y$-direction) to allow the usage of the onboard $\mu$AUV self-localization system described in \cite{Duecker20}.
 
 
-
 \begin{figure}
     \centering
-    \includesvg[width=6cm]{images/04/hippo_with_markers}
-    \caption{\textcolor{blue}{HippoCampus \ac{uauv} equipped with reflective markers. Note that the black tape is used to avoid reflections on the acrylic glas enclosure that can be misinterpreted as markers.}}
-    \label{fig:hippo_with_marker}
+    \includegraphics[width=0.7\textwidth]{images/04/hippo_in_tank.png}
+    \caption{\textcolor{blue}{HippoCampus \ac{uauv} in experimental testbed.}}
+    \label{fig:my_label}
 \end{figure}
 
 
@@ -109,6 +108,15 @@ This allows to use the data live within the experiment, e.\,g. as a pose data fo
 Prior the experimental study, the motion capture system is calibrated to determine the camera positions with respect to the base frame origin. 
 Moreover, the averaged residuals are computed using the software \textit{Qualisys Tracking Manager} (QTM).
 The parameters are summarized in \Cref{tab:mocap_parameters}.
+
+
+\begin{figure}
+    \centering
+    \includesvg[width=6cm]{images/04/hippo_with_markers}
+    \caption{\textcolor{blue}{HippoCampus \ac{uauv} equipped with reflective markers. Note that the black tape is used to avoid reflections on the acrylic glas enclosure that can be misinterpreted as markers.}}
+    \label{fig:hippo_with_marker}
+\end{figure}
+
 
 \begin{figure}
     \centering
@@ -211,7 +219,7 @@ The parameters are summarized in \Cref{tab:mocap_parameters}.
 			% every box/.style={line, draw=mumblue, marker=o},
 			% every whisker/.style={line, mumblue},
 			cycle list={{mumblue}},
-			ylabel={Computatino time [\unit{ns}]},
+			ylabel={Computation time [\unit{ns}]},
 			xlabel={Zeitfenster},
 			boxplot={
 				draw position={\plotnumofactualtype}
