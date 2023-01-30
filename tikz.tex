@@ -23,6 +23,15 @@
 \makeatother
 %%
 
+\makeatletter
+\pgfplotsset{
+    boxplot/hide outliers/.code={
+        \def\pgfplotsplothandlerboxplot@outlier{}%
+    }
+}
+\makeatother
+
+
 \pgfplotsset{every axis/.append style={cycle list={
 			{mumblue},
 			{mumred},

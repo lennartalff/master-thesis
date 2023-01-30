@@ -94,6 +94,41 @@
 \end{itemize}
 
 \section{Computational Performance}
+\begin{figure}%[H]
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[
+			width=0.4\textwidth,
+			height=7cm,
+			boxplot/draw direction=y,
+			xtick={0, ..., 5},
+			xticklabels={Input Check, Collision Check, Input Feasible, Input Infeasible, Collision Feasible, Collision Infeasible},
+			xticklabel style = {align=right, rotate=60, anchor=east},
+			% x tick label as interval,
+			ymajorgrids,
+			% ytick distance={20},
+			% minor y tick num=4,
+			ymax=1250, ymin=0,
+			% every box/.style={line, draw=mumblue, marker=o},
+			% every whisker/.style={line, mumblue},
+			cycle list={{mumblue}},
+			ylabel={Computatino time [\unit{ns}]},
+			xlabel={Zeitfenster},
+			boxplot={
+				draw position={\plotnumofactualtype}
+			},
+			]
+			
+			\pgfplotsforeachungrouped \i in {1,...,6}
+			{
+				\addplot+[boxplot, draw=mumblue, mark=none, thick] table [col sep=comma, y index=\i]{plots/perf_dat/t_all.dat};
+			}
+		\end{axis}
+		% \node[below left] at (border.north east) {\ref{legend}};
+	\end{tikzpicture}
+	\caption{Computation time over 1000 samples. Input and collision feasibility check for all results and separated by feasibility result.}
+	\label{fig:computation-time-desktop}
+\end{figure}
 
 \begin{itemize}
 	\color{red}
@@ -117,10 +152,23 @@
 \input{plots/sim/implicit/replanning_xy_damping_4.4.tex}
 \input{plots/sim/implicit/replanning_xy_damping_5.9.tex}
 \input{plots/sim/implicit/replanning_xy_damping_6.4.tex}
+
 \begin{figure}
 	\centering
 	\input{plots/sim/implicit/ring_all.tex}
 	\caption{Intersections with the plane of the target object. The target object is visualized as black circle. High repeatability and accuracy as long as damping is not overestimated.}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\subfloat[Trajectory tracking without implicit feedback.]{
+		\centering
+		\input{plots/lab/explicit/ring.tex}
+	}
+	\subfloat[Mixed implicit feedback and tracking controller.]{
+		\centering
+		\input{plots/lab/mixed/ring.tex}
+	}
 \end{figure}
 
 
