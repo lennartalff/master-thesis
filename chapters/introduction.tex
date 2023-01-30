@@ -2,12 +2,39 @@
 \chapter{Introduction}\label{chap:introduction}
 
 \section{Motivation}
+Maritime environmental field exploration and monitoring are among the most promising task to be addressed by autonomous underwater vehicles (AUVs).
+The recent technological progress on the miniaturization of electronic components literally boosted the development of a new field of small-scale underwater robots.
+While full-scale underwater robots are mostly deployed in ocean and open-water like settings, this new class of small-scale vehicles enable accessing new \textit{confined} scenarios.
+These environments are characterized by lengths-scales of tenths of meters and are often cluttered. 
+This requires agile maneuvering and quick reactions by the robot’s planning algorithm if obstacles are detected.
+Examples include the range from harbor areas and marinas towards industry tanks such as nuclear storage ponds in various forms.
+%These environments come with strict space constraints and are often unstructured and cluttered. This requires agile maneuvering and quick reactions by the robot’s planning algorithm if obstacles are detected.
+These settings pose strong constraints on the vehicles with regard to maneuverability and size.
+This motivated the introduction of the class of micro AUVs ($\mu$AUVs) which has become a common category for tether-free underwater robots with a characteristic length up to 50\,cm.
+Prominent example include the AVEXIS \cite{Griffiths16} and the HippoCampus platform \cite{Duecker_AUV} as well as the LoCo AUV \cite{Edge20}.
+
+Given the strict constraints on the vehicle size, the onboard computational and sensory resources of these vehicles is naturally limited.
+Hence, a key design criterion for any algorithm to be developed is being computationally light-weight and still fast. 
+Following this thought, $\mu$AUVs pose much different requirements than marine robots designed for the open sea, as these focus on long planning horizons, own slow dynamics and carry sophisticated sensing equipment.
+
+\begin{itemize}
+    \item general - auv exploration blabla
+    \item difference to fill slae
+    \item aerial drones
+    \item 
+    \item make clear what I mean by real time capable (i.e. fast enough to keep up with the update rate, but no real-time guarantees in worst-case execution time)
+\end{itemize}
+
+
+
+
+
 \begin{itemize}
     \color{red}
     \item Definition micro auv \cite{micro-auv}
     \item Definition of hydrobatic \cite{hydrobatic} (bridge between fully actuated hover style AUVs and the traditional ones)
     \item Definition of agile \cite{duecker-phd}
-    \item make clear what I mean by real time capable (i.e. fast enough to keep up with the update rate, but no real-time guarantees in worst-case execution time)
+    
 \end{itemize}
 
 
