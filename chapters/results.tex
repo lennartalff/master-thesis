@@ -1,5 +1,5 @@
 % !TeX root = ../Thesis.tex
-\chapter{Analysis}
+\chapter{Analysis}\label{chap:analysis}
 
 % \definecolor{darkgray176}{RGB}{176,176,176}
 % \definecolor{lightblue158218229}{RGB}{158,218,229}
@@ -27,13 +27,24 @@
 \end{itemize}
 
 \textcolor{blue}{
-\section{(Experimental) Setup}
+\section{Analysis Setup}
+The following section provides details on the simulation and the experimental testbed used for the analysis of the proposed methodology.
+\subsection{Simulation Environment}
+The numerical studies of this thesis are conducted within the Gazebo simulation environment. 
+Gazebo is chosen for its seamless integration into the ROS world.
+This is particularly beneficial as Gazebo allows testing in the developed trajectory planning and control framework in a software-in-the-loop-like manner, i.\,e. the software implementation for simulation is identical to the implementation onboard the underwater robot.
+Note that the upgrade from the legacy ROS version \textit{one} towards ROS2 required upgrading the Gazebo implementation as well.
+\Cref{fig:analysis_setups} shows a screenshot of the Gazebo simulator.
+The simulation parameters are summarized in \Cref{tab:sim_parameters}.
+\textcolor{red}{
 \begin{itemize}
-    \item size of tank etc fresh water  / apriltag array inside
-    \item add figure
-\end{itemize}
+    \item where do the parameter come from?
+    \item what else to consider here? 
+\end{itemize}}
+}
+\textcolor{red}{
 \begin{table}[]
-        \caption{Overview on ....}
+        \caption{Overview on Model Parameters for the Gazebo Simulation.}
 		%\hspace*{-1.5cm}  % move table down (left in landscape) - tabular width: 
 		\centering
 		% change column width: >{\hsize=1.5\hsize\linewidth=\hsize}
@@ -50,18 +61,106 @@
             \midrule 
             %%%%%%%% Beispiel
             mass $m$ & $1$\,kg \\
+            added mass $m_\mathrm{a}$ & \,kg \\
+            damping $d_\mathrm{v}$ &  \\
+            inertia $I_\mathrm{x}$ &  \\
+            inertia $I_\mathrm{y}$ &  \\
+            inertia $I_\mathrm{z}$ &  \\
             \bottomrule
 		\end{NiceTabular}
-		\label{tab:parameters}
+		\label{tab:sim_parameters}
 \end{table}
-\subsection{Qualisys Motion Capture System}
-\begin{itemize}
-    \item Figure sketch - 4 cameras inside the tank (+ maybe screenshot from QTM?)
-    \item photo of sexy blue glowing cameras
-    \item photo of hippocampus with reflective markers
-    \item after conducting the QTM calibration procedure the estimated accuracy wihtin the calibration is XXXXXX according to the QTM calibration process.
-\end{itemize}
 }
+\begin{figure}
+    \centering
+    \includegraphics[width=0.4\textwidth]{images/04/roboquarium_tested_topview.jpg}
+    \quad\quad
+    \includegraphics[width=0.4\textwidth]{images/04/roboquarium_tested_topview.jpg}
+    \caption{Analysis setup for performance evaluations. Gazebo for simulation studies (\textit{left}) and top-view of the \textit{Roboquarium} underwater robot testbed (\textit{right}).}
+    \label{fig:testbed_topview}
+    \label{fig:analysis_setups}
+\end{figure}
+\subsection{Experimental Testbed}
+Evaluating the performance of the proposed methodology in real-world experiments is an important step in the development process.
+The physical experiments of this work have been conducted at the underwater robotics testing facilities \textit{Roboquarium} at the Institute of Mechanics and Ocean Engineering at TU Hamburg.
+The dimensions of the used water basin are $4\times2\times1.5\,\mathrm{m}^3$.
+\Cref{fig:testbed_topview} shows a photo of the testbed.
+The tank is filled with fresh water that is continuously filtered and provides good visibility conditions as required by vision-based localization systems.
+Furthermore, the tank floor is equipped with an array of AprilTag markers (Tag-Family 36h11, size $7.5$\,cm, $25$\,cm spacing in $X$-direction, $30$\,cm in $Y$-direction) to allow the usage of the onboard $\mu$AUV self-localization system described in \cite{Duecker20}.
+
+
+
+\begin{figure}
+    \centering
+    \includesvg[width=6cm]{images/04/hippo_with_markers}
+    \caption{\textcolor{blue}{HippoCampus \ac{uauv} equipped with reflective markers. Note that the black tape is used to avoid reflections on the acrylic glas enclosure that can be misinterpreted as markers.}}
+    \label{fig:hippo_with_marker}
+\end{figure}
+
+
+\subsubsection*{Qualisys Motion Capture System}
+Recently, the Roboquarium testbed has been equipped with a professional underwater motion capture system to provide high-precision ground truth pose data of the tracked underwater objects.
+The installed motion capture system features four \textit{Qualisys\,Miqus\,3} underwater cameras that are mounted into the corners of the water basin, as shown in \Cref{fig:testbed_topview}.
+Prior to the experiment, the objects to be tracked, i.\,e. the \ac{uauv}, are equipped with multiple reflective markers, as depicted in \Cref{fig:hippo_with_marker}. 
+In the current setup, the motion capture system provides 6-DOF data of pre-defined underwater objects at 100\,Hz, see also the 3D-overlay in \Cref{fig:qtm_3d} and the multi-camera reflection intensity view in \Cref{fig:qtm_intensity}.
+Note that the motion captures system has been integrated into the Roboquarium ROS network.
+This allows to use the data live within the experiment, e.\,g. as a pose data for the vehicle control loops.
+
+Prior the experimental study, the motion capture system is calibrated to determine the camera positions with respect to the base frame origin. 
+Moreover, the averaged residuals are computed using the software \textit{Qualisys Tracking Manager} (QTM).
+The parameters are summarized in \Cref{tab:mocap_parameters}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/04/qtm_3d_overlay.png}
+    \caption{3D-overlay with tracked vehicle (yellow skeleton), the frame origin, and the four cameras provided by the Qualisys QTM software.}
+    \label{fig:qtm_3d}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/04/qtm_multi_cam_intensity.png}
+    \caption{Multi-camera view with reflective intensity from \textit{blue} (low intensity) to \textit{red} (high intensity).}
+    \label{fig:qtm_intensity}
+\end{figure}
+
+% \begin{itemize}
+%     \item Figure sketch - 4 cameras inside the tank (+ maybe screenshot from QTM?)
+%     \item photo of sexy blue glowing cameras
+%     \item photo of hippocampus with reflective markers
+%     \item after conducting the QTM calibration procedure the estimated accuracy wihtin the calibration is XXXXXX according to the QTM calibration process.
+% \end{itemize}
+
+\begin{table}[]
+        \caption{Calibration Parameters of Motion Capture System.}
+		%\hspace*{-1.5cm}  % move table down (left in landscape) - tabular width: 
+		\centering
+		% change column width: >{\hsize=1.5\hsize\linewidth=\hsize}
+		% >{\hsize=0.5\hsize\linewidth=\hsize}
+		\begin{NiceTabular}
+            {
+            %%%%% Leider scheint die beste Methode wirklich hardgecodete Spaltenbreiten zu sein - hier am Ende rumspielen
+            >{\centering\arraybackslash}m{2cm}  %
+            >{\raggedleft\arraybackslash}m{1.7cm} % 
+            >{\raggedleft\arraybackslash}m{1.7cm} %
+            >{\centering\arraybackslash}m{1.7cm} %
+            >{\centering\arraybackslash}m{2.2cm} %
+            >{\centering\arraybackslash}m{2cm} %
+            }
+            \toprule
+            %%%%%%%%%%% Top row - names of each columns
+            Camera\,\# &  X\,(mm) & Y\,(mm) & Z\,(mm) & Calibration Points & Average Residual (mm) \\  
+            \midrule 
+            %%%%%%%% Beispiel
+            01 & -1\,126.29 & -1\,346.14 & 1\,360.69 & 1\,891 & 0.5458 \\
+            02 &     460.29 &  1\,357.67 & 1\,360.02 & 1\,584 & 0.6037\\
+            03 &     483.47 &  2\,022.77 & 1\,350.27 & 1\,332 & 0.7383\\
+            04 & -1\,055.28 &  2\,049.69 & 1\,326.27 & 1\,500 & 0.6270\\
+            \bottomrule
+		\end{NiceTabular}
+		\label{tab:mocap_parameters}
+\end{table}
+
 
 
 \section{Body Rates Analysis}

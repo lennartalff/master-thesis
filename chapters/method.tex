@@ -1,18 +1,19 @@
 % !TeX root = ../Thesis.tex
 
 \chapter{An Approach to Agile Maneuvering}
-\label{sec:approach-to-agile-maneuvering}
+\label{chap:approach-to-agile-maneuvering}
 
-\section{Concept}
+\section{Concept}\label{sec:concept}
 \textcolor{red}{
 \begin{itemize}
-    \item briefly describe the general concept
+    \item briefly describe the general concept / framework
     \begin{itemize}
         \item What do we do here?
         \item how is the planning suppose to work
         \item what modules/step do we need to take to make this work
     \end{itemize} 
-    \item brief intro that we now use ROS2
+    \item brief intro that we now use ROS2 - based on limitations mentioned in \Cref{sec:sw_limitatations} - recent development of ROS2 - promising direction/solution 
+    \item just recently stable version of ROS2 - so far made no sense
     \begin{itemize}
         \item what is getting better?
         \item compare with corresponding figure in chapter 2
@@ -51,6 +52,8 @@
 
         % High level Planner
         \node[draw, fill=lightgray, semithick, rectangle, rounded corners=0.2cm, densely dashed, minimum width=\blockwidth, minimum height=\blockheight-1cm, align=center, above= of trajectoryblock, label={[label distance=\labelyshift]90:High Level Planner}] (plannerblock) {\includegraphics[width=.25\textwidth]{images/03/high_level_planner.png}};  % high_level_planner3.png ist scharf aber kein so geeigneter Zeitpunkt
+
+        % State Estimation
 
         % Trajectory 
 
@@ -126,14 +129,18 @@
 \label{sec:system-dynamics}
 
 \subsection{Choice of Reference Frames}
+We define two reference frames, referred to as \textit{world} and \textit{body} to describe the 6\,DOF motion of the underwater robot.
+Figure\,\ref{fig:reference_frames} illustrated the definition of both frames.
 \begin{figure}[h!]
 	\centering
 	\input{images/03/free-body-diagram.pdf_tex}
 	\caption{Definition of the world-fixed inertial frame of reference $\mathcal{W}$ and the body-fixed frame $\mathcal{B}$.}
+ \label{fig:reference_frames}
 \end{figure}
+\textcolor{blue}{
 \subsubsection{World-fixed Frame}
 \subsubsection{Body-fixed Frame}
-
+}
 
 
 % In order to describe the 6\,DOF motion of an underwater vehicle we define two main geographic reference frames.
@@ -593,15 +600,17 @@ and
 	\end{itemize}
 \end{itemize}
 
-\subsection{Differential Flatness (Optional)}
-\label{sec:differential-flatness}
-{\color{red}
-	show diff. flatness and motivate it by highlighting that it is useful for the trajectory-generation section
-}
+% \subsection{Differential Flatness (Optional -- Streichen,)}
+% \label{sec:differential-flatness}
+% {\color{orange}
+% 	show diff. flatness and motivate it by highlighting that it is useful for the trajectory-generation section
+% }
+
+
 
 \section{Trajectory Generation}
 \label{sec:trajectory-generation}
-
+\todo{Einfach streichen und irgendwo auf das IROS 2021 mit Christian referenzieren und sagen, dass das for the sake of brevity dort zu finden ist und in detailliert noch mal in meiner diss}
 The goal of the generated trajectories is to bring the vehicle from an initial state $\vehiclestate_0$ at time $t=0$ to a desired final state $\vehiclestate_{\text{f}}$ at $t=T$, with the vehicle state being described by 
 \begin{equation}
 	\vehiclestate = 
@@ -1348,13 +1357,12 @@ The trajectory is feasible with respect to the position constraints if and only 
 \end{equation}
 with $\pbo_{\text{W}}$ denoting an arbitrary point on the plane defining the wall constraint. Geometrically interpreted, we can regard $\pp_{\text{n}}$ as the velocity projected onto the normal direction of the plane given by $\nb_{\text{W}}$.
 
-The position is a quintic polynomial, as we can see in \Cref{eq:optimal-trajectory-per-axis}. Thus, computing $\mathcal{C}_{\text{crit}}$ is done by solving the roots of the fourth order polynomial $\pp_{\text{n}}$. The feasibility check is carried out by evaluating the left-hand side of \Cref{eq:position-feasibility-criterion} at least twice and most six times per axis. This is similar to the input feasibility checks presented in \Cref{sec:input-feasibility} with the difference that no recursion is needed, though.
+The position is a quintic polynomial, as we can see in \Cref{eq:optimal-trajectory-per-axis}. Thus, computing $\mathcal{C}_{\text{crit}}$ is done by solving the roots of the fourth-order polynomial $\pp_{\text{n}}$. The feasibility check is carried out by evaluating the left-hand side of \Cref{eq:position-feasibility-criterion} at least twice and most six times per axis. This is similar to the input feasibility checks presented in \Cref{sec:input-feasibility} with the difference that no recursion is needed, though.
 
 \subsubsection{Velocity Feasibility}
-
 \todo{optional}
 
-\section{Obstacle/Collision Avoidance}
+\section{Obstacle/Collision Avoidance}\label{sec:collision-avoidance}
 
 \begin{itemize}
 	\color{red}
@@ -1523,10 +1531,10 @@ The general control architecture implements the inner-outer loop control scheme 
         \draw[-stealth] ([xshift=0.3cm]trackingcontroller.north) -- ++(0, \yshiftaboveblocks) -- ([xshift=\xshiftfirstuintomixer, yshift=\yshiftaboveblocks+0.5*\blockheight]mixer.west) -- ([xshift=\xshiftfirstuintomixer, yshift=2*\yshiftthreelines]mixer.west) -- ([yshift=2*\yshiftthreelines]mixer.west) node[midway, above] {$u_1$};
 
 	\end{tikzpicture}
-	\caption{\textcolor{blue}{Overview of the control loops.}}
+	\caption{Overview of the control loops.}
 	\label{fig:inner-outer-loop-feedback-control}
 \end{figure}
-The authors in \cite{Maurya09} demonstrated the viability of this approach for marine vehicles. The basic idea is to divide the problem of trajectory into easier to solve sub problems. By inner loops we refer to the low-level dynamic control loops consisting of attitude or body rate controllers. The design and tuning of these inner loops are highly dependent on the vehicle dynamics. The outer control loops, for example a position, path, or trajectory tracking controller, can be considered as kinematic control loops. They are by design decoupled from vehicle dynamics under the assumption, that the inner control loops are fast enough to reach the target value instantaneously from the perspective of the outer loop. This is equivalent to the assumption in \Cref{sec:thruster-model}, that the thruster dynamics compared to the \ac{uauv} dynamics are sufficiently fast to be negligible. As a result, we have a fast-slow separation from inner to outer loop, i.e. the inner loops run with a significantly higher frequency than the outer ones.
+The authors in \cite{Maurya09} demonstrated the viability of this approach for marine vehicles. The basic idea is to divide the problem of trajectory into easier-to-solve subproblems. By inner loops, we refer to the low-level dynamic control loops consisting of attitude or body rate controllers. The design and tuning of these inner loops are highly dependent on the vehicle dynamics. The outer control loops, for example, a position, path, or trajectory tracking controller, can be considered as kinematic control loops. They are by design decoupled from vehicle dynamics under the assumption, that the inner control loops are fast enough to reach the target value instantaneously from the perspective of the outer loop. This is equivalent to the assumption in \Cref{sec:thruster-model}, that the thruster dynamics compared to the \ac{uauv} dynamics are sufficiently fast to be negligible. As a result, we have a fast-slow separation from the inner to the outer loop, i.e. the inner loops run with a significantly higher frequency than the outer ones.
 
 
 
@@ -1841,6 +1849,8 @@ The desired roll angle $\rolldesired$ and the desired thrust $\thrustdesiredworl
 
 
 \section{Implementation}
+\label{sec:implementation}
+
 \begin{figure}
 	\centering
 	\includegraphics[width=0.5\textwidth]{gazebo-ros-interaction}
@@ -1900,4 +1910,18 @@ Consequently, the migration implies severe changes of the framework already exis
 
 \ac{ros2} comes with a new generation of the simulator Gazebo, hence requiring a new implementation of the simulation setup for the HippoCampus \ac{uauv}. The dynamic behavior of a model in the simulation can be replicated via plugins. The vehicle dynamics and the thruster forces and moments are modeled based on  \Cref{eq:thruster-load-vs-uesc,eq:eom-translational-with-input,eq:eom-rotational-with-input}.
 
-\label{sec:implementation}
+\textcolor{blue}{
+
+Based on limitations identified in \Cref{sec:sw_limitatations}....
+
+This can be overcome by migrating from \ac{ros} to its successor \ac{ros2}, that enables direct communication between the \ac{fcu} and the onboard computer via \ac{dds}. Hence, all software modules developed in the scope of this thesis are implemented using \ac{ros2}.
+
+The interested reader may refer to \cite{ros2} for an exhaustive overview of the design and architecture of \ac{ros2}. The main aspects relevant for this thesis are listed below.
+
+Embedded systems are well integrated into the \ac{ros2} framework. A \ac{ros2} stack specifically designed for microcontrollers, called micro-ROS, allows the direct communication between computers and microcontrollers. With regard to HippoCampus, this means the \ac{fcu} running PX4 and the onboard computer can communicate directly without the abstraction layers introduced by MAVROS and \ac{mavlink}. This enables high rate data streams between the devices.
+
+Furthermore, \ac{ros2} introduces the concept of \ac{qos} as it relies on \ac{dds} for communication. Hence, data streams transporting sensor data can be declared to be transmitted with \emph{best effort}. As a result, the loss of messages is accepted, while the latency can be reduced. This especially useful for sensor data, where it is of interest to receive the most recent measurements as fast as possible. For message sizes of up to \unit[1]{MB} latencies below \unit[1]{ms} can be achieved for communication between different processes \cite{ros2}. High latencies impose delays on control loops and state estimation with possibly severe negative influence on their performance.
+
+Though not required for this thesis, it should be noted, that \ac{ros2} is suitable for real-time systems. In contrast to its predecessor, \ac{ros2} can be configured for deterministic scheduling to enforce real-time constraints \cite{ros-realtime20}. This can be a critical property for the field of mobile robotics, where deterministic execution times can be safety critical.
+
+}
