@@ -1,13 +1,24 @@
 % !TeX root = ../Thesis.tex
-\chapter{Introduction}
+\chapter{Introduction}\label{chap:introduction}
+
+\section{Motivation}
 \begin{itemize}
     \color{red}
     \item Definition micro auv \cite{micro-auv}
     \item Definition of hydrobatic \cite{hydrobatic} (bridge between fully actuated hover style AUVs and the traditional ones)
     \item Definition of agile \cite{duecker-phd}
-    \item make clear what I mean by real time capable (i.e. fast enough to keep up with the update rate, but no real time guarantees in worst case execution time)
+    \item make clear what I mean by real time capable (i.e. fast enough to keep up with the update rate, but no real-time guarantees in worst-case execution time)
 \end{itemize}
-\section{Motivation}
+
+
+
+
+
+
+
+
+
+
 
 \section{Problem Statement}
 Consider the scenario of the highly agile and underactuated HippoCampus \ac{uauv} maneuvering in a confined environment -- such as a water tank -- to reach a time dependent goal state.
@@ -15,7 +26,7 @@ Such a time dependent goal state can be represented by a moving ring, that is to
 Additionally, there might be obstacles present, which make a method for collision avoidance mandatory.
 Due to the physical limitations of wireless underwater communication \cite{Bettale08p1,GeistEtAl16}, all algorithms have to be executed on-board and in real time to allow for autonomous maneuvering.
 
-From this scenario we can derive the following requirements for a trajectory generation and tracking system:
+From this scenario, we can derive the following requirements for a trajectory generation and tracking system:
 
 \begin{itemize}
     \item real time capability of the trajectory generation algorithm, when executed by the on-board hardware
@@ -30,21 +41,54 @@ Goal of this thesis is to develop such a system meeting the above-mentioned requ
     \centering
     \includesvg{agile_maneuvering_motivation}
     \caption{Agile maneuvering in confined underwater environment. \textcolor{blue}{Das gleiche mit mehreren Trajektorien später nochmal in Konzept ? - wie Fig. 3.1 von Christian}}
-    \label{fig:my_label}
+    \label{fig:agile_maneuvering_motivation}
 \end{figure}
 
 
-\section{Contribution and Outline}
+\section{Contribution}
 
-Based on a literature review in \Cref{sec:review-path-planning} on existing underwater path planning approaches in general and agile path planning -- including publications in the field of aerial vehicles -- the suitability of different approaches is discussed. 
+\textcolor{red}{
+What have been gaps/limitations?
+%
+What are the key contributions?
+\begin{enumerate}
+    \item 
+    \item ROS2 - because....
+    \item
+\end{enumerate}
+}
 
-By leveraging the synergies between aerobatic \acp{uav} and hydrobatic \acp{uauv}, the approach of computational efficient trajectory generation for quadrocopters in \cite{MuellerHehn15} is transferred to the underwater domain in \Cref{sec:approach-to-agile-maneuvering}.
+Based on a literature review in \Cref{sec:review-motion-planning} on existing underwater path planning approaches in general and agile path planning -- including publications in the field of aerial vehicles -- the suitability of different approaches is discussed. 
+
+By leveraging the synergies between aerobatic \acp{uav} and hydrobatic \acp{uauv}, the approach of computational efficient trajectory generation for quadrocopters in \cite{MuellerHehn15} is transferred to the underwater domain in \Cref{chap:approach-to-agile-maneuvering}.
 This includes taking the differences in modelling the vehicle's dynamics into account and addressing them with respect to computational efficiency, robustness of the trajectory tracking performance, and the sampling strategy.
-
-The dynamic model of the HippoCampus \ac{uauv} is derived in \Cref{sec:system-dynamics} and applied to the sampling-based trajectory generation framework presented in \Cref{sec:trajectory-generation} and \Cref{sec:feasibility}.
-It is complemented by a attitude controller as proposed in \Cref{sec:control}.
-The framework's implementation details are presented in this thesis are given in \Cref{sec:implementation}
-
 \todo[inline]{Schon mal sagen, welche Erkenntnisse konkret aus den Experimenten gewonnen werden. Muss abgestimmt werden, mit dem, was ich am Ende tatsaechlich dort stehen habe}
+
+
+\section{Thesis Outline}
+The subsequent structure of this thesis is as follows. 
+\Cref{chap:fundamentals} provide a concise overview on the fundamentals for this work.
+First, we present the micro underwater robot platform in XXX and point-out relevant details on its hardware and software concept. 
+Subsequently, a review on state of the art motion planning methods is conducted in \Cref{sec:review-motion-planning}.
+This survey starts from methods used in the underwater domain but also opens its view to methods for agile path planning in other domains such as the very active field of aerial drones.
+The identified relevant literature is summarized for the reader's convenience in \Cref{tab:state_of_the_art}.
+%
+Based on these fundamentals, we develop a novel approach to agile underwater motion planning in \Cref{chap:approach-to-agile-maneuvering}. 
+Starting from the conceptual overview in \cref{sec:concept}, we study the system dynamics of the HippoCampus \ac{uauv} in \Cref{sec:system-dynamics}.
+This is followed by the presentation of the sampling-based trajectory generation approach in \Cref{sec:trajectory-generation} which is elaborated in  \Cref{sec:feasibility}  and  \Cref{sec:collision-avoidance} with methods for feasibility checks and an approach for collision avoidance, respectively.
+Moreover, we develop suitable control strategies in \Cref{sec:control}.
+Finally, we provide insights on the actual implementation of the proposed agile planning framework in \Cref{sec:implementation}.
+%
+A detailed performance analysis is conducted in \Cref{chap:analysis}. It considers numerical studies and experimental studies.
+%
+The thesis concludes in \Cref{chap:conclusion} with a summary of the thesis' main findings and an outlook toward future work.
+
+
+
+% The dynamic model of the HippoCampus \ac{uauv} is derived in \Cref{sec:system-dynamics} and applied to the sampling-based trajectory generation framework presented in \Cref{sec:trajectory-generation} and \Cref{sec:feasibility}.
+% It is complemented by a attitude controller as proposed in \Cref{sec:control}.
+% The framework's implementation details are presented in this thesis are given in \Cref{sec:implementation}
+
+
 
 
