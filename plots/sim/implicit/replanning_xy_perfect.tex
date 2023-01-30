@@ -6,6 +6,7 @@
     
     \begin{groupplot}[group style={group size=1 by 2}]
     \nextgroupplot[
+    width=0.98\textwidth,
     xlabel={$y$[m]},
     grid=both,
     xmin=1, xmax=3.5,
@@ -14,10 +15,16 @@
     ylabel={$x$ [m]},
     axis equal,
     legend entries={Actual Position,
-                    Replanned Target Path},
+                    Replanned Target Path, Start},
+    legend style={legend cell align=left, align=left, draw=white!15!black,at={(0.5,0.0)}, , anchor=south}
     ]
     \addlegendimage{no markers,red, thick}
     \addlegendimage{no markers,lightblue158218229, thick}
+    \addlegendimage{black, thick, mark=*, only marks}
+    \addplot+[mark=*, black]
+    table {%
+    3.27933958051337 0.206896182083703
+    };
     \addplot [thick, lightblue158218229]
     table {%
     3.27933958051337 0.206896182083703

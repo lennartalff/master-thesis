@@ -7,18 +7,23 @@
     
     \begin{groupplot}[group style={group size=1 by 2}]
     \nextgroupplot[
-    xlabel={$y$[m]},
+        width=0.98\textwidth,
+    xlabel={$y$ [m]},
     grid=both,
     xmin=1, xmax=3.5,
     ymin=0, ymax=1.5,
     y dir=reverse,
     ylabel={$x$ [m]},
     axis equal,
-    legend entries={Actual Position,
-                    Replanned Target Path},
+    % legend entries={Actual Position,
+    %                 Replanned Target Path},
     ]
-    \addlegendimage{no markers,red, thick}
-    \addlegendimage{no markers,lightblue158218229, thick}
+    % \addlegendimage{no markers,red, thick}
+    % \addlegendimage{no markers,lightblue158218229, thick}
+    \addplot+[mark=*, black]
+    table {%
+        3.13483517162475 0.0986168548241004
+    };
     \addplot [thick, lightblue158218229]
     table {%
     3.13483517162475 0.0986168548241004

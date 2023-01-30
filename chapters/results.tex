@@ -26,23 +26,17 @@
 	\item Multi Trajectory/Implicit Feedback should show the full capability of the approach. Collision avoidance can be added optionally
 \end{itemize}
 
-\textcolor{blue}{
+
 \section{Analysis Setup}
-The following section provides details on the simulation and the experimental testbed used for the analysis of the proposed methodology.
+The following section provides details on the simulation and the experimental testbed used for the analysis of the methodology proposed in this thesis.
+
 \subsection{Simulation Environment}
 The numerical studies of this thesis are conducted within the Gazebo simulation environment. 
-Gazebo is chosen for its seamless integration into the ROS world.
+Gazebo is chosen for its seamless integration into the \ac{ros} framework.
 This is particularly beneficial as Gazebo allows testing in the developed trajectory planning and control framework in a software-in-the-loop-like manner, i.\,e. the software implementation for simulation is identical to the implementation onboard the underwater robot.
 Note that the upgrade from the legacy ROS version \textit{one} towards ROS2 required upgrading the Gazebo implementation as well.
 \Cref{fig:analysis_setups} shows a screenshot of the Gazebo simulator.
-The simulation parameters are summarized in \Cref{tab:sim_parameters}.
-\textcolor{red}{
-\begin{itemize}
-    \item where do the parameter come from?
-    \item what else to consider here? 
-\end{itemize}}
-}
-\textcolor{red}{
+The vehicle parameters used in the simulation are the ones summarized in \Cref{tab:sim_parameters}, unless stated otherwise.
 \begin{table}[]
         \caption{Overview on Model Parameters for the Gazebo Simulation.}
 		%\hspace*{-1.5cm}  % move table down (left in landscape) - tabular width: 
@@ -60,20 +54,20 @@ The simulation parameters are summarized in \Cref{tab:sim_parameters}.
             Parameter &  Value \\  
             \midrule 
             %%%%%%%% Beispiel
-            mass $m$ & $1$\,kg \\
-            added mass $m_\mathrm{a}$ & \,kg \\
-            damping $d_\mathrm{v}$ &  \\
-            inertia $I_\mathrm{x}$ &  \\
-            inertia $I_\mathrm{y}$ &  \\
-            inertia $I_\mathrm{z}$ &  \\
+            mass $m$ & \unit[2.31]{kg} \\
+            added mass $X_{u}$ & \unit[2.0]{kg} \\
+            damping $X_{\dot{u}}$ &  \\
+            inertia $I_\mathrm{x}$ & $\unit[0.014]{kg m^2}$ \\
+            inertia $I_\mathrm{y}$ &  $\unit[0.039]{kg m^2}$\\
+            inertia $I_\mathrm{z}$ &  $\unit[0.039]{kg m^2}$\\
             \bottomrule
 		\end{NiceTabular}
 		\label{tab:sim_parameters}
 \end{table}
-}
+For an older iteration of the HippoCampus \ac{uauv}, model parameters have been identified. Since the vehicle design has changed since then, they can be considered as a rough estimation basis for the new design. The vehicle's mass is measured with a scale and the inertia terms are calculated based on the geometry of the vehicle and its mass, where the vehicle approximated as cylinder.
 \begin{figure}
     \centering
-    \includegraphics[width=0.4\textwidth]{images/04/roboquarium_tested_topview.jpg}
+    \includegraphics[width=0.4\textwidth]{images/04/gazebo.png}
     \quad\quad
     \includegraphics[width=0.4\textwidth]{images/04/roboquarium_tested_topview.jpg}
     \caption{Analysis setup for performance evaluations. Gazebo for simulation studies (\textit{left}) and top-view of the \textit{Roboquarium} underwater robot testbed (\textit{right}).}
@@ -164,6 +158,10 @@ The parameters are summarized in \Cref{tab:mocap_parameters}.
 
 
 \section{Body Rates Analysis}
+
+In this section a brief analysis of the HippoCampus' body rates is given. Thereby, the assumption of instantaneously achievable body rates can be verified and put in a temporal context. Moreover, it is possible to determine an upper limit for feasible body rates, used in the trajectory module.
+
+The first experiment is conducted without any controller. Only the angular rate around the vehicle's vertical axis $\exbody$ is examined, since the movement around the roll axis is not relevant for the trajectory tracking as stated in the previous chapter. The movement around $\eybody$ and $\ezbody$ can be assumed to be identical due to the symmetrical design of the vehicle. For the experiment, the vehicle is freely floating in the water of the tank depicted in \Cref{fig:testbed_topview}. The thrusters are then driven in saturation and the body rates are measured by the onboard \ac{imu}. The resulting body rate is shown in \Cref{fig:body-rate-saturation}.
 \begin{figure}
 	\centering
 	\begin{tikzpicture}
@@ -181,23 +179,94 @@ The parameters are summarized in \Cref{tab:mocap_parameters}.
 			\addplot+[thick] table [x=t, y=v_ang, col sep=comma] {data/lab/rates_saturation.csv};
 		\end{axis}
 	\end{tikzpicture}
-	\caption{Angular rate for thrusters in saturation around the vehicle's vertical axis $\ezbody$. Maximum rate is ca. \unit[6.15]{rad/s}}. \unit[63]{\%} of the maximum is reached around $\tau \approx \unit[0.3]{s}$.
+	\caption{Angular rate for thrusters in saturation around the vehicle's vertical axis $\ezbody$. Maximum rate is ca. \unit[6.15]{rad/s}. \unit[63]{\%} of the maximum is reached around $\tau \approx \unit[0.3]{s}$.}
+	\label{fig:body-rate-saturation}
 \end{figure}
+We observe a maximum achievable body rate of $\omega_{\max}\approx \unit[6.15]{rad/s}$, i.\,e. slightly below one rotation per second.
+Furthermore, \unit[63]{\%} of the final rate are reached after \unit[0.3]{s}, which is equivalent of a time constnat $\tau = \unit[0.3]{s}$ for a first-order system.
+Note that this experiment reflects a worst case scenario.
+In general, we can expect to reach desired body rates faster, if a controller is used and the desired body rate is below the maximum possible.
 
-\begin{itemize}
-	\color{red}
-	\item Useful for myself to get reasonable values for the body rate limit
-	\item Either use the body rate controller or just feed through
-	\item Use step function and compute the time constant?
-	\item Only test pitch/yaw. Roll is irrelevant
-\end{itemize}
+In the second experiment, a body rate controller is deployed. The desired body rate is set to values between \unit[1]{rad/s} and \unit[4]{rad/s} and applied as step inputs to the system. The corresponding results are presented in \Cref{fig:body-rate-controlled}.
+\begin{figure}
+	\centering
+	\input{plots/lab/rates.tex}
+	\caption{Angular rates with active rate controller. First-order time constant can be assumed in the magnitude of $\tau=\unit[0.1]{s}$}.
+	\label{fig:body-rate-controlled}
+\end{figure}
+The body rates are reached significantly faster than in the first experiment without controller.
+The first-order time constant can be estimated to be in the vicinity of $\tau=\unit[0.1]{s}$. Still, it takes considerable time to reach the desired body rates, which should be noted for future design of control modules.
 
 \section{Computational Performance}
+For the trajectory generation and implicit feedback control scheme, the computation time required for sampling new trajectories and check their feasibility with respect to the dynamic and translational constraints, is crucial. The more trajectories can be generated and checked for feasibility, the higher the probability of finding a new solution per control step. Furthermore, a high computation time introduces delays in the control loop. This is undesirable, especially in the context of agile maneuvering with high velocities.
+
+To evaluate the performance of the trajectory module, a Monte Carlo simulation \todo{Is this correct? Bucki says so.} is conducted. For a given initial position $p_0 = \left[0, 0, 0\right]^\top$ uniformly distributed values are sampled randomly over a defined range. 
+\begin{table}[]
+	\caption{Parameters of the Monte Carlo simulation}
+	%\hspace*{-1.5cm}  % move table down (left in landscape) - tabular width: 
+	\centering
+	% change column width: >{\hsize=1.5\hsize\linewidth=\hsize}
+	% >{\hsize=0.5\hsize\linewidth=\hsize}
+	\begin{NiceTabular}
+		{
+		%%%%% Leider scheint die beste Methode wirklich hardgecodete Spaltenbreiten zu sein - hier am Ende rumspielen
+		>{\centering\arraybackslash}m{4cm}  %
+		>{\raggedleft\arraybackslash}m{1.7cm} % 
+		>{\raggedleft\arraybackslash}m{1.7cm} % 
+		>{\raggedleft\arraybackslash}m{1.7cm} %
+		}
+		\toprule
+		%%%%%%%%%%% Top row - names of each columns
+		Paramter & Symbol & Minimum & Maximum \\
+		\midrule
+		%%%%%%%% Beispiel
+		Initial Position & $\pbo_0$ & \unit[0]{m} & \unit[0]{m} \\
+		Initial Velocity & $\vb_0$ & \unit[-1.0]{m/s} & \unit[1.0]{m/s} \\
+		Initial Acceleration & $\ab_0$ & $\unit[-1.0]{m/s^2}$ & $\unit[1.0]{m/s^2}$ \\
+		Final Position & $\pbo_{\text{f}}$ & $\unit[-4.0]{m}$ & $\unit[4.0]{m}$ \\
+		\bottomrule
+	\end{NiceTabular}
+	\label{tab:mocap_parameters}
+\end{table}
 \begin{figure}%[H]
 	\centering
-	\begin{tikzpicture}
+	\begin{subfigure}[t]{0.49\textwidth}
+		\begin{tikzpicture}
+			\begin{axis}[
+				width=\textwidth,
+				height=7cm,
+				boxplot/draw direction=y,
+				xtick={0, ..., 5},
+				xticklabels={Input Check, Collision Check, Input Feasible, Input Infeasible, Collision Feasible, Collision Infeasible},
+				xticklabel style = {align=right, rotate=60, anchor=east},
+				% x tick label as interval,
+				ymajorgrids,
+				% ytick distance={20},
+				% minor y tick num=4,
+				ymax=1250, ymin=0,
+				% every box/.style={line, draw=mumblue, marker=o},
+				% every whisker/.style={line, mumblue},
+				cycle list={{mumblue}},
+				ylabel={Computatino time [\unit{ns}]},
+				boxplot={
+					draw position={\plotnumofactualtype}
+				},
+				]
+				
+				\pgfplotsforeachungrouped \i in {1,...,6}
+				{
+					\addplot+[boxplot, draw=mumblue, mark=none, thick] table [col sep=comma, y index=\i]{plots/perf_dat/t_all.dat};
+				}
+			\end{axis}
+			% \node[below left] at (border.north east) {\ref{legend}};
+		\end{tikzpicture}
+		\caption{Desktop Computer with Intel i7-7700HQ CPU @ \unit[2.8]{GHz}}
+		\label{fig:computation-time-desktop}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.49\textwidth}
+		\begin{tikzpicture}
 		\begin{axis}[
-			width=0.4\textwidth,
+			width=0.99\textwidth,
 			height=7cm,
 			boxplot/draw direction=y,
 			xtick={0, ..., 5},
@@ -207,12 +276,11 @@ The parameters are summarized in \Cref{tab:mocap_parameters}.
 			ymajorgrids,
 			% ytick distance={20},
 			% minor y tick num=4,
-			ymax=1250, ymin=0,
+			ymax=4000, ymin=0,
 			% every box/.style={line, draw=mumblue, marker=o},
 			% every whisker/.style={line, mumblue},
 			cycle list={{mumblue}},
 			ylabel={Computatino time [\unit{ns}]},
-			xlabel={Zeitfenster},
 			boxplot={
 				draw position={\plotnumofactualtype}
 			},
@@ -220,14 +288,17 @@ The parameters are summarized in \Cref{tab:mocap_parameters}.
 			
 			\pgfplotsforeachungrouped \i in {1,...,6}
 			{
-				\addplot+[boxplot, draw=mumblue, mark=none, thick] table [col sep=comma, y index=\i]{plots/perf_dat/t_all.dat};
+				\addplot+[boxplot, draw=mumblue, mark=none, thick] table [col sep=comma, y index=\i]{plots/perf_dat/t_all_pi.dat};
 			}
 		\end{axis}
 		% \node[below left] at (border.north east) {\ref{legend}};
 	\end{tikzpicture}
-	\caption{Computation time over 1000 samples. Input and collision feasibility check for all results and separated by feasibility result.}
-	\label{fig:computation-time-desktop}
+	\caption{Raspberry Pi 4B with ARM-A72 @ \unit[1.8]{GHz}}
+	\end{subfigure}
+	\caption{Computation time over 1000 samples. Input and collision feasibility check for all results and separated by feasibility result. Note the difference in scale between both plots.}
 \end{figure}
+
+
 
 \begin{itemize}
 	\color{red}
@@ -246,11 +317,47 @@ The parameters are summarized in \Cref{tab:mocap_parameters}.
 
 \section{Implicit Feedback}
 
-\input{plots/sim/implicit/replanning_xy_perfect.tex}
-\input{plots/sim/implicit/replanning_xy_damping_4.9.tex}
-\input{plots/sim/implicit/replanning_xy_damping_4.4.tex}
-\input{plots/sim/implicit/replanning_xy_damping_5.9.tex}
-\input{plots/sim/implicit/replanning_xy_damping_6.4.tex}
+\begin{figure}
+	\centering
+	\begin{subfigure}[t]{0.49\textwidth}
+		\centering
+		\input{plots/sim/implicit/replanning_xy_perfect.tex}
+		\caption{$1.0 X_{\dot{u}}$}
+	\end{subfigure}
+
+	\begin{subfigure}[t]{0.49\textwidth}
+		\centering
+		\input{plots/sim/implicit/replanning_xy_damping_4.4.tex}
+		\caption{$0.8 X_{\dot{u}}$}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.49\textwidth}
+		\centering
+		\input{plots/sim/implicit/replanning_xy_damping_4.9.tex}
+		\caption{$0.9 X_{\dot{u}}$}
+	\end{subfigure}
+
+	\begin{subfigure}[t]{0.49\textwidth}
+		\centering
+		\input{plots/sim/implicit/replanning_xy_damping_5.9.tex}
+		\caption{$1.1 X_{\dot{u}}$}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.49\textwidth}
+		\centering
+		\input{plots/sim/implicit/replanning_xy_damping_6.4.tex}
+		\caption{$1.2 X_{\dot{u}}$}
+	\end{subfigure}
+\end{figure}
+\begin{figure}
+	\input{plots/sim/implicit_problem.tex}
+	\caption{Implicit feedback-loop closed each \unit[0.5]{s} causes problems due to underestimated damping ($0.9 X_{\dot{u}}$)}
+	\label{fig:implicit_problem_velocity}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\input{plots/sim/mixed_planned_path.tex}
+	\caption{Improved tracking performance, if replanning and non-implicit feedback trajectory tracking are mixed.}
+\end{figure}
 
 \begin{figure}
 	\centering
