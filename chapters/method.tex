@@ -1910,9 +1910,7 @@ Consequently, the migration implies severe changes of the framework already exis
 
 \ac{ros2} comes with a new generation of the simulator Gazebo, hence requiring a new implementation of the simulation setup for the HippoCampus \ac{uauv}. The dynamic behavior of a model in the simulation can be replicated via plugins. The vehicle dynamics and the thruster forces and moments are modeled based on  \Cref{eq:thruster-load-vs-uesc,eq:eom-translational-with-input,eq:eom-rotational-with-input}.
 
-\textcolor{blue}{
-
-Based on limitations identified in \Cref{sec:sw_limitatations}....
+\textcolor{blue}{Based on limitations identified in \Cref{sec:sw_limitatations}....}
 
 This can be overcome by migrating from \ac{ros} to its successor \ac{ros2}, that enables direct communication between the \ac{fcu} and the onboard computer via \ac{dds}. Hence, all software modules developed in the scope of this thesis are implemented using \ac{ros2}.
 
@@ -1923,5 +1921,3 @@ Embedded systems are well integrated into the \ac{ros2} framework. A \ac{ros2} s
 Furthermore, \ac{ros2} introduces the concept of \ac{qos} as it relies on \ac{dds} for communication. Hence, data streams transporting sensor data can be declared to be transmitted with \emph{best effort}. As a result, the loss of messages is accepted, while the latency can be reduced. This especially useful for sensor data, where it is of interest to receive the most recent measurements as fast as possible. For message sizes of up to \unit[1]{MB} latencies below \unit[1]{ms} can be achieved for communication between different processes \cite{ros2}. High latencies impose delays on control loops and state estimation with possibly severe negative influence on their performance.
 
 Though not required for this thesis, it should be noted, that \ac{ros2} is suitable for real-time systems. In contrast to its predecessor, \ac{ros2} can be configured for deterministic scheduling to enforce real-time constraints \cite{ros-realtime20}. This can be a critical property for the field of mobile robotics, where deterministic execution times can be safety critical.
-
-}
