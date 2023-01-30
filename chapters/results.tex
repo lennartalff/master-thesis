@@ -255,7 +255,7 @@ To evaluate the performance of the trajectory module, a Monte Carlo simulation \
 				% every box/.style={line, draw=mumblue, marker=o},
 				% every whisker/.style={line, mumblue},
 				cycle list={{mumblue}},
-				ylabel={Computatino time [\unit{ns}]},
+				ylabel={Computation time [\unit{ns}]},
 				boxplot={
 					draw position={\plotnumofactualtype}
 				},
@@ -271,6 +271,7 @@ To evaluate the performance of the trajectory module, a Monte Carlo simulation \
 		\caption{Desktop Computer with Intel i7-7700HQ CPU @ \unit[2.8]{GHz}}
 		\label{fig:computation-time-desktop}
 	\end{subfigure}
+    %\quad
 	\begin{subfigure}[t]{0.49\textwidth}
 		\begin{tikzpicture}
 		\begin{axis}[
@@ -289,7 +290,7 @@ To evaluate the performance of the trajectory module, a Monte Carlo simulation \
 			% every whisker/.style={line, mumblue},
 			cycle list={{mumblue}},
 			ylabel={Computation time [\unit{ns}]},
-			xlabel={Zeitfenster},
+			%xlabel={Zeitfenster},
 			boxplot={
 				draw position={\plotnumofactualtype}
 			},
@@ -304,7 +305,7 @@ To evaluate the performance of the trajectory module, a Monte Carlo simulation \
 	\end{tikzpicture}
 	\caption{Raspberry Pi 4B with ARM-A72 @ \unit[1.8]{GHz}}
 	\end{subfigure}
-	\caption{Computation time over 1000 samples. Input and collision feasibility check for all results and separated by feasibility result. Note the difference in scale between both plots.}
+	\caption{Comparison of computation time over 1000 samples. Input and collision feasibility check for all results and separated by feasibility result. Note the difference in scale between both plots.}
 \end{figure}
 
 
