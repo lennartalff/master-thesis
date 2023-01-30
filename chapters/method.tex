@@ -913,6 +913,7 @@ with
 We see, that the solution of the optimal state trajectory over the time horizon $T$ is constrained by the initial state $\sbo_0$ and the final state $\sbo_\text{f}$. Furthermore, we have seen in \Cref{sec:trajectory-dynamics}, that we can establish a relation between the state trajectory and the system inputs based on the system dynamics in \Cref{eq:trajectory-acceleration-eom}. Because we have not taken any feasibility constraints into account yet, we are able to generate trajectories in a highly efficient manner. For a given set of $T$, $\sbo_0$ and $\sbo_\text{f}$ only a matrix multiplication has to be performed to compute a trajectory. This enables us to generate an amount of trajectories in the magnitude of hundred thousands up to millions per second. A sampling strategy to choose appropriate final states to reach a high level goal is proposed in the following section.
 
 \subsection{Sampling Strategy}
+\label{sec:sampling-strategy}
 We consider the proposed high level goal of catching or moving through a ring in a spatially confined environment. The time dependent state of the ring is assumed to be known exactly at all times. In general, this is not strictly necessary, and the vehicle could have sensors to measure and estimate the current state of the ring and predict future states based on these observations, but this lies outside the scope of this thesis.
 
 

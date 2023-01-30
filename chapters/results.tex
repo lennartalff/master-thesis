@@ -56,7 +56,7 @@ The vehicle parameters used in the simulation are the ones summarized in \Cref{t
             %%%%%%%% Beispiel
             mass $m$ & \unit[2.31]{kg} \\
             added mass $X_{u}$ & \unit[2.0]{kg} \\
-            damping $X_{\dot{u}}$ &  \\
+            damping $X_{\dot{u}}$ &  $\unit[value]{dimension}$\\
             inertia $I_\mathrm{x}$ & $\unit[0.014]{kg m^2}$ \\
             inertia $I_\mathrm{y}$ &  $\unit[0.039]{kg m^2}$\\
             inertia $I_\mathrm{z}$ &  $\unit[0.039]{kg m^2}$\\
@@ -208,9 +208,9 @@ The first-order time constant can be estimated to be in the vicinity of $\tau=\u
 \section{Computational Performance}
 For the trajectory generation and implicit feedback control scheme, the computation time required for sampling new trajectories and check their feasibility with respect to the dynamic and translational constraints, is crucial. The more trajectories can be generated and checked for feasibility, the higher the probability of finding a new solution per control step. Furthermore, a high computation time introduces delays in the control loop. This is undesirable, especially in the context of agile maneuvering with high velocities.
 
-To evaluate the performance of the trajectory module, a Monte Carlo simulation \todo{Is this correct? Bucki says so.} is conducted. For a given initial position $p_0 = \left[0, 0, 0\right]^\top$ uniformly distributed values are sampled randomly over a defined range. 
+To evaluate the performance of the trajectory module, a Monte Carlo simulation \todo{Is this correct? Bucki says so.} is conducted. The chosen range of the randomly distributed parameters is given in \Cref{tab:monte-carlo-params}.
 \begin{table}[]
-	\caption{Parameters of the Monte Carlo simulation}
+	\caption{Parameters of the Monte Carlo simulation.}
 	%\hspace*{-1.5cm}  % move table down (left in landscape) - tabular width: 
 	\centering
 	% change column width: >{\hsize=1.5\hsize\linewidth=\hsize}
@@ -218,27 +218,33 @@ To evaluate the performance of the trajectory module, a Monte Carlo simulation \
 	\begin{NiceTabular}
 		{
 		%%%%% Leider scheint die beste Methode wirklich hardgecodete Spaltenbreiten zu sein - hier am Ende rumspielen
-		>{\centering\arraybackslash}m{4cm}  %
+		>{\centering\arraybackslash}m{3.5cm}  %
 		>{\raggedleft\arraybackslash}m{1.7cm} % 
-		>{\raggedleft\arraybackslash}m{1.7cm} % 
-		>{\raggedleft\arraybackslash}m{1.7cm} %
+		>{\raggedleft\arraybackslash}m{2.0cm} % 
+		>{\raggedleft\arraybackslash}m{2.0cm} %
 		}
 		\toprule
 		%%%%%%%%%%% Top row - names of each columns
-		Paramter & Symbol & Minimum & Maximum \\
+		Parameter & Symbol & Minimum & Maximum \\
 		\midrule
 		%%%%%%%% Beispiel
-		Initial Position & $\pbo_0$ & \unit[0]{m} & \unit[0]{m} \\
-		Initial Velocity & $\vb_0$ & \unit[-1.0]{m/s} & \unit[1.0]{m/s} \\
+		Initial Position & $\pbo_0$ & $\unit[0]{m}$ & $\unit[0]{m}$ \\
+		Initial Velocity & $\vb_0$ & $\unit[-1.0]{m/s}$ & $\unit[1.0]{m/s}$ \\
 		Initial Acceleration & $\ab_0$ & $\unit[-1.0]{m/s^2}$ & $\unit[1.0]{m/s^2}$ \\
 		Final Position & $\pbo_{\text{f}}$ & $\unit[-4.0]{m}$ & $\unit[4.0]{m}$ \\
+		Final Velocity & $\vb_{\text{f}}$ & $\unit[-1.0]{m/s}$ & $\unit[1.0]{m/s}$ \\
+		Final Acceleration & $\ab_{\text{f}}$ & $\unit[-1.0]{m/s^2}$ & $\unit{m/s^2}$ \\
+		Duration & $T_{\text{f}}$ & $\unit[0.5]{s}$ & $\unit[5.0]{s}$ \\
+		Obstacle Radius & $r_{\mathcal{O}}$ & $\unit[0.1]{m}$ & $\unit[0.5]{m}$ \\
+		Samples & $n_{\text{S}}$ & \Block{1-2}{1000}\\
 		\bottomrule
 	\end{NiceTabular}
-	\label{tab:mocap_parameters}
+	\label{tab:monte-carlo-params}
 \end{table}
+The values for the vectors are sampled in the stated range per component. The obstacle for the collision check is chosen to be a sphere. For $n_{\text{S}} = 1000$ samples, the execution time of the feasibility checks is measurend and shown in \Cref{fig:computation-time}. In \Cref{fig:computation-time-desktop} are the findings for a desktop computer, whereas \Cref{fig:computation-time-pi} shows the results for the Raspberry Pi 4B onboard computer of the HippoCampus \ac{uauv}.
 \begin{figure}%[H]
 	\centering
-	\begin{subfigure}[t]{0.49\textwidth}
+	\begin{subfigure}[b]{0.49\textwidth}
 		\begin{tikzpicture}
 			\begin{axis}[
 				width=\textwidth,
@@ -271,7 +277,7 @@ To evaluate the performance of the trajectory module, a Monte Carlo simulation \
 		\caption{Desktop Computer with Intel i7-7700HQ CPU @ \unit[2.8]{GHz}}
 		\label{fig:computation-time-desktop}
 	\end{subfigure}
-	\begin{subfigure}[t]{0.49\textwidth}
+	\begin{subfigure}[b]{0.49\textwidth}
 		\begin{tikzpicture}
 		\begin{axis}[
 			width=0.99\textwidth,
@@ -303,58 +309,82 @@ To evaluate the performance of the trajectory module, a Monte Carlo simulation \
 		% \node[below left] at (border.north east) {\ref{legend}};
 	\end{tikzpicture}
 	\caption{Raspberry Pi 4B with ARM-A72 @ \unit[1.8]{GHz}}
+	\label{fig:computation-time-pi}
 	\end{subfigure}
 	\caption{Computation time over 1000 samples. Input and collision feasibility check for all results and separated by feasibility result. Note the difference in scale between both plots.}
+	\label{fig:computation-time}
 \end{figure}
+Note the different scale between the two plots.
+The Raspberry Pi is approximately 3 to 4 times slower, but is still able to perform the input check by an average of $\unit[1.6]{µs}$ and the collision check by an average of $\unit[1.7]{µs}$.
+The generation of the trajectories with an average of $\unit[0.06]{µs}$ per trajectory is not authoritative regarding the total computation time.
+The computation time for infeasible trajectories varies a lot.
+This is most likely caused by the fact, that checks reaching the recursion limit as described in \Cref{sec:feasibility,sec:collision-avoidance} are the most time-consuming.
+From the simulation we conclude, that more than 250\,000 trajectories can be generated and checked for feasibility on the onboard computer. In practice the number is likely to be even higher.
+Only generated trajectories that are cheaper in terms of the cost function defined in \Cref{eq:cost-function} than an already found solution have to be checked for feasibility. Otherwise, they can be discarded immediately.
+
+%  pi
+% median						
+% 60	420	340	430	240	340	220
+% avg	avg	avg				
+% 61,03	438,541	396,75	477,668485675307	331,123595505618	396,734902763562	397,391304347826
+% stddev						
+% 14,7328258034961	397,586704388498	286,854009424172	431,332407097582	256,694304318835	285,683470698148	340,230101165565
+% percentile95						
+% 80	700	640	690	720	620	1066
 
 
+% pi average
+% median						median
+% 315	1648	1500	1704	685	1500	1601,5
+% avg	avg	avg				avg
+% 311,461	1622,702	1729,93	1756,8485675307	1254,42696629214	1723,82959183673	2028,85
+% stddev						stddev
+% 59,4466347355466	951,249620781548	1197,30034210686	923,089234707891	931,559286482879	1177,93760339379	1944,93034038429
+% percentile95						percentile95
+% 315	2500,9	2722	2100,2	2660,6	2648,95	6703,55
+% median						median
+% 315	1648	1500	1704	685	1500	1777,96517019215
+% avg	avg	avg				avg
+% 309,383441400337	1589,52495142649	1705,41890596597	1715,56123155314	1245,10489069496	1698,69028401151	2525,61439627402
+% stddev						stddev
 
-\begin{itemize}
-	\color{red}
-	\item Measure the following
-	\begin{itemize}
-		\item generation time (expected to be constant, small variance due to running on a best effort machine)
-		\item input feasibility (a recursive algorithm. maybe have a special look on worst case)
-		\item position feasibility (only extrema need to be considered. small variance expected)
-		\item collision avoidance ()
-	\end{itemize}
-	\item Tabular, or BoxPlot? Or Barplot? 
-\end{itemize}
+\section{Implicit Feedback Control}
 
-\section{Single Trajectory Tracking}
+The most severe difference between the application of the proposed trajectory framework and the corresponding implicit feedback control scheme for quadrocopters and \acp{uauv}, are the different dynamics of the vehicles. This mainly refers to the hydrodynamic damping. Consequently, the influence of the added damping is analyzed in this section.
 
+The experiments presented below are carried out in the Gazebo simulation environment. The model of the vehicle is simulated with the parameters as stated in \Cref{tab:sim_parameters}. The implicit feedback control scheme presented in \Cref{sec:implicit-feedback-control} is applied, i.\,e. the desired trajectory is recomputed in every control step with a rate of $\unit[50]{Hz}$. The sampling of possible final states is performed according to \Cref{sec:sampling-strategy}. The vehicle moves autonomously to a defined start position via pure-pursuit. Subsequently, the trajectory module is activated and the vehicle tries to reach one of the possible final states to reach the high-level goal of moving through a circular hoop. Between the runs, the damping parameter used by the trajectory module is changed. Hence, the hydrodynamic damping is either under- or overestimated.
 
-\section{Implicit Feedback}
-
+The results are shown in \Cref{fig:}
 \begin{figure}
 	\centering
 	\begin{subfigure}[t]{0.49\textwidth}
 		\centering
 		\input{plots/sim/implicit/replanning_xy_perfect.tex}
-		\caption{$1.0 X_{\dot{u}}$}
+		\caption{$1.0 X_u$}
 	\end{subfigure}
 
 	\begin{subfigure}[t]{0.49\textwidth}
 		\centering
 		\input{plots/sim/implicit/replanning_xy_damping_4.4.tex}
-		\caption{$0.8 X_{\dot{u}}$}
+		\caption{$0.8 X_u$}
 	\end{subfigure}
 	\begin{subfigure}[t]{0.49\textwidth}
 		\centering
 		\input{plots/sim/implicit/replanning_xy_damping_4.9.tex}
-		\caption{$0.9 X_{\dot{u}}$}
+		\caption{$0.9 X_u$}
 	\end{subfigure}
 
 	\begin{subfigure}[t]{0.49\textwidth}
 		\centering
 		\input{plots/sim/implicit/replanning_xy_damping_5.9.tex}
-		\caption{$1.1 X_{\dot{u}}$}
+		\caption{$1.1 X_u$}
 	\end{subfigure}
 	\begin{subfigure}[t]{0.49\textwidth}
 		\centering
 		\input{plots/sim/implicit/replanning_xy_damping_6.4.tex}
-		\caption{$1.2 X_{\dot{u}}$}
+		\caption{$1.2 X_u$}
 	\end{subfigure}
+	\caption{The implicit feedback control scheme applied with }
 \end{figure}
 \begin{figure}
 	\input{plots/sim/implicit_problem.tex}
