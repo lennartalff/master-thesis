@@ -11,6 +11,7 @@
         \item What do we do here?
         \item how is the planning suppose to work
         \item what modules/step do we need to take to make this work
+        \item EXPLAIN THAT DRIVING THROUGH RING IS TOY EXAMPLE
     \end{itemize} 
     \item brief intro that we now use ROS2 - based on limitations mentioned in \Cref{sec:sw_limitatations} - recent development of ROS2 - promising direction/solution 
     \item just recently stable version of ROS2 - so far made no sense
@@ -24,7 +25,7 @@
 \begin{figure}
     \centering
     \includesvg[width=\textwidth]{images/03/overview}
-	\caption{\textcolor{red}{Proposed concept of the trajectory generation framework.}}
+	\caption{Proposed concept of the trajectory generation framework. Starting from the high-level planner, i.e. the here-depicted toy example of driving through a moving ring, the trajectory module samples goal states of the time-dependent target. Then, a high number of trajectories is sampled towards the goal states. Feasibility checks considering system dynamics and obstacles are applied. From the remaining trajectories, the jerk-optimal trajectory is chosen and sent to the subsequent controllers.}
 	\label{fig:overview}
 \end{figure}
 
@@ -278,7 +279,7 @@ We make the following assumptions with respect to HippoCampus \ac{uauv} to simpl
 	\item The principal axes of inertia coincide with the body-fixed frame axes.
 \end{itemize}
 
-Using the body symmetry, the added mass matrix becomes \todo{Fossen 7.5.2 p.172}
+Using the body symmetry, the added mass matrix becomes %\todo{Fossen 7.5.2 p.172}
 \begin{equation}
 	\Madded =
 	\text{diag}\left(X_{\up}, Y_{\vp}, Z_{\wpo}, K_{\pp}, M_{\qp}, N_{\rp}\right)
@@ -289,7 +290,7 @@ and since the axes of inertia coincide with the body-fixed frame, the rigid-body
 	.
 \end{equation}
 For uncoupled motions \cite{Fossen11} suggests assuming diagonal shape for $\Dadded$ as well. For high speeds, the damping is non-linear. But the speed of the HippoCampus \ac{uauv} is assumed to be small enough, that the linear terms are dominant. Therefore, the damping is approximated as linear function in terms of velocity.
-\todo{find a reference for assuming linear terms only. see hastedt}
+%\todo{find a reference for assuming linear terms only. see hastedt}
 Hence, the added damping reads
 \begin{equation}
 	\Dadded(\nub) = -\text{diag}(X_\text{u}, Y_\text{v}, Z_\text{w}, K_\text{p}, M_\text{q}, N_\text{r})
@@ -308,7 +309,7 @@ and write \Cref{eq:6dof-equation-of-motion} separated by the translational and r
 	\vlinbody \times \Mbs \vangbody
 	-\Dvadded \vlinbody
 	+ \prescript{\mathcal{B}}{}{\fb}
-\end{equation}\todo{Muss es nicht nur die obere Haelfte von $\gb$ sein? Muesste $\Mbs$ nicht vor $\vlinbody$ stehen?}
+\end{equation}%\todo{Muss es nicht nur die obere Haelfte von $\gb$ sein? Muesste $\Mbs$ nicht vor $\vlinbody$ stehen?}
 and
 \begin{equation}
 	\label{eq:equation-of-motion-rotational}
@@ -582,14 +583,14 @@ We further assume the \ac{uauv} is mainly moving in surge direction, which seems
 	\Mbs = m\Ib + \text{diag}\left(X_{\dot{u}}, Y_{\dot{v}}, Z_{\dot{w}}\right)
 	=
 	m\Ib + X_{\dot{u}} \Ib
-\end{equation} \todo[inline]{$\approx$ instead of $=$?}
+\end{equation} %\todo[inline]{$\approx$ instead of $=$?}
 and the damping matrix by
 \begin{equation}
 	\label{eq:added-damping-trajectory-simplification}
 	\Dvadded = -\text{diag}\left(X_\text{u}, Y_\text{v}, Z_\text{w}\right)
 	= -X_\text{u} \Ib
 	.
-\end{equation} \todo[inline]{$\approx$ instead of $=$?}
+\end{equation} %\todo[inline]{$\approx$ instead of $=$?}
 
 
 Using \Cref{eq:added-mass-trajectory-simplification,eq:added-damping-trajectory-simplification}, we rewrite \Cref{eq:eom-world-without-cross-coupling} as
@@ -734,7 +735,7 @@ By reordering \Cref{eq:jerk-vs-bodyrates}, we can recover the body rates based o
 \end{equation}
 
 Since the jerk is related to the system inputs as stated in \Cref{eq:jerk-vs-bodyrates}, we can interpret the jerk as indicator for the required system input. Therefore, we use the jerk to formulate the cost function
-\todo[inline]{Problem: The acceleration term means, that we can not set an upper bound for the product of the system inputs as in \cite{MuellerHehn15}. Can I find a better reason why choosing a jerk optimal trajectory is still a good idea?}
+%\todo[inline]{Problem: The acceleration term means, that we can not set an upper bound for the product of the system inputs as in \cite{MuellerHehn15}. Can I find a better reason why choosing a jerk optimal trajectory is still a good idea?}
 \begin{equation}
 	\label{eq:cost-function}
 	J_\text{\Sigma} = \frac{1}{T} \int_{0}^{T}\left\lVert \pbppp(t)\right\rVert^2 \text{d}t
@@ -1016,7 +1017,7 @@ and bound the thrust conservatively by summation over the per axis extrema
 	.
 \end{align}
 
-We denote the maximum and minimum of the per axis thrust as \fmaxaxis and \fminaxis, respectively \todo{Hier ist im Unterschied zu Mueller eine kubische Funktion fuer die Nullstellen zu loesen} 
+We denote the maximum and minimum of the per axis thrust as \fmaxaxis and \fminaxis, respectively %\todo{Hier ist im Unterschied zu Mueller eine kubische Funktion fuer die Nullstellen zu loesen} 
 and write the extrema in \Cref{eq:fmax-per-axis,eq:fmin-per-axis} as
 \begin{align}
 	\max_{t \in \mathcal{T}}
@@ -1261,8 +1262,7 @@ with $\pbo_{\text{W}}$ denoting an arbitrary point on the plane defining the wal
 
 The position is a quintic polynomial, as we can see in \Cref{eq:optimal-trajectory-per-axis}. Thus, computing $\mathcal{C}_{\text{crit}}$ is done by solving the roots of the fourth-order polynomial $\pp_{\text{n}}$. The feasibility check is carried out by evaluating the left-hand side of \Cref{eq:position-feasibility-criterion} at least twice and most six times per axis. This is similar to the input feasibility checks presented in \Cref{sec:input-feasibility} with the difference that no recursion is needed, though.
 
-\subsubsection{Velocity Feasibility}
-\todo{optional}
+
 
 \section{Obstacle/Collision Avoidance}\label{sec:collision-avoidance}
 
@@ -1469,7 +1469,7 @@ and the control law for controlling $\vangbody$, reading
 	}_{\text{feed forward}}
 	,
 \end{align}
-\todo{add p and d term and we have pid with feedfoward. }
+%\todo{add p and d term and we have pid with feedfoward. }
 where the feed forward terms are based on vehicle dynamics in \Cref{eq:eom-rotational-with-input}. The control law displays a PID-Controller with feed forward term, where $\KpBodyRate$, $\KiBodyRate$ and $\KdBodyRate$ are diagonal matrices denoting the proportional, integral and derivative gain, respectively.
 
 We set $\aangdesiredbody = \unit[0]{rad/s^2}$ and observe that the input for the body rate controller is $\vangdesiredbody$. We will see in \Cref{sec:implicit-feedback-control} the usefulness of this for the implicit feedback control scheme in the context of the trajectory generation system, given the inner-outer loop assumptions hold.
@@ -1682,7 +1682,7 @@ We compute the axis of rotation $\kb$ and the corresponding angle of rotation $\
 	\right)
 	.
 \end{equation}
-In general, it is also possible to rotate $\exbodyinworld$ by $-\alpha$ around $-\kb$ to align it with $\thrustdesiredworld$. Hence, we invert the signs of $\alpha$ and $\kb$ in case $\lvert\alpha\rvert > \pi$, so we always get the shortest rotation. \todo{not necessary, since we multiply $\alpha$ and $\kb$?}
+In general, it is also possible to rotate $\exbodyinworld$ by $-\alpha$ around $-\kb$ to align it with $\thrustdesiredworld$. Hence, we invert the signs of $\alpha$ and $\kb$ in case $\lvert\alpha\rvert > \pi$, so we always get the shortest rotation. %\todo{not necessary, since we multiply $\alpha$ and $\kb$?}
 
 From \Cref{eq:rotation-to-desired-thrust-vector} we compute the body rates required to align $\exbodyinworld$ with $\thrustdesiredworld$ in time $\Delta T_{\text{s}}$ directly
 \begin{equation}
@@ -1693,9 +1693,7 @@ We close the feedback loop for the trajectory tracking implicitly, i.e. we compu
 Therefore, disturbances and model inaccuracies can be compensated, because the new initial state of the generated trajectories is the actual state of the \ac{uauv}.
 
 \subsection{Trajectory Tracking Feedback Control}
-\begin{itemize}
-	\item \cite{Maurya09} suggests inner-outer-loop. slow-fast, dynamic-kinematic. -> i want to go with this.
-\end{itemize}
+\label{sec:closed-loop-tracking}
 There might be cases, for those it is desirable or even necessary to track a given trajectory for a longer period then $\Delta T_{\text{s}}$ before being given a new trajectory to track.
 For example, when all newly generated trajectories become infeasible. According to \cite{MuellerHehn15} this is to be expected, when the duration of the sampled trajectories becomes small.
 As a consequence input feasibility checks will fail and render all trajectories infeasible.
@@ -1814,7 +1812,9 @@ The desired roll angle $\rolldesired$ and the desired thrust $\thrustdesiredworl
 
 \begin{figure}
 	\centering
-	\includegraphics[width=0.5\textwidth]{gazebo-ros-interaction}
+	\includesv[width=0.9\textwidth]{images/03/software_architecture_new}
+    \caption{\textcolor{red}{...}}
+    \label{fig:communication_px4_ros2}
 \end{figure}
 
 
@@ -1833,9 +1833,7 @@ The desired roll angle $\rolldesired$ and the desired thrust $\thrustdesiredworl
     \def\blockwidth{3cm}
     \def\yshiftbetweenblocks{0.5cm}
     \def\yshiftrosblocks{0.8cm}
-
-        % Blocks
-		
+	
         % Gazebo
         \node[draw, fill=lightgray, semithick, rectangle, loosely dashed, minimum width=\gazeboblockwidth, minimum height=\gazeboblockheight, align=center, label=above:{Gazebo}] (gazebo) at (0,0) {};
         \node[draw, fill=white, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center] (thrustermodel) at (0,0.5*\gazeboblockheight-1cm) {thruster model};
@@ -1850,19 +1848,8 @@ The desired roll angle $\rolldesired$ and the desired thrust $\thrustdesiredworl
         \draw[-stealth] (controlloops.south) -- (mixer.north);
         \draw[-stealth] (mixer.south) -- ++(0, -2.5cm);
   
-        % \draw[] ([yshift=\yshiftthreelines]gazebo.north) {$u_2$};
-        % \node[align=center, above= of gazebo]  (gazebo_label) {Gazebo};
-        
-		% \node[draw, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center, right= of generator, xshift=\xshiftblocks] (trackingcontroller) {Trajectory\\Tracking\\Controller};
-
-		
-        % trajectory generator - trajectory tracking controller
-		%\draw[-stealth] (generator.east) -- (trackingcontroller.west) node[midway, above] {$\bm{\sigma}_{\text{des}}$};
-        % trajectory tracking controller - mixer (above blocks)
-        % \draw[-stealth] ([xshift=0.3cm]trackingcontroller.north) -- ++(0, \yshiftaboveblocks) -- ([xshift=\xshiftfirstuintomixer, yshift=\yshiftaboveblocks+0.5*\blockheight]mixer.west) -- ([xshift=\xshiftfirstuintomixer, yshift=2*\yshiftthreelines]mixer.west) -- ([yshift=2*\yshiftthreelines]mixer.west) node[midway, above] {$u_1$};
-
 	\end{tikzpicture}
-	\caption{\textcolor{blue}{Work in progress - Was genau wollen wir hier überhaupt zeigen? Solver bei Gazebo noch eintragen? Zusätzlich / Alternativ ROS node graph?}}
+	\caption{\textcolor{blue}{Work in progress - Was genau wollen wir hier überhaupt zeigen?} \textcolor{red}{Streichen!}}
 	\label{fig:control_architecture}
 \end{figure}
 

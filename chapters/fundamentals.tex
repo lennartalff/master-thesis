@@ -39,9 +39,8 @@ Since \ac{uorb} is restricted to intra-process communication, communication with
 The interface between \ac{mavlink} and \ac{ros} is MAVROS. It is a bidirectional bridge, translating messages from \ac{mavlink} to corresponding \acs{ros}-messages and vice versa. This whole setup is depicted in \Cref{fig:ros-px4-communication}.
 \begin{figure}[h!]
 	\centering
-    \def\svgwidth{12cm}  
-	\input{images/02/03_sw_layer.pdf_tex}
-	\caption{HippoCampus software architecture with multiple layers of abstraction according to \cite{duecker-phd}. Communication between \acs{ros} (left) and PX4 (right) via \acs{mavlink} and MAVROS.}
+	\includesvg[width=0.9\textwidth]{images/02/software_architecture_old}
+	\caption{HippoCampus software architecture with multiple layers of abstraction. Communication between \acs{ros} (left) and PX4 (right) via \acs{mavlink}. On the \acs{ros}-side this requires the MAVROS package, while on the PX4-side, the \acs{mavlink} transceiver package is used.}
     \label{fig:ros-px4-communication}
 \end{figure}
 

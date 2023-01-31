@@ -4,38 +4,33 @@
 \section{Motivation}
 Maritime environmental field exploration and monitoring are among the most promising task to be addressed by autonomous underwater vehicles (AUVs).
 The recent technological progress on the miniaturization of electronic components literally boosted the development of a new field of small-scale underwater robots.
-While full-scale underwater robots are mostly deployed in ocean and open-water like settings, this new class of small-scale vehicles enable accessing new \textit{confined} scenarios.
+While full-scale underwater robots are mostly deployed in ocean- and open water-like settings, this new class of small-scale vehicles enable accessing new \textit{confined} scenarios.
 These environments are characterized by lengths-scales of tenths of meters and are often cluttered. 
 This requires agile maneuvering and quick reactions by the robot’s planning algorithm if obstacles are detected.
 Examples include the range from harbor areas and marinas towards industry tanks such as nuclear storage ponds in various forms.
 %These environments come with strict space constraints and are often unstructured and cluttered. This requires agile maneuvering and quick reactions by the robot’s planning algorithm if obstacles are detected.
 These settings pose strong constraints on the vehicles with regard to maneuverability and size.
-This motivated the introduction of the class of micro AUVs ($\mu$AUVs) which has become a common category for tether-free underwater robots with a characteristic length up to 50\,cm.
-Prominent example include the AVEXIS \cite{Griffiths16} and the HippoCampus platform \cite{Duecker_AUV} as well as the LoCo AUV \cite{Edge20}.
 
-Given the strict constraints on the vehicle size, the onboard computational and sensory resources of these vehicles is naturally limited.
-Hence, a key design criterion for any algorithm to be developed is being computationally light-weight and still fast. 
-Following this thought, $\mu$AUVs pose much different requirements than marine robots designed for the open sea, as these focus on long planning horizons, own slow dynamics and carry sophisticated sensing equipment.
+This motivated the introduction of the class of micro AUVs ($\mu$AUVs) which has become a common category for tether-free underwater robots with a characteristic length up to 50\,cm \cite{micro-auv}.
+Prominent examples include the AVEXIS \cite{Griffiths2016} and the HippoCampus platform \cite{duecker2020hippocampusx} as well as the LoCo AUV \cite{Edge2020}.
+Recently, the term \textit{hydrobatics} has been established in a series of publications \cite{DueckerEtAl18, Duecker20, duecker2021aerobatics} as the marine counterpart of aerobatic aerial drones.
+Specifically, hydrobatics refers to the class of underactuated underwater robots with mostly streamlined designs that are capable of agile maneuvering.
+As a quantitative metric  -- analogue to their aerial siblings -- high vehicle motion speeds of multiple body lengths per second are used as baseline \cite{duecker2021aerobatics}.
 
-\begin{itemize}
-    \item general - auv exploration blabla
-    \item difference to fill slae
-    \item aerial drones
-    \item 
-    \item make clear what I mean by real time capable (i.e. fast enough to keep up with the update rate, but no real-time guarantees in worst-case execution time)
-\end{itemize}
+Given the strict constraints on the vehicle size, the onboard computational and sensory resources of these vehicles is naturally limited \cite{Watson2020}.
+Hence, a key design criterion for any algorithm to be developed is being computationally light-weight. 
+Following this thought, $\mu$AUVs pose much different requirements than marine robots designed for the open sea, as these focus on long planning horizons, slow dynamics and carry sophisticated sensing equipment.
 
+Closing the loop from the original tasks of field exploration and monitoring, both constitute high-level planning tasks that are usually performed with slow update rates due to their strong computational requirements.
+Their output is often a sequence of way points.
+At the other end, we see the high-rate low-level control scheme that drive the vehicle attitude towards its desired orientation.
+A common approach is thus to design a trajectory generation module that acts as an interface between both ends, taking for instance way points as an input while providing feasible setpoints for the low-level controller. 
+Moreover, these trajectory generation modules ideally consider the dynamic capabilities of the underwater robot while at the same time considering potentially present obstacles and avoid those at a planning stage.
+It is worth noting that these module underlie strong restrictions with respect to the available computational resource as they have to be implemented embedded onboard the robot.
+At the same time, they need to be \textit{real time} capable. 
+Note that throughout this thesis, we consider a slightly relaxed interpretation of being real time  capable, meaning being fast enough to keep up with the update rate. 
+Hence, no real-time guarantees in worst-case execution time.
 
-
-
-
-\begin{itemize}
-    \color{red}
-    \item Definition micro auv \cite{micro-auv}
-    \item Definition of hydrobatic \cite{hydrobatic} (bridge between fully actuated hover style AUVs and the traditional ones)
-    \item Definition of agile \cite{duecker-phd}
-    
-\end{itemize}
 
 
 

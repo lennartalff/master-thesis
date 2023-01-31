@@ -1,0 +1,677 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="135.33426mm"
+   height="62.477749mm"
+   viewBox="0 0 135.33426 62.477749"
+   version="1.1"
+   id="svg121862"
+   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+   sodipodi:docname="software_architecture_new.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview121864"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="true"
+     inkscape:zoom="5.1754899"
+     inkscape:cx="260.65165"
+     inkscape:cy="79.895818"
+     inkscape:window-width="3840"
+     inkscape:window-height="2071"
+     inkscape:window-x="-9"
+     inkscape:window-y="1125"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid123758"
+       originx="-47.474999"
+       originy="-67.318287" />
+  </sodipodi:namedview>
+  <defs
+     id="defs121859">
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect53139"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,5.2916667,0,1 @ F,0,0,1,0,5.2916667,0,1 @ F,0,0,1,0,5.2916667,0,1 @ F,0,0,1,0,5.2916667,0,1"
+       unit="px"
+       method="auto"
+       mode="F"
+       radius="20"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect53139-3"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,5.2916667,0,1 @ F,0,0,1,0,5.2916667,0,1 @ F,0,0,1,0,5.2916667,0,1 @ F,0,0,1,0,5.2916667,0,1"
+       unit="px"
+       method="auto"
+       mode="F"
+       radius="20"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+    <marker
+       style="overflow:visible"
+       id="marker103618"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="TriangleStart"
+       markerWidth="2.595"
+       markerHeight="3"
+       viewBox="0 0 5.3244081 6.1553851"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path103616" />
+    </marker>
+  </defs>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-47.475,-67.318285)">
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-linejoin:bevel;stroke-dasharray:0.9, 0.9;stroke-dashoffset:0;paint-order:normal"
+       id="rect10554-7"
+       width="54.239582"
+       height="62.177078"
+       x="47.625"
+       y="67.46875"
+       inkscape:path-effect="#path-effect53139"
+       d="m 52.916667,67.46875 h 43.656248 a 5.2916667,5.2916667 45 0 1 5.291665,5.291667 l 0,51.593743 a 5.2916667,5.2916667 135 0 1 -5.291665,5.29167 H 52.916667 A 5.2916667,5.2916667 45 0 1 47.625,124.35416 V 72.760417 a 5.2916667,5.2916667 135 0 1 5.291667,-5.291667 z"
+       sodipodi:type="rect" />
+    <rect
+       style="fill:#e1e1e1;stroke:#000000;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+       id="rect10554-7-48"
+       width="48.947918"
+       height="26.45833"
+       x="50.270828"
+       y="82.020828" />
+    <rect
+       style="fill:#e1e1e1;stroke:#000000;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+       id="rect10554-7-48-3"
+       width="48.947918"
+       height="17.197916"
+       x="50.270828"
+       y="109.80208" />
+    <g
+       id="g69278"
+       transform="translate(42.333332,59.53125)">
+      <rect
+         style="fill:#ffffff;stroke:#000000;stroke-width:0.2;stroke-linejoin:round;stroke-dasharray:none"
+         id="rect52664-6-9-6-8"
+         width="14.552083"
+         height="7.9375"
+         x="9.260417"
+         y="58.208336" />
+      <text
+         xml:space="preserve"
+         style="font-size:2.11667px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+         x="11.833903"
+         y="61.75127"
+         id="text10675-3-8-7-3-3-1"><tspan
+           sodipodi:role="line"
+           style="font-size:2.11667px;stroke:none;stroke-width:0.2"
+           x="11.833903"
+           y="61.75127"
+           id="tspan10677-36-2-9-4-0-9">\scriptsize{sensor}</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-size:2.11667px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+         x="11.306772"
+         y="64.92627"
+         id="text10675-3-8-7-3-3-1-2"><tspan
+           sodipodi:role="line"
+           style="font-size:2.11667px;stroke:none;stroke-width:0.2"
+           x="11.306772"
+           y="64.92627"
+           id="tspan10677-36-2-9-4-0-9-1">\scriptsize{drivers}</tspan></text>
+    </g>
+    <g
+       id="g69285"
+       transform="translate(42.333332,59.53125)">
+      <rect
+         style="fill:#ffffff;stroke:#000000;stroke-width:0.2;stroke-linejoin:round;stroke-dasharray:none"
+         id="rect52664-6-9-6-8-4"
+         width="14.552083"
+         height="7.9375"
+         x="25.135416"
+         y="58.208336" />
+      <text
+         xml:space="preserve"
+         style="font-size:2.11667px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+         x="27.794687"
+         y="61.75127"
+         id="text10675-3-8-7-3-3-1-0"><tspan
+           sodipodi:role="line"
+           style="font-size:2.11667px;stroke:none;stroke-width:0.2"
+           x="27.794687"
+           y="61.75127"
+           id="tspan10677-36-2-9-4-0-9-5">\scriptsize{further}</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-size:2.11667px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+         x="27.975555"
+         y="64.92627"
+         id="text10675-3-8-7-3-3-1-2-9"><tspan
+           sodipodi:role="line"
+           style="font-size:2.11667px;stroke:none;stroke-width:0.2"
+           x="27.975555"
+           y="64.92627"
+           id="tspan10677-36-2-9-4-0-9-1-7">\scriptsize{drivers}</tspan></text>
+    </g>
+    <g
+       id="g69292"
+       transform="translate(42.333332,59.53125)">
+      <rect
+         style="fill:#ffffff;stroke:#000000;stroke-width:0.2;stroke-linejoin:round;stroke-dasharray:none"
+         id="rect52664-6-9-6-8-4-2"
+         width="14.552083"
+         height="7.9375"
+         x="41.010414"
+         y="58.208336" />
+      <text
+         xml:space="preserve"
+         style="font-size:2.11667px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+         x="43.418507"
+         y="61.75127"
+         id="text10675-3-8-7-3-3-1-0-9"><tspan
+           sodipodi:role="line"
+           style="font-size:2.11667px;stroke:none;stroke-width:0.2"
+           x="43.418507"
+           y="61.75127"
+           id="tspan10677-36-2-9-4-0-9-5-1">\scriptsize{others}</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-size:2.11667px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+         x="45.757538"
+         y="64.92627"
+         id="text10675-3-8-7-3-3-1-2-9-5"><tspan
+           sodipodi:role="line"
+           style="font-size:2.11667px;stroke:none;stroke-width:0.2"
+           x="45.757538"
+           y="64.92627"
+           id="tspan10677-36-2-9-4-0-9-1-7-2">\scriptsize{...}</tspan></text>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:3.88056px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+       x="67.131477"
+       y="115.03502"
+       id="text10675-3-8-5"><tspan
+         sodipodi:role="line"
+         style="stroke:none;stroke-width:0.2"
+         x="67.131477"
+         y="115.03502"
+         id="tspan10677-36-2-6">Ubuntu</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.88056px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+       x="69.173271"
+       y="87.253769"
+       id="text10675-3-8"><tspan
+         sodipodi:role="line"
+         style="stroke:none;stroke-width:0.2"
+         x="69.173271"
+         y="87.253769"
+         id="tspan10677-36-2">ROS2</tspan></text>
+    <rect
+       style="fill:#e1e1e1;stroke:#000000;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+       id="rect10554-7-48-3-1"
+       width="48.94791"
+       height="17.197916"
+       x="130.96875"
+       y="109.80208" />
+    <g
+       id="g69406"
+       transform="translate(42.333332,59.53125)">
+      <rect
+         style="fill:#ffffff;stroke:#000000;stroke-width:0.2;stroke-linejoin:round;stroke-dasharray:none"
+         id="rect52664-6-9-6"
+         width="14.552083"
+         height="7.9375"
+         x="89.958336"
+         y="58.208332" />
+      <text
+         xml:space="preserve"
+         style="font-size:2.11667px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+         x="92.686852"
+         y="61.75127"
+         id="text10675-3-8-7-3-3-1-09"><tspan
+           sodipodi:role="line"
+           style="font-size:2.11667px;stroke:none;stroke-width:0.2"
+           x="92.686852"
+           y="61.75127"
+           id="tspan10677-36-2-9-4-0-9-6">\scriptsize{sensor}</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-size:2.11667px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+         x="92.531822"
+         y="64.92627"
+         id="text10675-3-8-7-3-3-1-2-6"><tspan
+           sodipodi:role="line"
+           style="font-size:2.11667px;stroke:none;stroke-width:0.2"
+           x="92.531822"
+           y="64.92627"
+           id="tspan10677-36-2-9-4-0-9-1-2">\scriptsize{drivers}</tspan></text>
+    </g>
+    <g
+       id="g69413"
+       transform="translate(42.333332,59.53125)">
+      <rect
+         style="fill:#ffffff;stroke:#000000;stroke-width:0.2;stroke-linejoin:round;stroke-dasharray:none"
+         id="rect52664-6-9-1"
+         width="14.552083"
+         height="7.9375"
+         x="105.83333"
+         y="58.208332" />
+      <text
+         xml:space="preserve"
+         style="font-size:2.11667px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+         x="106.62693"
+         y="61.75127"
+         id="text10675-3-8-7-3-3-1-0-8"><tspan
+           sodipodi:role="line"
+           style="font-size:2.11667px;stroke:none;stroke-width:0.2"
+           x="106.62693"
+           y="61.75127"
+           id="tspan10677-36-2-9-4-0-9-5-3">\scriptsize{actuator}</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-size:2.11667px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+         x="106.8078"
+         y="64.92627"
+         id="text10675-3-8-7-3-3-1-2-9-54"><tspan
+           sodipodi:role="line"
+           style="font-size:2.11667px;stroke:none;stroke-width:0.2"
+           x="106.8078"
+           y="64.92627"
+           id="tspan10677-36-2-9-4-0-9-1-7-4">\scriptsize{drivers}</tspan></text>
+    </g>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-linejoin:bevel;stroke-dasharray:0.9, 0.9;stroke-dashoffset:0;paint-order:normal"
+       id="rect10554-7-8"
+       width="54.23959"
+       height="62.177078"
+       x="128.32291"
+       y="67.46875"
+       inkscape:path-effect="#path-effect53139-3"
+       d="m 133.61457,67.46875 h 43.65626 a 5.2916667,5.2916667 45 0 1 5.29167,5.291667 v 51.593743 a 5.2916667,5.2916667 135 0 1 -5.29167,5.29167 h -43.65626 a 5.2916667,5.2916667 45 0 1 -5.29166,-5.29167 V 72.760417 a 5.2916667,5.2916667 135 0 1 5.29166,-5.291667 z"
+       sodipodi:type="rect" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.88056px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+       x="150.44766"
+       y="115.03502"
+       id="text10675-3-8-5-7"><tspan
+         sodipodi:role="line"
+         style="stroke:none;stroke-width:0.2"
+         x="150.44766"
+         y="115.03502"
+         id="tspan10677-36-2-6-5">NuttX</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.88056px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+       x="52.662758"
+       y="73.062897"
+       id="text10675-3"><tspan
+         sodipodi:role="line"
+         style="stroke:none;stroke-width:0.2"
+         x="52.662758"
+         y="73.062897"
+         id="tspan10677-36">Single Board Computer</tspan></text>
+    <rect
+       style="fill:#e1e1e1;stroke:#000000;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+       id="rect10554-7-48-0-2"
+       width="48.94791"
+       height="17.197918"
+       x="130.96875"
+       y="82.020828" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.88056px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+       x="68.448708"
+       y="78.594345"
+       id="text10675-1-6"><tspan
+         sodipodi:role="line"
+         style="stroke:none;stroke-width:0.2"
+         x="68.448708"
+         y="78.594345"
+         id="tspan10677-3-8">(SBC)</tspan></text>
+    <rect
+       style="fill:#e1e1e1;stroke:#000000;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+       id="rect10554-7-48-0-7"
+       width="48.94791"
+       height="7.9375048"
+       x="130.96875"
+       y="100.54166" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.88056px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+       x="140.18124"
+       y="106.13582"
+       id="text10675-3-8-75-0"><tspan
+         sodipodi:role="line"
+         style="stroke:none;stroke-width:0.2"
+         x="140.18124"
+         y="106.13582"
+         id="tspan10677-36-2-8-9">uORB-Middleware</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.88056px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+       x="137.20438"
+       y="73.062897"
+       id="text10675-3-7"><tspan
+         sodipodi:role="line"
+         style="stroke:none;stroke-width:0.2"
+         x="137.20438"
+         y="73.062897"
+         id="tspan10677-36-9">Flight Control Unit</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.88056px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+       x="150.46954"
+       y="78.594345"
+       id="text10675-1-6-4"><tspan
+         sodipodi:role="line"
+         style="stroke:none;stroke-width:0.2"
+         x="150.46954"
+         y="78.594345"
+         id="tspan10677-3-8-0">(FCU)</tspan></text>
+    <g
+       id="g69420"
+       transform="translate(42.333332,59.53125)">
+      <rect
+         style="fill:#ffffff;stroke:#000000;stroke-width:0.2;stroke-linejoin:round;stroke-dasharray:none"
+         id="rect52664-6-9"
+         width="14.552083"
+         height="7.9375"
+         x="121.70834"
+         y="58.208332" />
+      <text
+         xml:space="preserve"
+         style="font-size:2.11667px;white-space:pre;inline-size:10.8211;display:inline;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+         x="112.21017"
+         y="57.78252"
+         id="text10675-3-8-7-3-3-1-0-2-4"
+         transform="translate(12.80386,4.0340238)"><tspan
+           x="112.21017"
+           y="57.78252"
+           id="tspan128954">\scriptsiz</tspan><tspan
+           x="112.21017"
+           y="60.428356"
+           id="tspan128956">e{others}</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-size:2.11667px;white-space:pre;inline-size:11.5235;display:inline;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+         x="102.2473"
+         y="65.365173"
+         id="text10675-3-8-7-3-3-1-2-9-1-2"
+         transform="translate(24.635158,-1.2190551)"><tspan
+           x="102.2473"
+           y="65.365173"
+           id="tspan128958">\scriptsize</tspan><tspan
+           x="102.2473"
+           y="68.011012"
+           id="tspan128960">{...}</tspan></text>
+    </g>
+    <g
+       id="g69406-1"
+       transform="translate(50.270832,31.749999)">
+      <rect
+         style="fill:#ffffff;stroke:#000000;stroke-width:0.2;stroke-linejoin:round;stroke-dasharray:none"
+         id="rect52664-6-9-6-4"
+         width="14.552083"
+         height="7.9375"
+         x="89.958336"
+         y="58.208332" />
+      <text
+         xml:space="preserve"
+         style="font-size:2.11667px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+         x="92.686852"
+         y="61.75127"
+         id="text10675-3-8-7-3-3-1-09-1"><tspan
+           sodipodi:role="line"
+           style="font-size:2.11667px;stroke:none;stroke-width:0.2"
+           x="92.686852"
+           y="61.75127"
+           id="tspan10677-36-2-9-4-0-9-6-3">\scriptsize{state}</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-size:2.11667px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+         x="90.415154"
+         y="64.92627"
+         id="text10675-3-8-7-3-3-1-2-6-1"><tspan
+           sodipodi:role="line"
+           style="font-size:2.11667px;stroke:none;stroke-width:0.2"
+           x="90.415154"
+           y="64.92627"
+           id="tspan10677-36-2-9-4-0-9-1-2-8">\scriptsize{estimation}</tspan></text>
+    </g>
+    <g
+       id="g69413-1"
+       transform="translate(50.270832,31.749999)">
+      <rect
+         style="fill:#ffffff;stroke:#000000;stroke-width:0.2;stroke-linejoin:round;stroke-dasharray:none"
+         id="rect52664-6-9-1-9"
+         width="14.552083"
+         height="7.9375"
+         x="105.83333"
+         y="58.208332" />
+      <text
+         xml:space="preserve"
+         style="font-size:2.11667px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+         x="107.1561"
+         y="61.75127"
+         id="text10675-3-8-7-3-3-1-0-8-8"><tspan
+           sodipodi:role="line"
+           style="font-size:2.11667px;stroke:none;stroke-width:0.2"
+           x="107.1561"
+           y="61.75127"
+           id="tspan124332">\scriptsize{low-level}</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-size:2.11667px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+         x="107.86612"
+         y="64.92627"
+         id="text10675-3-8-7-3-3-1-2-9-54-7"><tspan
+           sodipodi:role="line"
+           style="font-size:2.11667px;stroke:none;stroke-width:0.2"
+           x="107.86612"
+           y="64.92627"
+           id="tspan124336">\scriptsize{control}</tspan></text>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:3.88056px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+       x="142.15237"
+       y="87.253769"
+       id="text10675-3-8-75"><tspan
+         sodipodi:role="line"
+         style="stroke:none;stroke-width:0.2"
+         x="142.15237"
+         y="87.253769"
+         id="tspan10677-36-2-8">PX4-Firmware</tspan></text>
+    <g
+       id="g84425"
+       transform="translate(42.333332,63.5)">
+      <rect
+         style="fill:#ffffff;stroke:#000000;stroke-width:0.2;stroke-linejoin:round;stroke-dasharray:none"
+         id="rect52664-8"
+         width="14.552083"
+         height="7.9375"
+         x="9.260417"
+         y="35.71875" />
+      <text
+         xml:space="preserve"
+         style="font-size:2.11667px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+         x="10.510986"
+         y="39.261684"
+         id="text10675-3-8-7-3-3-1-0-1-4"><tspan
+           sodipodi:role="line"
+           style="font-size:2.11667px;stroke:none;stroke-width:0.2"
+           x="10.510986"
+           y="39.261684"
+           id="tspan10677-36-2-9-4-0-9-5-7-9">\scriptsize{mission-}</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-size:2.11667px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+         x="10.510986"
+         y="42.215878"
+         id="text10675-3-8-7-3-3-1-0-24-7"><tspan
+           sodipodi:role="line"
+           style="font-size:2.11667px;stroke:none;stroke-width:0.2"
+           x="10.510986"
+           y="42.215878"
+           id="tspan10677-36-2-9-4-0-9-5-6-2">\scriptsize{planner}</tspan></text>
+    </g>
+    <g
+       id="g84425-2"
+       transform="translate(58.208332,63.5)">
+      <rect
+         style="fill:#ffffff;stroke:#000000;stroke-width:0.2;stroke-linejoin:round;stroke-dasharray:none"
+         id="rect52664-8-9"
+         width="22.489584"
+         height="7.9375"
+         x="9.260417"
+         y="35.71875" />
+      <g
+         id="g127068"
+         transform="translate(8.4666669)">
+        <rect
+           style="fill:#ffffff;stroke:#000000;stroke-width:0.2;stroke-linejoin:round;stroke-dasharray:none"
+           id="rect52664"
+           width="29.104166"
+           height="7.9374995"
+           x="51.59375"
+           y="89.958328"
+           transform="translate(-58.208332,-63.499999)" />
+        <text
+           xml:space="preserve"
+           style="font-size:2.11667px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+           x="1.118278"
+           y="30.00127"
+           id="text10675-3-8-7-3-3-1-0-1-4-6"><tspan
+             sodipodi:role="line"
+             style="font-size:2.11667px;stroke:none;stroke-width:0.2"
+             x="1.118278"
+             y="30.00127"
+             id="tspan10677-36-2-9-4-0-9-5-7-9-4">\scriptsize{trajectory}</tspan></text>
+        <text
+           xml:space="preserve"
+           style="font-size:2.11667px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+           x="0.19223678"
+           y="32.635735"
+           id="text10675-3-8-7-3-3-1-0-24-7-3"><tspan
+             sodipodi:role="line"
+             style="font-size:2.11667px;stroke:none;stroke-width:0.2"
+             x="0.19223678"
+             y="32.635735"
+             id="tspan10677-36-2-9-4-0-9-5-6-2-7">\scriptsize{generation}</tspan></text>
+      </g>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:2.09397px;fill:#000000;stroke:none;stroke-width:0.197856;stroke-linejoin:bevel;paint-order:markers fill stroke"
+       x="69.166473"
+       y="106.90596"
+       id="text10675-3-8-7-3-3-1-0-24"
+       transform="scale(1.0108385,0.98927771)"><tspan
+         sodipodi:role="line"
+         style="font-size:2.09397px;stroke:none;stroke-width:0.197856"
+         x="69.166473"
+         y="106.90596"
+         id="tspan10677-36-2-9-4-0-9-5-6">\scriptsize{localization}</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:2.09397px;fill:#000000;stroke:none;stroke-width:0.197856;stroke-linejoin:bevel;paint-order:markers fill stroke"
+       x="73.479172"
+       y="103.88465"
+       id="text10675-3-8-7-3-3-1-0-24-4"
+       transform="scale(1.0108385,0.98927771)"><tspan
+         sodipodi:role="line"
+         style="font-size:2.09397px;stroke:none;stroke-width:0.197856"
+         x="73.479172"
+         y="103.88465"
+         id="tspan10677-36-2-9-4-0-9-5-6-1">\scriptsize{self-}</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:2.11667px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+       x="109.72973"
+       y="98.710236"
+       id="text10675-3-8-7-3-3-1-0-9-0-5-2"><tspan
+         sodipodi:role="line"
+         style="font-size:2.11667px;stroke:none;stroke-width:0.2"
+         x="109.72973"
+         y="98.710236"
+         id="tspan10677-36-2-9-4-0-9-5-1-2-4-1">\scriptsize{UART-}</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:2.11667px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+       x="108.40682"
+       y="101.9679"
+       id="text10675-3-8-7-3-3-1-0-9-0-5-2-8"><tspan
+         sodipodi:role="line"
+         style="font-size:2.11667px;stroke:none;stroke-width:0.2"
+         x="108.40682"
+         y="101.9679"
+         id="tspan10677-36-2-9-4-0-9-5-1-2-4-1-0">\scriptsize{interface}</tspan></text>
+    <path
+       style="fill:#660066;fill-opacity:0.366171;stroke:#660066;stroke-width:1.6;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:0;marker-start:url(#marker103618);marker-end:url(#marker103618);paint-order:normal"
+       d="M 99.218751,93.927081 H 130.96875"
+       id="path103508"
+       sodipodi:nodetypes="cc" />
+    <g
+       id="g84432"
+       transform="translate(58.208333,63.499998)">
+      <rect
+         style="fill:#ffffff;stroke:#000000;stroke-width:0.2;stroke-linejoin:round;stroke-dasharray:none"
+         id="rect52664-8-5"
+         width="6.614583"
+         height="7.9375"
+         x="33.072918"
+         y="35.71875" />
+      <text
+         xml:space="preserve"
+         style="font-size:2.11667px;fill:#000000;stroke:none;stroke-width:0.2;stroke-linejoin:bevel;paint-order:markers fill stroke"
+         x="34.992916"
+         y="40.460583"
+         id="text10675-3-8-7-3-3-1-2-9-5-3"><tspan
+           sodipodi:role="line"
+           style="font-size:2.11667px;stroke:none;stroke-width:0.2"
+           x="34.992916"
+           y="40.460583"
+           id="tspan10677-36-2-9-4-0-9-1-7-2-8">\scriptsize{...}</tspan></text>
+    </g>
+  </g>
+</svg>
