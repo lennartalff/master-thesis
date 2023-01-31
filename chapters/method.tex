@@ -4,32 +4,45 @@
 \label{chap:approach-to-agile-maneuvering}
 
 \section{Concept}\label{sec:concept}
-\textcolor{red}{
-\begin{itemize}
-    \item briefly describe the general concept / framework - see \Cref{fig:overview}
-    \begin{itemize}
-        \item What do we do here?
-        \item how is the planning suppose to work
-        \item what modules/step do we need to take to make this work
-        \item EXPLAIN THAT DRIVING THROUGH RING IS TOY EXAMPLE
-    \end{itemize} 
-    \item brief intro that we now use ROS2 - based on limitations mentioned in \Cref{sec:sw_limitatations} - recent development of ROS2 - promising direction/solution 
-    \item just recently stable version of ROS2 - so far made no sense
-    \begin{itemize}
-        \item what is getting better?
-        \item compare with corresponding figure in chapter 2
-    \end{itemize}
-\end{itemize}}
-
-
+% \textcolor{red}{
+% \begin{itemize}
+%     \item briefly describe the general concept / framework - see \Cref{fig:overview}
+%     \begin{itemize}
+%         \item What do we do here?
+%         \item how is the planning suppose to work
+%         \item what modules/step do we need to take to make this work
+%         \item EXPLAIN THAT DRIVING THROUGH RING IS TOY EXAMPLE
+%     \end{itemize} 
+%     \item brief intro that we now use ROS2 - based on limitations mentioned in \Cref{sec:sw_limitatations} - recent development of ROS2 - promising direction/solution 
+%     \item just recently stable version of ROS2 - so far made no sense
+%     \begin{itemize}
+%         \item what is getting better?
+%         \item compare with corresponding figure in chapter 2
+%     \end{itemize}
+% \end{itemize}}
+The general concept of this work is based on the state-to-state trajectory generation method for quadcopters proposed in \cite{Mueller13} and extended in \cite{MuellerHehn15} and \cite{Bucki19}. The proposed concept transfers these methods to the underwater domain and hydrobatic \acp{uauv}, is shown in \Cref{fig:overview}. 
 \begin{figure}
     \centering
     \includesvg[width=\textwidth]{images/03/overview}
-	\caption{Proposed concept of the trajectory generation framework. Starting from the high-level planner, i.e. the here-depicted toy example of driving through a moving ring, the trajectory module samples goal states of the time-dependent target. Then, a high number of trajectories is sampled towards the goal states. Feasibility checks considering system dynamics and obstacles are applied. From the remaining trajectories, the jerk-optimal trajectory is chosen and sent to the subsequent controllers.}
+	\caption{Proposed concept of the trajectory generation framework. Starting from the high-level planner, i.\,e. the here-depicted toy example of driving through a moving ring, the trajectory module samples the goal states of the time-dependent target. Then, a high number of trajectories is sampled towards the goal states. Feasibility checks considering system dynamics and obstacles are applied. From the remaining trajectories, the jerk-optimal trajectory is chosen and sent to the subsequent controllers.}
 	\label{fig:overview}
 \end{figure}
+Without loss of generality, we consider passing through a moving circular hoop as an example scenario for a high-level goal. This is a suitable scenario in order to motivate a time-dependent high-level goal, illustrating the underlying framework of lower-level trajectory planning and tracking. In general, the high-level goal is dependent on the respective application case, hence, the high-level planner is not within the scope of this work.
 
+The trajectory tracking and control framework presented in this chapter shall enable the vehicle to reach the given high-level goal. For a moving hoop, this task is, obviously, time-dependent. Additionally, the goal can be achieved by a multitude of vehicle states, i.\,e. the vehicle can pass the hoop at other points than solely the hoop's center.
+Furthermore, velocity, acceleration, and attitude with which the \ac{uauv} passes through the hoop can be chosen within certain boundaries, as long as the high-level goal can be achieved.
+As part of our approach, a computationally efficient trajectory generator generates a large set of motion primitives, each of them optimal with regard to a cost function that we will later define and discuss in \Cref{sec:trajectory-generation}.
+Right after sampling, the trajectories do not respect any constraints regarding vehicle dynamics or potential collisions. 
+Thus, we conduct various feasibility tests as the subsequent step.
+Tests include input constraints, namely thrust and body rates, as well as translational constraints.
+The input feasibility depends on the vehicle dynamics derived in this chapter.
+From the set of feasible trajectories, a single one is chosen and tracked by the control module presented in \Cref{sec:control}. 
+For this thesis, the \emph{best} trajectory is selected by its costs.
 
+\Cref{sec:sw_limitatations} pointed out current limitations for the software architecture.
+We address this flaw by throughoutly redesign the framework using the recently published \ac{ros2} as a basis for the software modules running on the \ac{uauv} onboard computer.
+%This decision is motivated by the limitations discussed in \Cref{sec:sw_limitatations}.
+Also, the recent progress in the development of \ac{ros2} with the release of their second long-term-support version, exceeding the end-of-life of \ac{ros}1, renders \ac{ros2} a promising sustainable approach for the HippoCampus software architecture and its future extensions.
 
 \section{System Dynamic}
 \label{sec:system-dynamics}
@@ -37,10 +50,10 @@ In the following, we derive the system dynamic of the underactuated HippoCampus 
 
 \subsection{Choice of Reference Frames}
 We define two reference frames, referred to as \textit{world} and \textit{body} to describe the 6\,DOF motion of the underwater robot.
-Figure\,\ref{fig:reference_frames} illustrated the definition of both frames.
-\begin{figure}[h!]
+\Cref{fig:reference_frames} illustrates the definition of both frames.
+\begin{figure}[tb]
 	\centering
-	\input{images/03/free-body-diagram.pdf_tex}
+	\includesvg[width=0.6\textwidth]{images/03/coord_frames}
 	\caption{Definition of the world-fixed inertial frame of reference $\mathcal{W}$ and the body-fixed frame $\mathcal{B}$.}
  \label{fig:reference_frames}
 \end{figure}
@@ -50,7 +63,7 @@ For this work, we follow the standard convention in robotics defined as \textit{
 Its axes are defined through the unit vectors $\prescript{\mathcal{N}}{}{\xb}$, $\prescript{\mathcal{N}}{}{\yb}$, and $\prescript{\mathcal{N}}{}{\zb}$ pointing towards true east, north, and in upward direction, respectively.
 Note that this work focuses on applications in confined underwater environments.
 Hence, it is often convenient to use a more flexible definition of the inertial reference frame to which we refer to as world frame $\mathcal{W}$.
-Consequently, we define this world frame by the unit vectors $\prescript{\mathcal{W}}{}{\xb}$, $\prescript{\mathcal{W}}{}{\yb}$, and $\prescript{\mathcal{W}}{}{\zb}$ and the origin ${O}^{W}$.
+Consequently, we define this world frame by the unit vectors $\prescript{\mathcal{W}}{}{\xb}$, $\prescript{\mathcal{W}}{}{\yb}$, and $\prescript{\mathcal{W}}{}{\zb}$ and the origin ${O}_{\mathcal{W}}$.
 This coordinate system is specific to the facility the vehicle is deployed in.
 % Using this facility specific reference frame facilitates vehicle deployment within restricted volumes.
 % For instance in housed industry tanks where robust measurements of the true north/east directions are not available. 
@@ -59,7 +72,7 @@ Hence, a convenient approach is to define the $\prescript{\mathcal{W}}{}{x}$- an
 %
 \subsubsection{Body-fixed Frame}
 We define a moving \textit{body} frame $\mathcal{B}$ that is fixed to the vehicle of interest, i.\,e. the underwater robot.
-By definition, the body frame's origin ${O}^{B}$ coincidences with the vehicle's center of gravity.%\,(CG).
+By definition, the body frame's origin ${O}_{\mathcal{B}}$ coincidences with the vehicle's center of gravity.%\,(CG).
 We follow the common approach to choose body frame axes $\prescript{\mathcal{B}}{}{x}$, $\prescript{\mathcal{B}}{}{y}$, and $\prescript{\mathcal{B}}{}{z}$ such that they align with the vehicles \textit{principal axes of inertia}. 
 For the design of the HippoCampus \ac{uauv} we define
 \begin{itemize}
@@ -98,7 +111,6 @@ with
 where $\prescript{\mathcal{B}}{}{\vb}$ and $\prescript{\mathcal{B}}{}{\omeb}$ are the linear and angular velocity expressed in the body-fixed frame $\mathcal{B}$, respectively.
 
 The pose of the vehicle in the world-fixed frame $\mathcal{W}$ reads
-
 \begin{equation}
 	\etab = 
 	\begin{bmatrix}
@@ -122,7 +134,7 @@ with
 where $\prescript{\mathcal{W}}{}{\pbo}$ is the vehicle's position, i.\,e. the position of body frame origin $O_\mathcal{B}$, with respect to the world frame origin $O_\mathcal{W}$.
 Moreover, $\Theb_{\mathcal{W}\mathcal{B}}$ denotes the Euler angle vector describing the rotation between $\mathcal{W}$ and $\mathcal{B}$ following the extrinsic $x$-$y$-$z$ convention.
 
-We write the relation between the linear and angular velocities $\vlinbody$ and $\vangbody$ expressed in the body-fixed frame and the corresponding velocities in the world-fixed frame as
+Furthermore, we write the relation between the linear and angular velocities $\vlinbody$ and $\vangbody$ expressed in the body-fixed frame and the corresponding velocities in the world-fixed frame as
 \begin{equation}
 	\label[]{eq:velocity-world-body-transformation}
 	\begin{bmatrix}
@@ -141,7 +153,7 @@ We write the relation between the linear and angular velocities $\vlinbody$ and 
 		\vangbody
 	\end{bmatrix},
 \end{equation}
-with is the rotation matrix 
+with the rotation matrix 
 \begin{equation}
 	\label{eq:rotation-matrix}
 	\Rbodyworld = 
@@ -175,7 +187,7 @@ The time derivative of $\Rbodyworld$ is
 	\prescript{\mathcal{W}}{}{\dot{\bm{R}}_{\mathcal{B}}} = \Rbodyworld \Sb(\vangbody)
 	,
 \end{equation}
-with the cross product skew-symmetric matrix
+with the cross-product skew-symmetric matrix
 \begin{equation}
 	\Sb(\vangbody) = 
 	\begin{bmatrix}
@@ -197,12 +209,6 @@ with the cross product skew-symmetric matrix
 
 \subsection{Equations of Motion}
 
-\begin{itemize}
-	\color{red}
-	\item Start with the general eq of motion
-	\item Apply and justify/explain the simplifications and assumptions to get to the simplified eom in \Cref{eq:equation-of-motion-translational,eq:equation-of-motion-rotational} \todo[inline]{further simplications for trajectory generation. but gazebo simulation uses these equations. how to structure this?}
-	\item 
-\end{itemize}
 
 In the following, we derive a dynamic model for the HippoCampus \ac{uauv} based on \cite{Fossen11}.
 Subsequently, we simplify the model by exploiting the properties of the robot and making reasonable assumptions.
@@ -228,7 +234,6 @@ denote the load vector with
 	\end{bmatrix}^\top
 \end{equation}
 being the forces and moments with respect to the body-fixed frame $\mathcal{B}$.
-
 We write the rigid-body equation of motion as
 \begin{equation}
 	\label{eq:rigid-body-equation-of-motion}
@@ -247,7 +252,7 @@ with
 	\end{bmatrix}
 	,
 \end{equation}
-where $\Mrigid$ is the rigid-body mass matrix, $\Crigid$ is the rigid-body Coriolis and centripetal matrix, and $\Jb$ the vehicle's inertia matrix with respect to its center of gravity.
+where $\Mrigid$ is the rigid-body mass matrix, $\Crigid$ is the rigid-body Coriolis and centripetal matrix, and $\Jb$ is the vehicle's inertia matrix with respect to its center of gravity.
 
 To account for hydrodynamic and hydrostatic effects, we extend \Cref{eq:rigid-body-equation-of-motion} by the corresponding terms, which yields in accordance with \cite{Fossen11}
 \begin{equation}
@@ -265,31 +270,31 @@ To account for hydrodynamic and hydrostatic effects, we extend \Cref{eq:rigid-bo
 	= \taub
 	,
 \end{equation}
-where $\Madded$ is the added mass matrix, $\Cadded$ the added Coriolis matrix, and $\Dadded$ the added damping matrix.
-The hydrostatic load, denoted by $\gb(\etab)$, represents the forces acting on the body due to gravity and buoyancy and moments induced by them.
+where $\Madded$ is the added mass matrix, $\Cadded$ the added Coriolis matrix, and $\Dadded$ the added damping matrix, respectively.
+Moreover, the hydrostatic load, denoted by $\gb(\etab)$, represents the forces acting on the body due to gravity and buoyancy and moments induced by them.
 
-We make the following assumptions with respect to HippoCampus \ac{uauv} to simplify \Cref{eq:6dof-equation-of-motion}:
+We make the following assumptions with respect to the HippoCampus \ac{uauv} to simplify \Cref{eq:6dof-equation-of-motion}:
 \begin{itemize}
-	\item Symmetry with respect to $xz$, $yz$ and $xy$ planes.
+	\item Symmetry with respect to $xz$-, $yz$-, and $xy$-planes.
 	\item The center of gravity lies in the origin $\bodyframeorigin$ of the body-fixed frame $\mathcal{B}$.
-	\item The difference in the magnitudes of buoyancy force and gravitational force is zero, i.e. the vehicle is neutrally buoyant. Therefore, the restoring force is assumed to be zero.
+	\item The difference in the magnitudes of buoyancy force and gravitational force is zero, i.\,e. the vehicle is neutrally buoyant. Therefore, the restoring force is assumed to be zero.
 	\item The center of buoyancy and the center of gravity coincide. The resulting restoring moment will be zero.
-	\item The vehicle's velocity is relatively small.
+	\item The vehicle's velocity is relatively small, i.\,e.high order nonlinear effects can be neglected.
 	\item The motion of the vehicle is uncoupled.
 	\item The principal axes of inertia coincide with the body-fixed frame axes.
 \end{itemize}
 
-Using the body symmetry, the added mass matrix becomes %\todo{Fossen 7.5.2 p.172}
+Using the body symmetry, the added mass matrix reads %\todo{Fossen 7.5.2 p.172}
 \begin{equation}
 	\Madded =
 	\text{diag}\left(X_{\up}, Y_{\vp}, Z_{\wpo}, K_{\pp}, M_{\qp}, N_{\rp}\right)
 \end{equation}
-and since the axes of inertia coincide with the body-fixed frame, the rigid-body inertia matrix $\Jb$ becomes diagonal as well, i.e.
+and since the axes of inertia coincide with the body-fixed frame, the rigid-body inertia matrix $\Jb$ becomes diagonal as well, i.\,e.
 \begin{equation}
 	\Jb = \text{diag}(J_x, J_y, J_z)
 	.
 \end{equation}
-For uncoupled motions \cite{Fossen11} suggests assuming diagonal shape for $\Dadded$ as well. For high speeds, the damping is non-linear. But the speed of the HippoCampus \ac{uauv} is assumed to be small enough, that the linear terms are dominant. Therefore, the damping is approximated as linear function in terms of velocity.
+For uncoupled motions, \cite{Fossen11} suggests assuming diagonal shape for $\Dadded$. For high speeds, the damping is non-linear. However, the speed of the HippoCampus \ac{uauv} is assumed to be small enough that the linear terms are dominant. Therefore, the damping can be approximated by linear function in terms of velocity.
 %\todo{find a reference for assuming linear terms only. see hastedt}
 Hence, the added damping reads
 \begin{equation}
@@ -297,10 +302,11 @@ Hence, the added damping reads
     .
 \end{equation}
 
-Since the vehicle is neutrally buoyant and the center of buoyancy and gravity are identical, the hydrostatic forces and moments vanish. Based on these simplifications we rewrite \Cref{eq:6dof-equation-of-motion}. With $\Madded = \text{diag}\left(\Mvadded, \Jadded\right)$ and $\Dadded = \text{diag}(\Dvadded, \Domegaadded)$, we introduce the following auxiliary variables
+Since the vehicle is neutrally buoyant and the center of buoyancy and gravity are identical, the hydrostatic forces and moments vanish. Based on these simplifications, we rewrite \Cref{eq:6dof-equation-of-motion}. With $\Madded = \text{diag}\left(\Mvadded, \Jadded\right)$ and $\Dadded = \text{diag}(\Dvadded, \Domegaadded)$, we introduce the following auxiliary variables
 \begin{equation}
-	\Mbs = \left(m\Ib + \Mvadded\right),\text{ and }
+	\Mbs = \left(m\Ib + \Mvadded\right)\text{ and }
 	\Jbs = \left(\Jb + \Jadded\right)
+    ,
 \end{equation}
 and write \Cref{eq:6dof-equation-of-motion} separated by the translational and rotational dynamics as
 \begin{equation}
@@ -309,6 +315,7 @@ and write \Cref{eq:6dof-equation-of-motion} separated by the translational and r
 	\vlinbody \times \Mbs \vangbody
 	-\Dvadded \vlinbody
 	+ \prescript{\mathcal{B}}{}{\fb}
+
 \end{equation}%\todo{Muss es nicht nur die obere Haelfte von $\gb$ sein? Muesste $\Mbs$ nicht vor $\vlinbody$ stehen?}
 and
 \begin{equation}
@@ -323,16 +330,16 @@ and
 
 \subsection{Thruster Model}
 \label{sec:thruster-model}
-The HippoCampus \ac{uauv} has four thrusters mounted in parallel to its forward axis depicted in \Cref{fig:free-body-diagram}.
-\begin{figure}[h!]
+The HippoCampus \ac{uauv} has four thrusters mounted in parallel to its forward axis as depicted in \Cref{fig:free-body-diagram}.
+\begin{figure}[bt]
 	\centering
 	\input{images/03/free-body-diagram.pdf_tex}
 	\caption{Free body diagram of the HippoCampus \mu AUV with buoyancy force $\bm{f}_\textrm{B}$, gravitational force $\bm{f}_\textrm{G}$, thruster forces $\bm{f}_\textrm{1:4}$, and thruster torques $\bm{m}_{1:4}$.}
 	\label{fig:free-body-diagram}
 \end{figure}
 The thruster configuration enables the vehicle to apply forces and moments.
-Each thruster applies a force $\fb_{i}$ in the direction of $\exbody$ and induces a moment $\mb_{i}$ around $\bodyframeorigin$.
-Furthermore, due to the thruster's rotational movement, it generates a moment around the forward axis. A physically based modelling approach is presented in \cite{Newman77} and following it, we can express the thruster force as
+Each thruster $i$ applies a force $\fb_{i}$ in the direction of $\exbody$ and induces a moment $\mb_{i}$ around $\bodyframeorigin$.
+Furthermore, due to the thruster's rotational movement, it generates a moment around the forward axis. A physics-based modelling approach is presented in \cite{Newman77} and following it, we can express the thruster force as
 \begin{equation}
 	\label{eq:thrust-function-newman}
 	f_i = \kappa_{\text{F},i}\rho d^4 n_i^2
@@ -350,17 +357,17 @@ Another relation for the thruster forces is presented in \cite{Hastedt19}, accor
 where $\ForceQuadCoeffi$ and $\ForceLinCoeffi$ denote constant thrust coefficients, and $\inputesci$ is the control input of the \ac{esc} controlling the thruster.
 Since the \acp{esc} of the HippoCampus \ac{uauv} do not apply feedback control, we cannot assume the actual velocity for a given $\inputesci$ being constant.
 Furthermore, the vehicle has no ability to measure the rotational velocity of the thrusters during operation.
-Hence, we choose \Cref{eq:thrust-function-hastedt} over \Cref{eq:thrust-function-newman} for modelling the forces of the thrusters.
+Hence, we choose \Cref{eq:thrust-function-hastedt} over \Cref{eq:thrust-function-newman} for modeling the forces of the thrusters.
 
 This implies three simplifications.
 First, we neglect the relative velocity between fluid and thruster.
-Second, we neglect the deadzone of the motors.
+Second, we neglect the dead-zone of the motors.
 And last, we do not account for asymmetries in the thrust function regarding the direction of rotation of the thrusters.
-The deadzone is a range of $\inputesci$, for which the motors do not start spinning.
+The dead-zone is a range of $\inputesci$, for which the motors do not start spinning.
 As a consequence, forces and moments induced by the thrusters cannot be arbitrarily small.
-Neglecting the deadzone seems appropriate, as we can assume a sufficiently high forward thrust during agile maneuvering that keeps the thrusters operating outside their deadzone.
+Neglecting the dead-zone seems appropriate, as we can assume a sufficiently high forward thrust during agile maneuvering that keeps the thrusters operating outside their respective dead-zone.
 
-Regarding the thruster dynamics, we assume the forces and moments being reached instantaneously. Considering the much slower vehicle dynamics, this seems justified.
+Regarding the thruster dynamics, we assume that the forces and moments are being reached instantaneously. Considering the much slower vehicle dynamics, this seems justified.
 
 In accordance to \Cref{eq:thrust-function-hastedt}, the moment $m_i$ applied by a thruster reads
 \begin{equation}
@@ -406,7 +413,7 @@ and by substituting with \Cref{eq:thrust-function-hastedt,eq:moment-function} th
 		\right)
 	\end{bmatrix}
 \end{equation}
-and as sum over all thrusters
+and as a sum over all thrusters
 \begin{equation}
 	\label{eq:thruster-load-vs-uesc}
 	\taub = 
@@ -489,18 +496,18 @@ and
 	.
 \end{equation}
 
-\begin{itemize}
-	\color{red}
-	\item Rigid body dynamics -> added hydrodynamic terms -> assumptions and simplifications -> yields simplified dynamic model
-	\item Thruster model
-	\begin{itemize}
-		\item assume motor speed is reached instantaneously (fast in comparison to the body dynamics)
-		\item assume quadratic thrust curve (Hastedt)
-		\item neglect relative velocity
-		\item neglect dead band
-		\item neglect forward/reverse asymmetry.
-	\end{itemize}
-\end{itemize}
+% \begin{itemize}
+% 	\color{red}
+% 	\item Rigid body dynamics -> added hydrodynamic terms -> assumptions and simplifications -> yields simplified dynamic model
+% 	\item Thruster model
+% 	\begin{itemize}
+% 		\item assume motor speed is reached instantaneously (fast in comparison to the body dynamics)
+% 		\item assume quadratic thrust curve (Hastedt)
+% 		\item neglect relative velocity
+% 		\item neglect dead band
+% 		\item neglect forward/reverse asymmetry.
+% 	\end{itemize}
+% \end{itemize}
 
 % \subsection{Differential Flatness (Optional -- Streichen,)}
 % \label{sec:differential-flatness}
@@ -531,15 +538,16 @@ while being subject to the translational constraints
 	j=1,\dots,N_c
 	.
 \end{equation}
-We can interpret these constraints as bounds to the vehicle's position, velocity and acceleration. The positional constraints can be used to encode spatial constraints, such as a confined environment in which the \ac{uauv} is maneuvering. While for \acp{uav} constraints on the acceleration can be used to directly encode limits one the tilt, as presented in \cite{MuellerHehn15}, this is not the case for \acp{uauv}. This is caused by differences in the dynamic models used for \acp{uav} in \cite{MuellerHehn15} and \acp{uauv} as presented in this thesis. A more detailed explanation is given in the course of this section.
+We can interpret these constraints as bounds to the vehicle's position, velocity, and acceleration. The position constraints can be used to encode spatial constraints, such as a confined environment in which the \ac{uauv} is maneuvering. While for \acp{uav}, constraints on the acceleration can be used to directly enforce limits on the tilt, as presented in \cite{MuellerHehn15}, this is not the case for \acp{uauv}. This is caused by differences in the dynamic models used for \acp{uav} in \cite{MuellerHehn15} and \acp{uauv} as presented in this thesis. A more detailed explanation is given in the course of this section.
 
-In addition to the translational constraints, the trajectory has to respect the dynamic abilities of the vehicle, i.e. the trajectory bringing the vehicle from $\vehiclestate_0$ to $\vehiclestate_\text{f}$ has to be dynamically feasible. This includes respecting the simplified dynamic model we introduce in the following section, as well as bounds to the system input.
+In addition to the translational constraints, the trajectory has to respect the dynamic abilities of the vehicle, i.\,e. the trajectory bringing the vehicle from $\vehiclestate_0$ to $\vehiclestate_\text{f}$ has to be dynamically feasible. This includes respecting the simplified dynamic model we introduce in the following section, as well as bounds to the system input.
 
 For this section, we focus on the generation of the trajectories, before dealing with the feasibility constraints in the next section.
 
 \subsection{Trajectory Dynamics}
 \label{sec:trajectory-dynamics}
-In this section, we simplify the dynamic model described in \Cref{eq:eom-translational-with-input} and derive equations to calculate the system inputs for a given trajectory. In the following all equations are expressed in the world-fixed frame $\mathcal{W}$ and the corresponding indices are omitted in favor of readability, if unambiguous.
+In this section, we simplify the dynamic model described in \Cref{eq:eom-translational-with-input} and derive equations to calculate the system inputs for a given trajectory. In the following, all equations are expressed in the world-fixed frame $\mathcal{W}$.
+Note, the corresponding indices are omitted in favor of readability, if unambiguous.
 
 Similar to \cite{MuellerHehn15}, we define the state variable of the trajectory and its derivative as
 \begin{equation}
@@ -570,9 +578,9 @@ with
 	\quad
 	\jb = \pbppp
 \end{equation}
-being the velocity, acceleration and jerk.
+representing velocity, acceleration, and jerk, respectively.
 
-We neglect the cross-coupling term in \Cref{eq:eom-translational-with-input} and can write the translational equation of motion expressed in the world frame $\mathcal{W}$ as
+Note, we neglect the cross-coupling term in \Cref{eq:eom-translational-with-input} and can write the translational equation of motion expressed in the world frame $\mathcal{W}$ as
 \begin{equation}
 	\label{eq:eom-world-without-cross-coupling}
 	\Rbodyworld \, \Mbs \, \Rbodyworld^\top \, \pbpp = \Rbodyworld\Dadded\Rbodyworld^\top \pbp + u_1 \exbodyinworld.
@@ -762,12 +770,6 @@ and use it to generate trajectories with minimal costs.
 % \end{equation}
 
 \subsection{Kinematic Derivation of the jerk-optimal Trajectory}
-\begin{itemize}
-	\color{red}
-	\item Define the cost function
-	\item derive the minimum jerk solution per axis
-	\item 
-\end{itemize}
 In this section, we derive the jerk-minimal trajectory with respect to the cost function defined in \Cref{eq:cost-function}. This is done by decomposing the three-dimensional problem in a per axis notation and finding the optimal solution per axis.
 
 We write \Cref{eq:cost-function} in per axis notation
@@ -904,30 +906,31 @@ with
 	\end{bmatrix}
 	.
 \end{equation}
-We see, that the solution of the optimal state trajectory over the time horizon $T$ is constrained by the initial state $\sbo_0$ and the final state $\sbo_\text{f}$. Furthermore, we have seen in \Cref{sec:trajectory-dynamics}, that we can establish a relation between the state trajectory and the system inputs based on the system dynamics in \Cref{eq:trajectory-acceleration-eom}. Because we have not taken any feasibility constraints into account yet, we are able to generate trajectories in a highly efficient manner. For a given set of $T$, $\sbo_0$ and $\sbo_\text{f}$ only a matrix multiplication has to be performed to compute a trajectory. This enables us to generate an amount of trajectories in the magnitude of hundred thousands up to millions per second. A sampling strategy to choose appropriate final states to reach a high level goal is proposed in the following section.
+We see that the solution of the optimal state trajectory over the time horizon $T$ is constrained by the initial state $\sbo_0$ and the final state $\sbo_\text{f}$. Furthermore, we have seen in \Cref{sec:trajectory-dynamics} that we can establish a relation between the state trajectory and the system inputs based on the system dynamics in \Cref{eq:trajectory-acceleration-eom}. Because we have not taken any feasibility constraints into account yet, we are able to generate trajectories in a highly efficient manner. For a given set of $T$, $\sbo_0$, and $\sbo_\text{f}$ only a matrix multiplication has to be performed to compute a trajectory. This enables us to generate a large number of trajectories, i.\,e. in the magnitude of hundred thousand up to millions per second. A sampling strategy to choose appropriate final states to reach a high-level goal is proposed in the following section.
 
 \subsection{Sampling Strategy}
 \label{sec:sampling-strategy}
-We consider the proposed high level goal of catching or moving through a ring in a spatially confined environment. The time dependent state of the ring is assumed to be known exactly at all times. In general, this is not strictly necessary, and the vehicle could have sensors to measure and estimate the current state of the ring and predict future states based on these observations, but this lies outside the scope of this thesis.
+We consider the proposed high-level goal of catching or moving through a ring in a spatially confined environment. The time-dependent state of the target ring is assumed to be known exactly at all times. In general, this is not strictly necessary, and the vehicle may feature onboard sensors to measure and estimate the current state of the ring and predict future states based on these observations.
+However, this lies outside the scope of this thesis and left to future work.
 
+Generally, the more different final states are sampled, the higher the probability to find at least one feasible solution. Note we discuss feasibility testing in detail in \Cref{sec:feasibility}. 
+Note, for the quadcopter model in \cite{MuellerHehn15}, the direction of the vehicle is always pointing in the direction of the acceleration.
+However, this is not the case for the hydrodynamic model of the HippoCampus \ac{uauv} which considers damping effects. 
+Hence, we need to choose a suitable combination of final acceleration and velocity in order to encode the final attitude of the vehicle for generating a trajectory with an appropriate final state.
+By choosing the final acceleration $\bm{a}_\text{f} = \bm{0}$, we can simplify the problem of encoding the desired final attitude as final trajectory state $\bm{s}_\text{f}$.
 
-\begin{itemize}
-	\color{red}
-	\item how to choose the final state to reach the high level goal, i.e. catching the ring as proposed scenario.
-	\begin{itemize}
-		\item vehicle tip position inside the ring
-		\item different final attitudes possible (sampling on a section of a sphere around final tip position)
-		\item calculate actual vehicle's position based on that
-	\end{itemize}
-	\item higher variety of final states increases chance to generate a feasible solution -> refer to following section
-	\item introduce additional rotated inertial system to specify axis components or let them unspecified
-	\item stress out the difference to MuellerHehn15, due to velocity dependency.
-\end{itemize}
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width=0.7\linewidth]{generation_example.png}
-	\caption{Generated trajectories for different final states and time horizons.}
-\end{figure}
+The front of the HippoCampus \ac{uauv} has to to be inside the opening of the circular hoop in order to achieve the high-level objective.
+We sample positions for the vehicle's front with a radial distance from the center of the hoop in the range $[0, r_{\max}]$ and angle $\varphi_r$ in the range $[0, 2\pi]$.
+For each final position of the vehicle's front, the center of the vehicle can be positioned on a sphere around this point. We constrain the direction of approach by limiting the angle between the vehicle's forward axis and the normal vector perpendicular to the opening of the hoop $\alpha$ to the range $[0, \alpha_{\max}$. By rotating the vehicle's axis around the normal vector with an angle $\beta$ in the range $[0, \beta_{\max}]$, we obtain center points of the vehicle lying on the surface of a cone. This process is repeated for each final tip position. 
+
+Subsequently, we choose the velocities for each final position $\bm{p}_\text{f}$ distributed between the velocity limits $\bm{v}_{\min}$ and $\bm{v}_{\max}$. As last parameter to specify a trajectory, we set the duration of the trajectory to a value in the range $[0, T_{\max}]$.
+
+% \begin{figure}[h!]
+% 	\centering
+% 	\includegraphics[width=0.7\linewidth]{generation_example.png}
+% 	\caption{Generated trajectories for different final states and time horizons.}
+    
+% \end{figure}
 \section{Feasibility of Trajectories}
 \label{sec:feasibility}
 In the previous section, the trajectory generation approach was presented and the relation between the state trajectory and the system inputs has been established.
@@ -938,7 +941,7 @@ Since these constraints are not inherent to the generation stage, they can be co
 \subsection{Input Feasibility}
 \label{sec:input-feasibility}
 
-We can split the problem of input feasibility into two subproblems, thrust feasibility and body rate feasibility. The thrust feasibility check ensures that the vehicle does not exceed its thrust capabilities denoted by $\fmin$ for the minimum and $\fmax$ for the maximum thrust it can generate.
+We can split the problem of input feasibility into two subproblems, namely, thrust feasibility and body rate feasibility. The thrust feasibility check ensures that the vehicle does not exceed its thrust capabilities denoted by $\fmin$ for the minimum and $\fmax$ for the maximum thrust it can generate.
 We formulate the thrust constraints as
 \begin{equation}
 	\label{eq:thrust-limits}
@@ -954,15 +957,13 @@ The body rate feasibility check declares a given state trajectory feasible if
 \end{equation}
 is guaranteed to be valid over the whole trajectory.
 
-Both checks are applied on the trajectory per axis with sufficient but not necessary criterions for both feasibility and infeasibility. As a consequence there might be feasible (as well as infeasible) trajectories that might be classified as indeterminable. The checks are applied recursively on subsections of the whole interval $\left[0,T\right]$ in case they can not classify the section as provably feasible or unfeasible.
+Both checks are applied on the trajectory per axis with sufficient but not necessary criteria for both, feasibility and infeasibility. As a consequence, there might be feasible (as well as infeasible) trajectories that might be classified as indeterminable. The checks are applied recursively on subsections of the whole interval $\left[0,T\right]$ in case they cannot classify the section as provably feasible or unfeasible.
 
 \subsubsection{Thrust Input Feasibility}
-\begin{itemize}
-	\color{red}
-	\item cubic instead of quadratic function is to be solved
-	\item stress out, that feasibility criterium is quite coarse -> feasible solution might be classified as indeterminable
-	\item following equations are per axis. Indies are omitted if unambiguous.
-\end{itemize}
+% \begin{itemize}
+% 	\color{red}
+% 	\item stress out, that feasibility criterium is quite coarse -> feasible solution might be classified as indeterminable
+% \end{itemize}
 We consider the interval 
 \begin{equation}
 	\mathcal{T} = \left[\tau_1,\tau_2\right] \subseteq \left[0,T\right]
@@ -1003,7 +1004,7 @@ and bound the thrust conservatively by summation over the per axis extrema
 		\left(m + X_{\dot{u}}\right)
 		\ppp_k
 		+ X_u \pp_k
-	\right)^2 \\
+	\right)^2, \\
 	\label{eq:fmin-per-axis}
 	\min_{t \in \mathcal{T}} f(t)^2
 	&\geq
@@ -1017,7 +1018,7 @@ and bound the thrust conservatively by summation over the per axis extrema
 	.
 \end{align}
 
-We denote the maximum and minimum of the per axis thrust as \fmaxaxis and \fminaxis, respectively %\todo{Hier ist im Unterschied zu Mueller eine kubische Funktion fuer die Nullstellen zu loesen} 
+Moreover, we denote the maximum and minimum of the per axis thrust as \fmaxaxis and \fminaxis, respectively %\todo{Hier ist im Unterschied zu Mueller eine kubische Funktion fuer die Nullstellen zu loesen} 
 and write the extrema in \Cref{eq:fmax-per-axis,eq:fmin-per-axis} as
 \begin{align}
 	\max_{t \in \mathcal{T}}
@@ -1057,7 +1058,7 @@ whereas a sufficient criterion for feasibility with respect to the thrust input 
 	\max_{t \in \mathcal{T}}
 	\left\{\fmaxaxis^2, \fminaxis^2\right\}
 	& \leq
-	\fmaxsquare \\
+	\fmaxsquare, \\
 	\label{eq:sufficient-feasible-thrust-min}
 	\sum_{k=1}^{3}
 	\min_{t \in \mathcal{T}}
@@ -1065,9 +1066,12 @@ whereas a sufficient criterion for feasibility with respect to the thrust input 
 	& \geq
 	\fminsquare
 \end{align}
-hold. Note that it might be the case, that neither \Cref{eq:sufficient-infeasible-thrust} nor \Cref{eq:sufficient-feasible-thrust-max,eq:sufficient-feasible-thrust-min} hold. This does not necessarily mean, that the section has to be infeasible. Even though, the highest order term is $\pp_k$ of fourth order due to velocity dependent damping opposed to the \ac{uav} application in \cite{MuellerHehn15}, where it is of order three, we can still consider the per axis criteria as computationally efficient. Finding the extrema of a fourth order polynomial comes down to finding the roots of a third order polynomial, for which a closed form solution exists. Additionally, to find the extrema for the interval $\mathcal{T}$ it is sufficient to solve it once for the whole duration of the trajectory. Subsequently, we check for each interval $\mathcal{T}$, if the candidate for a local extremum lies within $\mathcal{T}$ and find the global extrema for $\mathcal{T}$ by comparing the thrusts of the respective candidate with the thrust values on the boundaries of $\mathcal{T}$. We can conclude, that in the best case, i.e. no local extremum candidate lies within $\mathcal{T}$, two function evaluations of a quartic polynomial are required. Whereas, for the worst case, i.e. all local extremum candidates lie within $\mathcal{T}$, five evaluations are required.
+hold. 
+Note that it might be the case, that neither \Cref{eq:sufficient-infeasible-thrust} nor \Cref{eq:sufficient-feasible-thrust-max,eq:sufficient-feasible-thrust-min} hold. This does not necessarily mean that the section has to be infeasible. 
+Even though the highest order term $\pp_k$ is of fourth order due to velocity dependent damping opposed to the \ac{uav} application in \cite{MuellerHehn15}, where it is of order three, we can still consider the per axis criteria as computationally efficient. 
+Finding the extrema of a fourth order polynomial comes down to finding the roots of a third order polynomial, for which a closed form solution exists. Additionally, to find the extrema for the interval $\mathcal{T}$ it is sufficient to solve it once for the whole duration of the trajectory. Subsequently, we check for each interval $\mathcal{T}$, if the candidate for a local extremum lies within $\mathcal{T}$ and find the global extrema for $\mathcal{T}$ by comparing the thrusts of the respective candidate with the thrust values on the boundaries of $\mathcal{T}$. We can conclude, that in the best case, i.\,e. no local extremum candidate lies within $\mathcal{T}$, two function evaluations of a quartic polynomial are required. Whereas, for the worst case, i.\,e. all local extremum candidates lie within $\mathcal{T}$, five evaluations are required.
 
-To obtain the thrust function in terms of the state trajectory parameters $\alpha$, $\beta$ and $\gamma$, we plug \Cref{eq:optimal-trajectory-per-axis} into \Cref{eq:trajectory-thrust}, which yields
+To obtain the thrust function in terms of the state trajectory parameters $\alpha$, $\beta$, and $\gamma$, we plug \Cref{eq:optimal-trajectory-per-axis} into \Cref{eq:trajectory-thrust}, which yields
 \begin{equation}
 	\begin{aligned}
 		f ={}
@@ -1138,11 +1142,7 @@ per axis.
 \end{algorithm}
 
 \subsubsection{Body Rates Input Feasibility}
-\begin{itemize}
-	\color{red}
-	\item Insert dynamics into definition of jerk
-\end{itemize}
-We can formulate an upper bound on the body rates by applying the vector induced euclidean norm $\left\lVert\Rb\right\rVert \leq 1$ on \Cref{eq:body-rate-relation}
+We can formulate an upper bound on the body rates by applying the vector induced euclidean norm $\left\lVert\Rb\right\rVert \leq 1$ on \Cref{eq:body-rate-relation}, yielding
 \begin{equation}
 	\label{eq:body-rates-bound}
 	\omega_3^2 + \omega_2^2 \leq
@@ -1154,7 +1154,7 @@ We can formulate an upper bound on the body rates by applying the vector induced
 	\right\rVert^2
 	.
 \end{equation}
-A conservative upper bound of \Cref{eq:body-rates-bound} in per axis notation denoted as $\bar{\omega}^2$ can be written with \Cref{eq:thrust-squared-per-axis} as
+Moreover, a conservative upper bound of \Cref{eq:body-rates-bound} in per axis notation denoted as $\bar{\omega}^2$ can be written with \Cref{eq:thrust-squared-per-axis} as
 \begin{equation}
 	\omega_2^2 + \omega_3^2
 	\leq
@@ -1176,10 +1176,9 @@ A conservative upper bound of \Cref{eq:body-rates-bound} in per axis notation de
 			+ X_u \pp_k
 		\right)^2
 	}
-	,
+	.
 \end{equation}
-
-and simplified with \Cref{eq:sufficient-feasible-thrust-min} and defining $\xi_k = \left(m + X_{\dot{u}}\right)\dddot{p}_k + X_u \ddot{p}$ so it reads
+Furthermore, simplifying with \Cref{eq:sufficient-feasible-thrust-min} and defining $\xi_k = \left(m + X_{\dot{u}}\right)\dddot{p}_k + X_u \ddot{p}$, results in
 \begin{equation}
 	\bar{\omega}^2 =
 	\frac{
@@ -1193,7 +1192,7 @@ and simplified with \Cref{eq:sufficient-feasible-thrust-min} and defining $\xi_k
 	}
 	.
 \end{equation}
-The minimum and maximum of $\xi_k$ is denoted as \ximaxaxis and \ximinaxis, respectively. With
+Hereby, the minimum and maximum of $\xi_k$ is denoted as \ximaxaxis and \ximinaxis, respectively. With
 \begin{equation}
 	\max_{t \in \mathcal{T}}
 	\left(
@@ -1228,15 +1227,16 @@ we formulate the feasibility criterion with respect to the body rates
 	\omegamaxsquare
 	.
 \end{equation}
-This body rate feasibility criterion is analogous to the upper bound criterion for the thrust feasibility in \Cref{eq:sufficient-feasible-thrust-max}. If \Cref{eq:body-rates-criterion-per-axis} does not hold, the tested interval $\mathcal{T}$ is split in half and the feasibility criterion is applied recursively on both subintervals, subsequently.
+This body rate feasibility criterion is analogue to the upper bound criterion for the thrust feasibility in \Cref{eq:sufficient-feasible-thrust-max}. If \Cref{eq:body-rates-criterion-per-axis} does not hold, the tested interval $\mathcal{T}$ is split in half and the feasibility criterion is applied recursively on both subintervals, subsequently.
 
 
 \subsection{Translational Constraints Feasibility}
-At this stage we can check if a trajectory meets the requirements for being classified as input feasible as presented in \Cref{sec:input-feasibility}. Still there is no guarantee, the trajectory will not violate the translational constraints formulated in \Cref{eq:translational-constraints}.
+At this stage, we can check if a trajectory meets the requirements for being classified as input feasible as presented in \Cref{sec:input-feasibility}. Still, there is no guarantee, the trajectory will not violate the translational constraints formulated in \Cref{eq:translational-constraints}.
 
 \subsubsection{Position Feasibility}
 \label{sec:position-feasibility}
-We can formulate position constraints as planes. We define the allowable side of the plane by a normal vector $\nb_{\text{p}}$. We call this kind of positional constraints wall constraints. These wall constraints can be used to encode the constraints due to local conditions, such as the water surface or the walls of a confined environment, the vehicle is not allowed or able to cross. Feasibility has to be tested for critical points only. The critical points are those meeting the sufficient criterion for being at a minimal distance to the plane encoding the wall constraint. We find the critical points by finding the roots of $\pp_{\text{n}}(t) = \nb_{\text{p}}^\top \, \pbp(t)$.
+We can formulate position constraints as planes. We define the allowable side of the plane by a normal vector $\nb_{\text{p}}$. We call this kind of positional constraints \textit{wall constraints}. These wall constraints can be used to encode constraints due to local conditions, such as the water surface or the walls of a confined environment, that an underwater vehicle is not allowed or able to cross. Feasibility has to be tested for critical points only. The critical points are those meeting the sufficient criterion for being at a minimal distance to the plane encoding the wall constraint. We find these critical points by finding the roots of $\pp_{\text{n}}(t) = \nb_{\text{p}}^\top \, \pbp(t)$.
+The constraints then read
 \begin{equation}
 	\mathcal{C}_{\text{crit}} =
 	\left\{
@@ -1246,8 +1246,7 @@ We can formulate position constraints as planes. We define the allowable side of
 	\cup
 	\left\{0,T\right\}
 \end{equation}
-
-The trajectory is feasible with respect to the position constraints if and only if
+Furthermore, the trajectory is feasible with respect to the position constraints if and only if
 \begin{equation}
 	\label{eq:position-feasibility-criterion}
 	\nb_\text{p}^\top
@@ -1258,21 +1257,13 @@ The trajectory is feasible with respect to the position constraints if and only 
 	\,\forall\, t \in \mathcal{C}_{\text{crit}}
 	,
 \end{equation}
-with $\pbo_{\text{W}}$ denoting an arbitrary point on the plane defining the wall constraint. Geometrically interpreted, we can regard $\pp_{\text{n}}$ as the velocity projected onto the normal direction of the plane given by $\nb_{\text{W}}$.
+with $\pbo_{\text{p}}$ denoting an arbitrary point on the plane defining the wall constraint. Geometrically interpreted, we can regard $\pp_{\text{n}}$ as the velocity projected onto the normal direction of the plane given by $\nb_{\text{p}}$.
 
-The position is a quintic polynomial, as we can see in \Cref{eq:optimal-trajectory-per-axis}. Thus, computing $\mathcal{C}_{\text{crit}}$ is done by solving the roots of the fourth-order polynomial $\pp_{\text{n}}$. The feasibility check is carried out by evaluating the left-hand side of \Cref{eq:position-feasibility-criterion} at least twice and most six times per axis. This is similar to the input feasibility checks presented in \Cref{sec:input-feasibility} with the difference that no recursion is needed, though.
+The position is a quintic polynomial, as we can see in \Cref{eq:optimal-trajectory-per-axis}. Thus, computing $\mathcal{C}_{\text{crit}}$ is done by solving the roots of the fourth-order polynomial $\pp_{\text{n}}$. Therefore, the feasibility check is carried out by evaluating the left-hand side of \Cref{eq:position-feasibility-criterion} at least twice and at most six times per axis. This is similar to the input feasibility checks presented in \Cref{sec:input-feasibility} with the difference that no recursion is needed, though.
 
 
 
-\section{Obstacle/Collision Avoidance}\label{sec:collision-avoidance}
-
-\begin{itemize}
-	\color{red}
-	\item Make clear, that obstacle avoidance is not built into the trajectory generation itself. 
-	\item can be seen as subsequent feasibility check. 
-\end{itemize}
-
-\todo[inline]{Reference \cite{Bucki19}}
+\section{Collision Avoidance}\label{sec:collision-avoidance}
 As for the translational constraints and the input feasibility, collision avoidance is not inherent to the generation of trajectories, but is applied as a test afterwards. Trajectories failing the test are discarded.
 Obstacle avoidance can be added to the trajectory planning straightforwardly by extending the position feasibility test in \Cref{sec:position-feasibility}.
 Instead of checking for a collision with a single predefined plane, the position check is performed recursively on subintervals of $\left[0, T\right]$.
@@ -1356,28 +1347,36 @@ Note that we are not restricted to static obstacles by this approach of obstacle
 where $\pbo_{\mathcal{O}}(t)$ denotes the obstacle's trajectory. Instead of performing the collision check for $\pbo$, we do it for $\pbs$. In general, $\pbo_{\mathcal{O}}$ and consequently $\pbs$ could be arbitrary functions of time.
 But choosing them not to be a polynomial of order at most five, would render the collision avoidance significantly less computational efficient. Hence, we assume the trajectories being of at most order five, and the collision avoidance being performable by solving roots of quartic polynomials.
 
-\begin{tikzpicture}
-    \begin{axis}[
-            xmin=-2,xmax=1,
-            ymin=-3,ymax=3,
-            grid=both,
-            ]
-            \addplot [domain=-0.5:3.5,samples=50]({-1.083 * x^3 + 5.25 * x^2 -6.67*x + 1},{0.167 * x^3 - 0.25 * x^2 + 0.583 *x - 2}); 
-    \end{axis}
-\end{tikzpicture}
+% \textcolor{red}{\Cref{fig:polynomial_example} wants to be referenced}
+
+% \begin{figure}
+%     \centering
+%     \begin{tikzpicture}
+%     \begin{axis}[
+%             xmin=-2,xmax=1,
+%             ymin=-3,ymax=3,
+%             grid=both,
+%             ]
+%             \addplot [domain=-0.5:3.5,samples=50]({-1.083 * x^3 + 5.25 * x^2 -6.67*x + 1},{0.167 * x^3 - 0.25 * x^2 + 0.583 *x - 2}); 
+%     \end{axis}
+%     \caption{\textcolor{red}{Was zeigen wir hier?}}
+%     \label{fig:polynomial_example}
+% \end{tikzpicture}
+% \end{figure}
+
 
 \section{Control}
 \label{sec:control}
-\begin{itemize}
-	\color{red}
-	\item one could use the min jerk trajectory approach simply for generation -> feed-back control to keep the vehicle on track
-	\item computational efficiency and real-time capability of approach enables trajectory generation to be used for implicit feedback. Regenerate trajectories in each control time step.
-	\item body rates will change rather slowly compared to quadrocopters -> instead of using body rates as in MuellerHehn15, use target attitude and attitude control (actually the body rates are derived from a target attitude anyway)
-\end{itemize}
-While we attended to the generation and planning of trajectories and the question of feasibility regarding vehicle dynamics, translational constraints and collision avoidance in the previous sections, this section is about tracking the obtained trajectories.
+% \begin{itemize}
+% 	\color{red}
+% 	%\item one could use the min jerk trajectory approach simply for generation -> feed-back control to keep the vehicle on track
+% 	%\item computational efficiency and real-time capability of approach enables trajectory generation to be used for implicit feedback. Regenerate trajectories in each control time step.
+% 	%\item body rates will change rather slowly compared to quadrocopters -> instead of using body rates as in MuellerHehn15, use target attitude and attitude control (actually the body rates are derived from a target attitude anyway)
+% \end{itemize}
+While we attended to the generation and planning of trajectories, as well as the question of feasibility regarding vehicle dynamics, translational constraints and collision avoidance in the previous sections, this section is about tracking the obtained trajectories.
 
 The general control architecture implements the inner-outer loop control scheme as depicted in \Cref{fig:inner-outer-loop-feedback-control}.
-\begin{figure}
+\begin{figure}[tb]
 	\centering
 	\begin{tikzpicture}
 
@@ -1433,15 +1432,10 @@ The general control architecture implements the inner-outer loop control scheme 
         \draw[-stealth] ([xshift=0.3cm]trackingcontroller.north) -- ++(0, \yshiftaboveblocks) -- ([xshift=\xshiftfirstuintomixer, yshift=\yshiftaboveblocks+0.5*\blockheight]mixer.west) -- ([xshift=\xshiftfirstuintomixer, yshift=2*\yshiftthreelines]mixer.west) -- ([yshift=2*\yshiftthreelines]mixer.west) node[midway, above] {$u_1$};
 
 	\end{tikzpicture}
-	\caption{Overview of the control loops.}
+	\caption{Overview of the control loops.} %The outer control loop consists of the trajectory tracking controller that outputs a desired thrust vector $\bm{f}_{\text{des}}$ and a roll angle $\bm{\phi}_{\text{des}}$, fully defining a desired state of the vehicle, allowing the vehicle to follow the given trajectory. This is then fed into the high-rate, low-level attitude controller. This controller outputs a desired resulting attitude, which is then achieved using the body rate controller. 
 	\label{fig:inner-outer-loop-feedback-control}
 \end{figure}
-The authors in \cite{Maurya09} demonstrated the viability of this approach for marine vehicles. The basic idea is to divide the problem of trajectory into easier-to-solve subproblems. By inner loops, we refer to the low-level dynamic control loops consisting of attitude or body rate controllers. The design and tuning of these inner loops are highly dependent on the vehicle dynamics. The outer control loops, for example, a position, path, or trajectory tracking controller, can be considered as kinematic control loops. They are by design decoupled from vehicle dynamics under the assumption, that the inner control loops are fast enough to reach the target value instantaneously from the perspective of the outer loop. This is equivalent to the assumption in \Cref{sec:thruster-model}, that the thruster dynamics compared to the \ac{uauv} dynamics are sufficiently fast to be negligible. As a result, we have a fast-slow separation from the inner to the outer loop, i.e. the inner loops run with a significantly higher frequency than the outer ones.
-
-
-
-
-
+The authors in \cite{Maurya09} demonstrated the viability of this approach for marine vehicles. The basic idea is to divide the problem of trajectory into easier-to-solve subproblems. By inner loops, we refer to the low-level dynamic control loops consisting of attitude or body rate controllers. The design and tuning of these inner loops are highly dependent on the vehicle dynamics. The outer control loops, for example, a position, path, or trajectory tracking controller, can be considered as kinematic control loops. They are by design decoupled from vehicle dynamics under the assumption that the inner control loops are fast enough to reach the target value instantaneously from the perspective of the outer loop. This is equivalent to the assumption in \Cref{sec:thruster-model} that the thruster dynamics compared to the \ac{uauv} dynamics are sufficiently fast to be negligible. As a result, we have a fast-slow separation from the inner to the outer loop, i.e. the inner loops run with a significantly higher frequency than the outer ones.
 
 
 \subsection{Body Rate Control}
@@ -1482,22 +1476,21 @@ The attitude controller is the next controller upstream of the body rate control
 		\left\lVert\thrustdesiredworld\right\rVert
 	}
 \end{equation}
-and the current thrust axis, that is equivalent to 
+and the current thrust axis that is equivalent to 
 \begin{equation}
 	\exbodyinworld = \qactual \odot \eb_1
 	,
 \end{equation}
-where $\qactual \odot \eb_1$ denotes the rotation of the vector $\eb_1$ by the quaternion $\qactual$ and $\qactual$ is the current attitude of the vehicle.
+where $\qactual \odot \eb_1$ denotes the rotation of the vector $\eb_1$ by the quaternion $\qactual$, while $\qactual$ is the current attitude of the vehicle.
 
-It is the task of the controller to compute a desired attitude given by the quaternion $\qdesired$ and compute the required body rates $\vangdesiredbody$, that rotate the vehicle to desired attitude. We define the error of the attitude as
+This controller computes a desired attitude given by the quaternion $\qdesired$ and computes the required body rates $\vangdesiredbody$ that result in rotating the vehicle to the desired attitude. For this, we define the error of the attitude as
 \begin{equation}
 	\label{eq:qerror}
 	\qerror = \qactual^{-1} \cdot \qdesired
 	.
 \end{equation}
-
-The alignment of $\exdesiredbodyinworld$ and $\exbodyinworld$ constraints two of the three rotational degrees of freedom of the vehicle, namely pitch and yaw.
-The rotation around the roll axis $\exbodyinworld$ can be chosen freely.
+Furthermore, the alignment of $\exdesiredbodyinworld$ and $\exbodyinworld$ constraints two of the three rotational degrees of freedom of the vehicle, namely pitch and yaw.
+On the other hand, the rotation around the roll axis $\exbodyinworld$ can be chosen freely.
 
 The quaternion-based control law
 \begin{equation}
@@ -1507,7 +1500,7 @@ The quaternion-based control law
 	\text{sgn}(q_{\text{e},0})
 	\qb_{\text{e},1:3}
 \end{equation}
-is globally asymptotically stable and fits the architecture of inner-outer loops \cite{Mayhew11,Brescianini13}, which is desirable in the context of agile maneuvering. The parameter $\tau$ can be interpreted as first-order time constant of the attitude controller. In practice, too small or too large values may lead to bad control performance \cite{Brescianini13} and an appropriate value has to be determined by tuning of the controller.
+is globally asymptotically stable and fits the architecture of inner-outer loops \cite{Mayhew11,Brescianini13}, which is desirable in the context of agile maneuvering. The parameter $\tau$ can be interpreted as first-order time constant of the attitude controller. In practice, too small or too large values may lead to bad control performance \cite{Brescianini13}. Therefore, an appropriate value has to be determined by tuning of the controller.
 
 The axis-angle representation of the rotation aligning $\exbodyinworld$ and $\exdesiredbodyinworld$ is given by
 \begin{equation}
@@ -1547,21 +1540,8 @@ The desired attitude aligning $\exdesiredbodyinworld$ and $\exbodyinworld$ reads
 	.
 \end{equation}
 
-\textcolor{red}{Recall the coordinate frame $\mathcal{C}$ from \Cref{sec:differential-flatness}}
-\begin{equation}
-	\eyinterinworld =
-	\begin{bmatrix}
-		0 & \cos(\rolldesired) & \sin(\rolldesired)
-	\end{bmatrix}^\top
-	\quad \text{and} \quad
-	\ezinterinworld =
-	\begin{bmatrix}
-		0 & -\cos(\rolldesired) & \sin(\rolldesired)
-	\end{bmatrix}
-	.
-\end{equation}
-\todo[line]{write some text here}
-From this it follows
+We introduce the intermediate coordinate system $\mathcal{C}$, that is rotated to $\mathcal{W}$ around $bm{x}_{\mathcal{W}}$ by the $\rolldesired$. 
+Subsequently, we can determine $\eydesiredbodyinworld$ and thereby $\ezdesiredbodyinworld$, so that we achieve the alignment of $\exdesiredbodyinworld$ with the desired roll angle according to \cite{Mayhew11}
 \begin{align}
 	\eydesiredbodyinworld = 
 	\frac{\ezinterinworld \times \exdesiredbodyinworld}{
@@ -1594,20 +1574,14 @@ as the rotation between $\qdesiredPY$ and $\qdesiredfull$ with $\anglemix$ being
 	\end{bmatrix}
 	.
 \end{equation}
-We plug \Cref{eq:qdesired} in \Cref{eq:qerror} to apply the control law in \Cref{eq:control-law-attitude}.
+Finally, we plug  \Cref{eq:qdesired} into \Cref{eq:qerror} in order to apply the control law in \Cref{eq:control-law-attitude}.
 
 
 
 \subsection{Implicit Feedback Control}
 \label{sec:implicit-feedback-control}
 
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width=0.8\textwidth]{trajectory-replanning}
-	\caption{Implicit feedback control by regenerating new trajectories and selecting the best in each step.}
-\end{figure}
-
-\begin{figure}
+\begin{figure}[tb]
 	\centering
 	\begin{tikzpicture}
 
@@ -1652,16 +1626,19 @@ We plug \Cref{eq:qdesired} in \Cref{eq:qerror} to apply the control law in \Cref
         \draw[-stealth] ([xshift=0.3cm]generator.north) -- ++(0, \yshiftaboveblocks) -- ([xshift=\xshiftfirstuintomixer, yshift=\yshiftaboveblocks+0.5*\blockheight]mixer.west) -- ([xshift=\xshiftfirstuintomixer, yshift=2*\yshiftthreelines]mixer.west) -- ([yshift=2*\yshiftthreelines]mixer.west) node[midway, above] {$u_1$};
 
 	\end{tikzpicture}
-	\caption{\textcolor{blue}{Overview of the control loops using implicit feedback. Note that ...}}
+	\caption{Overview of the control loops using implicit feedback. Here, the trajectory generator resamples trajectories at each time step. This way, disturbances and model inaccuracies can be compensated for, since a new feasible trajectory is chosen at each time step. The corresponding desired attitude and thrust commands are then directly send to low-level control, making the trajectory tracking and attitude controller obsolete.}
 	\label{fig:control_architecture}
 \end{figure}
 
-
-
-
-
-One advantage of the presented trajectory generation approach is, that it is computationally cheap. Hence, we can use the trajectory generation for implicit feedback control, due to the real-time capability of the trajectory planning. We are able to resample thousands of trajectories per control update step and choose the one best suited to accomplish a certain high level task.
-Subsequently, we need to recover the required thrust vector and commands for the rotational dynamics of the vehicle.
+One advantage of the presented trajectory generation approach is that it is computationally cheap. Hence, we can use trajectory generation for implicit feedback control, due to the real-time capability of the trajectory planning module. We are able to resample thousands of trajectories per control update step and choose the one best suited to accomplish a pre-defined high-level task. This procedure is depicted in \Cref{fig:implicit-resampling-example}. 
+\begin{figure}
+	\centering
+	% \includegraphics[width=0.8\textwidth]{trajectory-replanning}
+    \input{plots/resampling.tex}
+	\caption{Implicit feedback control by regenerating new trajectories and selecting the best with regards to minimum jerk in each step.}
+    \label{fig:implicit-resampling-example}
+\end{figure}
+We need to recover the required thrust vector and commands for the rotational dynamics of the vehicle to apply the trajectory generation system as implicit feedback controller.
 
 First, we compute the thrust vector $\thrustdesiredworld$ of the current trajectory at $t+\Delta T_\text{s}$, where $\Delta T_{\text{s}}$ is the update interval for the trajectory sampling, by applying the relation in \Cref{eq:trajectory-acceleration-eom} on the current trajectory.
 We compute the axis of rotation $\kb$ and the corresponding angle of rotation $\alpha$ required for aligning the current forward axis of the vehicle $\exbodyinworld$ with $\thrustdesiredworld$ by
@@ -1694,9 +1671,9 @@ Therefore, disturbances and model inaccuracies can be compensated, because the n
 
 \subsection{Trajectory Tracking Feedback Control}
 \label{sec:closed-loop-tracking}
-There might be cases, for those it is desirable or even necessary to track a given trajectory for a longer period then $\Delta T_{\text{s}}$ before being given a new trajectory to track.
-For example, when all newly generated trajectories become infeasible. According to \cite{MuellerHehn15} this is to be expected, when the duration of the sampled trajectories becomes small.
-As a consequence input feasibility checks will fail and render all trajectories infeasible.
+There might be cases for which it is desirable or even necessary to track a given trajectory for a longer period than $\Delta T_{\text{s}}$ before being given a new trajectory to track.
+For example, when all newly generated trajectories become infeasible. According to \cite{MuellerHehn15} this is to be expected when the duration of the sampled trajectories becomes small.
+As a consequence, input feasibility checks will fail and render all trajectories infeasible.
 But even for sufficiently large durations, the feasibility still depends on the combination of the initial state and the desired final state.
 While we can try to choose appropriate final states, to increase the probability of getting feasible trajectories, there is no way we can influence the initial state, as it is the actual state of the \ac{uauv}.
 In this case, there is no trajectory available and the implicit feedback control from the previous section can not be applied.
@@ -1705,7 +1682,7 @@ Theoretically, we could simply compute $\thrustdesiredworld$ and $\vangdesiredwo
 In practice, model inaccuracies and external disturbances will cause the actual trajectory to diverge from the planned desired trajectory over time.
 We tackle this issue by extending the architecture by a trajectory tracking feedback controller.
 
-For the trajectory tracking, we will design a control law based on the one proposed in \cite{MellingerKumar11} for a quadrocopter tracking minimum snap trajectories.
+For the trajectory tracking, we design a control law based on the one proposed in \cite{MellingerKumar11} for a quadcopter tracking minimum snap trajectories.
 
 Given a desired trajectory $\bm{\sigma}_{\text{des}}(t) = \left[\pbo_{\text{des}}(t), \rolldesired(t)\right]^\top$, we define the position and velocity error as
 \begin{equation}
@@ -1734,7 +1711,7 @@ with
 \end{equation}
 where $\Kb_p$ and $\Kb_v$ denote diagonal gain matrices and $\hat{\bm{M}} \pbpp$ and $\hat{\bm{D}}\pbp$ represent feed forward terms. Note that $u_1$ is scaled by the projection of $\thrustdesiredworld$ onto the current body axis $\exbodyinworld$.
 
-The advantages of this are two-fold. First, the closer $\thrustdesiredworld$ and $\exbodyinworld$ get of becoming perpendicular, the smaller $u_1$ will become. Therefore, more of the available thruster output can be allocated to minimize the attitude error. Second, for $\thrustdesiredworld$ and $\exbodyinworld$ we can see that $u_1$ can become negative. While usually not useful in the typical application of \acp{uav}, where the thrusters' direction of rotation is not reversible, \acp{uauv} can make use of backward directed thrust to minimize the translational errors $\eb_p$ and $\eb_v$. In case this should not be desired, though, we can still set $u_1=0$ if $\exbodyinworld^\top \thrustdesiredworld < 0$. Accordingly, we reformulate \Cref{eq:translational-control-law-short}
+The advantages of this are two-fold. First, the closer $\thrustdesiredworld$ and $\exbodyinworld$ get to becoming perpendicular, the smaller $u_1$ will become. Therefore, more of the available thruster output can be allocated to minimize the attitude error. Second, for $\thrustdesiredworld$ and $\exbodyinworld$ we can see that $u_1$ can become negative. While usually not useful in the typical application of \acp{uav}, where the thrusters' direction of rotation is not reversible, \acp{uauv} can make use of backward directed thrust to minimize the translational errors $\eb_p$ and $\eb_v$. In case this should not be desired, though, we can still set $u_1=0$ if $\exbodyinworld^\top \thrustdesiredworld < 0$. Accordingly, we reformulate \Cref{eq:translational-control-law-short}
 \begin{equation}
 	u_1 = 
 	\begin{cases}
@@ -1751,14 +1728,7 @@ The desired roll angle $\rolldesired$ and the desired thrust $\thrustdesiredworl
 \section{Implementation}
 \label{sec:implementation}
 
-
-\textcolor{blue}{
-\begin{itemize}
-    \item Vor dem ROS2 gedöns hier nochmal auf die genauere umsetzung des Algorithmus eingehen? \textcolor{red}{Oder sollte das in ein extra 'algorithm overview' section? }
-    \item \Cref{fig:information-flow} - Für den zeitlichen ablauf / die implementierung des gesamten algorithmus
-\end{itemize}
-}
-
+The data flow of the proposed trajectory generation system and the control module implemented in the scope of this thesis is shown in \Cref{fig:information-flow}. Note that the high-level planner is not within the scope of this thesis.
 \begin{figure}
 	\centering
 	\begin{tikzpicture}
@@ -1790,10 +1760,10 @@ The desired roll angle $\rolldesired$ and the desired thrust $\thrustdesiredworl
 		\draw[-stealth] (generation.east) -- (feasibility.west) node[midway, above, align=center] {min. jerk} node[midway, below, align=center] {trajec-\\tories};
 		
 		% feasibility - picker
-		\draw[-stealth] (feasibility.east) -- (picker.west) node[midway, above, align=center] {traj.} node[midway, below, align=center] {candi-\\dates};
+		\draw[-stealth] (feasibility.east) -- (picker.west) node[midway, above, align=center] {trajec-\\tory} node[midway, below, align=center] {candi-\\dates};
 		
 		% picker - control
-		\draw[-stealth] (picker.east) -- (trackingcontrol.west) node[midway, above, align=center] {??} node[midway, below, align=center] {??};
+		\draw[-stealth] (picker.east) -- (trackingcontrol.west) node[midway, above, align=center] {desired} node[midway, below, align=center] {trajectory};
 		
 		% tracking controller - low level
 		\draw[-stealth] (trackingcontrol.south) -- (lowlevelcontrol.north) node[midway, left, align=center] {desired\\orientation,\\thrust};
@@ -1802,74 +1772,64 @@ The desired roll angle $\rolldesired$ and the desired thrust $\thrustdesiredworl
 		\draw[-stealth] (lowlevelcontrol.south) -- ++(0,-1cm) node[midway, left, align=center] {motor\\commands};
 		
 	\end{tikzpicture}
-	\caption{\textcolor{blue}{Information flow / Sequence of algorithm of proposed framework }}
+	\caption{Information flow of the proposed framework.}
 	\label{fig:information-flow}
 \end{figure}
 
+The control architecture presented in \Cref{sec:control} and the trajectory module in \Cref{sec:trajectory-generation} are implemented in a modular design in \ac{ros2}. While being the successor of \ac{ros}, \ac{ros2} has been developed from scratch independently from \ac{ros}.
+Consequently, the migration implies severe changes of the framework already existing for the HippoCampus platform. Nonetheless, this drawback is outweighed by the advantages this change entails.
 
+The decision to migrate from \ac{ros} to its successor \ac{ros2} is based on the limitations of the previous HippoCampus software architecture identified in \Cref{sec:sw_limitatations}.
+\ac{ros2} enables direct communication between the \ac{fcu} and the onboard computer via \ac{dds}. Hence, all software modules developed in the scope of this thesis are implemented using \ac{ros2}. The interested reader may refer to \cite{ros2} for an exhaustive overview of the design and architecture of \ac{ros2}. However, we point out the main aspects relevant for this thesis in the following.
 
-
-
+The requirements of embedded systems are well integrated into the \ac{ros2} framework. A \ac{ros2} stack specifically designed for micro controllers, called micro-ROS, allows direct communication between computers and microcontrollers. 
+With regard to the HippoCampus platform, this means the \ac{fcu} running PX4 and the onboard computer can communicate directly without the additionnal abstraction layers as they have been introduced by MAVROS and \ac{mavlink}. This enables high-rate data streams between the devices. The simplified communication between an onboard computer and \ac{fcu} compared to \Cref{fig:ros-px4-communication} is shown in \Cref{fig:communication_px4_ros2}.
 \begin{figure}
 	\centering
-	\includesv[width=0.9\textwidth]{images/03/software_architecture_new}
-    \caption{\textcolor{red}{...}}
+	\includesvg[width=0.9\textwidth]{images/03/software_architecture_new}
+    \caption{Direct communication between PX4/uORB (\emph{left}) and onboard computer/ROS2 (\emph{right}) without MAVROS, MAVLink and MAVLink transceiver.}
     \label{fig:communication_px4_ros2}
 \end{figure}
 
+Furthermore, \ac{ros2} introduces the concept of \ac{qos} as it relies on \ac{dds} for communication. Hence, data streams transporting sensor data can be declared to be transmitted with \emph{best effort}. As a result, the loss of messages is accepted, while the latency can be reduced. This is especially useful for sensor data, where it is of special interest to receive the most recent measurements as fast as possible. 
+For message sizes of up to \unit[1]{MB} latencies below \unit[1]{ms} can be achieved for communication between different processes \cite{ros2}. High latencies impose delays on control loops and state estimation with possibly severe negative influence on their performance.
+
+Though not explicitly required for this thesis, it should be noted that \ac{ros2} is suitable for real-time systems. In contrast to its predecessor, \ac{ros2} can be configured for deterministic scheduling to enforce real-time constraints \cite{ros-realtime20}. This can be a critical property for the field of mobile robotics, where deterministic execution times can be safety critical.
+
+Moreover, \ac{ros2} comes with a new generation of the simulator environment \textit{Gazebo}.
+Thus, a new implementation of the simulation setup for the HippoCampus \ac{uauv} has to be set up for numeric studies, see also \Cref{sec:gazebo_simulation}
+The dynamic behavior of a model in the simulation can be replicated via plugins.
+The vehicle dynamics and the thruster forces and moments are modeled based on  \Cref{eq:thruster-load-vs-uesc,eq:eom-translational-with-input,eq:eom-rotational-with-input}.
 
 
-
-
-
-\begin{figure}
-	\centering
-	\begin{tikzpicture}
-    % \scriptsize
-    \def\gazeboblockheight{5.5cm}
-    \def\rosblockheight{4cm}
-    \def\gazeboblockwidth{4cm}
-    \def\blockheight{0.8cm}
-    \def\blockwidth{3cm}
-    \def\yshiftbetweenblocks{0.5cm}
-    \def\yshiftrosblocks{0.8cm}
+% \begin{figure}
+% 	\centering
+% 	\begin{tikzpicture}
+%     % \scriptsize
+%     \def\gazeboblockheight{5.5cm}
+%     \def\rosblockheight{4cm}
+%     \def\gazeboblockwidth{4cm}
+%     \def\blockheight{0.8cm}
+%     \def\blockwidth{3cm}
+%     \def\yshiftbetweenblocks{0.5cm}
+%     \def\yshiftrosblocks{0.8cm}
 	
-        % Gazebo
-        \node[draw, fill=lightgray, semithick, rectangle, loosely dashed, minimum width=\gazeboblockwidth, minimum height=\gazeboblockheight, align=center, label=above:{Gazebo}] (gazebo) at (0,0) {};
-        \node[draw, fill=white, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center] (thrustermodel) at (0,0.5*\gazeboblockheight-1cm) {thruster model};
-        \node[draw, fill=white, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center, below= of thrustermodel, yshift=\yshiftbetweenblocks] (hydrodynamics) {hydrodynamics};
-        \node[minimum width=\blockwidth, minimum height=\blockheight, align=center, below= of hydrodynamics, yshift=\yshiftbetweenblocks] (rigidbody) {$+$\\rigid body\\(built in)};
+%         % Gazebo
+%         \node[draw, fill=lightgray, semithick, rectangle, loosely dashed, minimum width=\gazeboblockwidth, minimum height=\gazeboblockheight, align=center, label=above:{Gazebo}] (gazebo) at (0,0) {};
+%         \node[draw, fill=white, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center] (thrustermodel) at (0,0.5*\gazeboblockheight-1cm) {thruster model};
+%         \node[draw, fill=white, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center, below= of thrustermodel, yshift=\yshiftbetweenblocks] (hydrodynamics) {hydrodynamics};
+%         \node[minimum width=\blockwidth, minimum height=\blockheight, align=center, below= of hydrodynamics, yshift=\yshiftbetweenblocks] (rigidbody) {$+$\\rigid body\\(built in)};
         
-        % ROS2
-        \node[draw, fill=lightgray, semithick, rectangle, loosely dashed, minimum width=\gazeboblockwidth, minimum height=\rosblockheight, align=center, label=above:{ROS2}, right= of gazebo] (ros) {};
-        \node[draw, fill=white, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center] (controlloops) at ([yshift=\yshiftrosblocks]ros.center) {control loops};
-        \node[draw, fill=white, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center] (mixer) at ([yshift=-\yshiftrosblocks]ros.center) {mixer};
+%         % ROS2
+%         \node[draw, fill=lightgray, semithick, rectangle, loosely dashed, minimum width=\gazeboblockwidth, minimum height=\rosblockheight, align=center, label=above:{ROS2}, right= of gazebo] (ros) {};
+%         \node[draw, fill=white, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center] (controlloops) at ([yshift=\yshiftrosblocks]ros.center) {control loops};
+%         \node[draw, fill=white, semithick, rectangle, minimum width=\blockwidth, minimum height=\blockheight, align=center] (mixer) at ([yshift=-\yshiftrosblocks]ros.center) {mixer};
 
-        \draw[-stealth] (controlloops.south) -- (mixer.north);
-        \draw[-stealth] (mixer.south) -- ++(0, -2.5cm);
+%         \draw[-stealth] (controlloops.south) -- (mixer.north);
+%         \draw[-stealth] (mixer.south) -- ++(0, -2.5cm);
   
-	\end{tikzpicture}
-	\caption{\textcolor{blue}{Work in progress - Was genau wollen wir hier überhaupt zeigen?} \textcolor{red}{Streichen!}}
-	\label{fig:control_architecture}
-\end{figure}
-
-
-\textcolor{blue}{
-The control architecture presented in \Cref{sec:control} is implemented in a modular design in \ac{ros2}. While being the successor of \ac{ros}, \ac{ros2} is developed independently from \ac{ros}.
-Consequently, the migration implies severe changes of the framework already existing for the HippoCampus platform. Nonetheless, this drawback is outweighed by the advantages this design decision entails. }
-
-\ac{ros2} comes with a new generation of the simulator Gazebo, hence requiring a new implementation of the simulation setup for the HippoCampus \ac{uauv}. The dynamic behavior of a model in the simulation can be replicated via plugins. The vehicle dynamics and the thruster forces and moments are modeled based on  \Cref{eq:thruster-load-vs-uesc,eq:eom-translational-with-input,eq:eom-rotational-with-input}.
-
-
-\textcolor{blue}{Based on limitations identified in \Cref{sec:sw_limitatations}....}
-
-This can be overcome by migrating from \ac{ros} to its successor \ac{ros2}, that enables direct communication between the \ac{fcu} and the onboard computer via \ac{dds}. Hence, all software modules developed in the scope of this thesis are implemented using \ac{ros2}.
-
-The interested reader may refer to \cite{ros2} for an exhaustive overview of the design and architecture of \ac{ros2}. The main aspects relevant for this thesis are listed below.
-
-Embedded systems are well integrated into the \ac{ros2} framework. A \ac{ros2} stack specifically designed for microcontrollers, called micro-ROS, allows the direct communication between computers and microcontrollers. With regard to HippoCampus, this means the \ac{fcu} running PX4 and the onboard computer can communicate directly without the abstraction layers introduced by MAVROS and \ac{mavlink}. This enables high rate data streams between the devices.
-
-Furthermore, \ac{ros2} introduces the concept of \ac{qos} as it relies on \ac{dds} for communication. Hence, data streams transporting sensor data can be declared to be transmitted with \emph{best effort}. As a result, the loss of messages is accepted, while the latency can be reduced. This especially useful for sensor data, where it is of interest to receive the most recent measurements as fast as possible. For message sizes of up to \unit[1]{MB} latencies below \unit[1]{ms} can be achieved for communication between different processes \cite{ros2}. High latencies impose delays on control loops and state estimation with possibly severe negative influence on their performance.
-
-Though not required for this thesis, it should be noted, that \ac{ros2} is suitable for real-time systems. In contrast to its predecessor, \ac{ros2} can be configured for deterministic scheduling to enforce real-time constraints \cite{ros-realtime20}. This can be a critical property for the field of mobile robotics, where deterministic execution times can be safety critical.
+% 	\end{tikzpicture}
+% 	\caption{\textcolor{blue}{Work in progress - Was genau wollen wir hier überhaupt zeigen?} \textcolor{red}{Streichen!}}
+% 	\label{fig:control_architecture}
+% \end{figure}
 
