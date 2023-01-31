@@ -29,7 +29,7 @@ The \ac{fcu} is a PixRacer, that is used as flight controller \acp{auv}. It feat
 \subsection{Software Architecture}
 The general software architecture of the HippoCampus platform is shown in \Cref{fig:software-architecture-overview}. 
 For a detailed description the reader may refer to \cite{duecker-phd}. 
-\begin{figure}[h!]
+\begin{figure}
 	\centering
      \def\svgwidth{12cm}  
 	\input{images/02/03_hippo_system_architecture_draft.pdf_tex}
@@ -43,7 +43,7 @@ The interconnection between PX4's \ac{uorb} running on the \ac{fcu} and \ac{ros}
 Since \ac{uorb} is restricted to intra-process communication, communication with external devices is done via \ac{mavlink}.
 \ac{mavlink} is a communication protocol for \acp{uav}.
 The interface between \ac{mavlink} and \ac{ros} is MAVROS. It is a bidirectional bridge, translating messages from \ac{mavlink} to corresponding \acs{ros}-messages and vice versa. This whole setup is depicted in \Cref{fig:ros-px4-communication}.
-\begin{figure}[h!]
+\begin{figure}
 	\centering
 	\includesvg[width=0.9\textwidth]{images/02/software_architecture_old}
 	\caption{HippoCampus software architecture with multiple layers of abstraction. Communication between \acs{ros} (left) and PX4 (right) via \acs{mavlink}. On the \acs{ros}-side this requires the MAVROS package, while on the PX4-side, the \acs{mavlink} transceiver package is used.}

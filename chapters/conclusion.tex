@@ -1,10 +1,50 @@
 % !TeX root = ../Thesis.tex
 \chapter{Conclusion}\label{chap:conclusion}
+
+
 \section{Summary}
+
+% \Cref{chap:fundamentals} provide a concise overview on the fundamentals for this work.
+% First, we present the micro underwater robot platform in \Cref{sec:hippo-platform} and point-out relevant details on its hardware and software concept. 
+% Subsequently, a review on state-of-the-art motion planning methods is conducted in \Cref{sec:review-motion-planning}.
+% This survey starts from methods used in the underwater domain but also opens its view to methods for agile path planning in other domains such as the very active field of aerial drones.
+% The identified relevant literature is summarized for the reader's convenience in \Cref{tab:state_of_the_art}.
+% %
+% Based on these fundamentals, we develop a novel approach to agile underwater motion planning in \Cref{chap:approach-to-agile-maneuvering}. 
+% Starting from the conceptual overview in \cref{sec:concept}, we study the system dynamics of the HippoCampus \ac{uauv} in \Cref{sec:system-dynamics}.
+% This is followed by the presentation of the sampling-based trajectory generation approach in \Cref{sec:trajectory-generation} which is elaborated in  \Cref{sec:feasibility}  and  \Cref{sec:collision-avoidance} with methods for feasibility checks and an approach for collision avoidance, respectively.
+% Moreover, we develop suitable control strategies in \Cref{sec:control}.
+% Finally, we provide insights on the actual implementation of the proposed agile planning framework in \Cref{sec:implementation}.
+% %
+% A detailed performance analysis is conducted in \Cref{chap:analysis}. It considers numerical studies and experimental studies.
+% %
+% The thesis concludes in \Cref{chap:conclusion} with a summary of the thesis' main findings and an outlook toward future work.
+
+Starting from the initial problem statement of aggressive maneuvering for highly agile underwater vehicles, an exhaustive review of the state of the art on path-planning methods was conducted in \Cref{sec:review-motion-planning}. While there has been extensive research on the problem of path-planning in marine environments in general, a gap has been identified with regard to highly agile methods that are suitable for the recently developed class of underactuated \acp{uauv}. These vehicles enable maneuvering in confined, often times highly cluttered environments, such as nuclear storage ponds or marinas. However, to match these new dynamic capabilities, the current frontier of agile path planning methods constitutes a bottleneck for future applications and is thus within the focus of this work. 
+Due to similarities in the design of \acp{uauv} and small-scale \acp{uav}, the aerial domain was considered for agile path planning methods in specific.
+The findings of this review were then summarized in \Cref{tab:state_of_the_art} and critically discussed in the context.
+
+
+Based on the discussion of prior work and their limitations a concept for a trajectory generation and tracking framework was proposed in \Cref{chap:approach-to-agile-maneuvering}.
+The new framework extends \cite{MuellerHehn15} to the underwater domain and stresses out relevant differences between the dynamics of aerial and underwater vehicles, while exploiting the synergies between aerobatic \acp{uav} and hydrobatic \acp{uauv}.
+As a basis for the proposed trajectory generator, the equation of motion of the HippoCampus \ac{uauv} has been derived and appropriately simplified by well-argued reasonable assumptions.
+As a next step, feasibility checks, verifying the feasibility of planned trajectories with regard to vehicle dynamics and translational constraints such as walls or other convex obstacles have been designed and implemented.
+
+Furthermore, a control scheme has been presented considering all controllers deployed on the vehicle. Hence, in addition to the low-level body rate and attitude controller, the implicit feedback control scheme that extends the original idea in \cite{MuellerHehn15} has been integrated into the system resulting in a dedicated trajectory tracking controller for the HippoCampus has been developed.
+
+From an implementation of view, the HippoCampus \ac{uauv} software architecture has been fully revised and migrated to \ac{ros2}. This can be seen as a crucial step forward to overcome the limitations of the previous software framework as presented in \Cref{sec:sw_limitatations} and \Cref{sec:implementation}. Moreover, it paves the way for many future extensions.
+
+Finally, the performance of the proposed methods is evaluated in a series of numerical simulations and real-world experiments.
+The computational efficiency of the trajectory generation system could be confirmed and the disadvantages of the implicit feedback loop for \acp{uauv} subject to hydrodynamic damping have been analyzed in simulation.
+As a result, the trajectory tracking controller has been shown to work efficiently with and without active re-planning in lab experiments.
+
+To conclude, this thesis presents a powerful framework for highly agile trajectory tracking, enabling \acp{uauv} such as the HippoCampus platform to achieve a time-dependent high-level goal.
+
 \section{Future Work}
-\begin{itemize}
-    \item (experiment with actually moving target)
-    \item Test obstacle avoidance in the first place!
-    \item Extend obstacle avoidance to work with moving obstacles
-    \item Can the approach be extended to allow for negative thrust? -- even more agile!! comparable to the parking problem
-\end{itemize}
+Based on the findings of this thesis we point out interesting directions for future research in the following.
+
+Although, the trajectory tracking controller has demonstrated its capability of compensating errors in the estimated hydrodynamic parameters, a thorough analysis of the parameters is suggested, to ensure valid feasibility checks.
+
+Moreover, it is recommended to examine, whether the presented approach for agile maneuvering can be extended to allow for negative (backward) thrust. Hence, the reversibility of the thrusters could be exploited and is expected to greatly increase the agility of the vehicle. Since the thruster dynamics are much faster than the vehicle dynamics, this would enable the \ac{uauv} to perform even more rapid changes in the direction of movement.
+
+Finally, the computational efficiency of the trajectory generation system can be exploited in future works to compose more complex trajectories by composing multiple motion primitives and selecting new trajectories not only on a single final state, but a sequence of states.

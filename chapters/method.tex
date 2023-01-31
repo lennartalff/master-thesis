@@ -315,7 +315,6 @@ and write \Cref{eq:6dof-equation-of-motion} separated by the translational and r
 	\vlinbody \times \Mbs \vangbody
 	-\Dvadded \vlinbody
 	+ \prescript{\mathcal{B}}{}{\fb}
-
 \end{equation}%\todo{Muss es nicht nur die obere Haelfte von $\gb$ sein? Muesste $\Mbs$ nicht vor $\vlinbody$ stehen?}
 and
 \begin{equation}
@@ -519,7 +518,6 @@ and
 
 \section{Trajectory Generation}
 \label{sec:trajectory-generation}
-\todo{Einfach streichen und irgendwo auf das IROS 2021 mit Christian referenzieren und sagen, dass das for the sake of brevity dort zu finden ist und in detailliert noch mal in meiner diss}
 The goal of the generated trajectories is to bring the vehicle from an initial state $\vehiclestate_0$ at time $t=0$ to a desired final state $\vehiclestate_{\text{f}}$ at $t=T$, with the vehicle state being described by 
 \begin{equation}
 	\vehiclestate = 
@@ -548,6 +546,8 @@ For this section, we focus on the generation of the trajectories, before dealing
 \label{sec:trajectory-dynamics}
 In this section, we simplify the dynamic model described in \Cref{eq:eom-translational-with-input} and derive equations to calculate the system inputs for a given trajectory. In the following, all equations are expressed in the world-fixed frame $\mathcal{W}$.
 Note, the corresponding indices are omitted in favor of readability, if unambiguous.
+
+The property of differential flatness is proven for the HippoCampus \ac{uauv} for the outputs $\bm{\sigma} = \left[\bm{p}^\top \phi\right]^\top$ in \cite{duecker2021aerobatics} and \cite{duecker-phd} and is, for the sake of brevity, not presented in this work. The property of differential flatness guarantees that the underactuated HippoCampus \ac{uauv} can follow any smooth trajectory $\bm{\sigma}(t)$ given the derivatives of $\bm{\sigma}$ are sufficiently bounded.
 
 Similar to \cite{MuellerHehn15}, we define the state variable of the trajectory and its derivative as
 \begin{equation}
@@ -1085,7 +1085,7 @@ To obtain the thrust function in terms of the state trajectory parameters $\alph
 		+ \left(m + X_{\dot{u}}\right) a_0
 \end{aligned}
 \end{equation}
-per axis.
+per axis. The pseucode of the recursive thrust feasibility check is shown in \Cref{alg:thrust-feasibility}.
 
 \begin{algorithm}
     \caption{CheckThrustFeasibility}
@@ -1581,7 +1581,7 @@ Finally, we plug  \Cref{eq:qdesired} into \Cref{eq:qerror} in order to apply the
 \subsection{Implicit Feedback Control}
 \label{sec:implicit-feedback-control}
 
-\begin{figure}[tb]
+\begin{figure}
 	\centering
 	\begin{tikzpicture}
 
@@ -1635,7 +1635,7 @@ One advantage of the presented trajectory generation approach is that it is comp
 	\centering
 	% \includegraphics[width=0.8\textwidth]{trajectory-replanning}
     \input{plots/resampling.tex}
-	\caption{Implicit feedback control by regenerating new trajectories and selecting the best with regards to minimum jerk in each step.}
+	\caption{Implicit feedback control by generating new trajectories and selecting the best with regards to minimum jerk in each step. }
     \label{fig:implicit-resampling-example}
 \end{figure}
 We need to recover the required thrust vector and commands for the rotational dynamics of the vehicle to apply the trajectory generation system as implicit feedback controller.

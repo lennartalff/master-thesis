@@ -39,19 +39,20 @@ The vehicle parameters used in the simulation are the ones summarized in \Cref{t
             {
             %%%%% Leider scheint die beste Methode wirklich hardgecodete Spaltenbreiten zu sein - hier am Ende rumspielen
             >{\centering\arraybackslash}m{3cm}  %
+            >{\centering\arraybackslash}m{1.7cm} % 
             >{\centering\arraybackslash}m{3cm} % 
             }
             \toprule
             %%%%%%%%%%% Top row - names of each columns
-            Parameter &  Value \\  
+            Parameter & Symbol & Value \\  
             \midrule 
             %%%%%%%% Beispiel
-            mass $m$ & \unit[2.31]{kg} \\
-            added mass $X_{u}$ & \unit[2.0]{kg} \\
-            damping $X_{\dot{u}}$ &  $\unit[5.4]{N/s}$\\
-            inertia $I_\mathrm{x}$ & $\unit[0.014]{kg m^2}$ \\
-            inertia $I_\mathrm{y}$ &  $\unit[0.039]{kg m^2}$\\
-            inertia $I_\mathrm{z}$ &  $\unit[0.039]{kg m^2}$\\
+            Mass & $m$ &  \unit[2.31]{kg} \\
+            Added mass & $X_{u}$ & \unit[2.0]{kg} \\
+            Damping & $X_{\dot{u}}$ &  $\unit[5.4]{N/s}$\\
+            Inertia & $I_\mathrm{x}$ & $\unit[0.014]{kg m^2}$ \\
+            Inertia & $I_\mathrm{y}$ &  $\unit[0.039]{kg m^2}$\\
+            Inertia & $I_\mathrm{z}$ &  $\unit[0.039]{kg m^2}$\\
             \bottomrule
 		\end{NiceTabular}
 		\label{tab:sim_parameters}
@@ -83,21 +84,20 @@ Furthermore, the tank floor is equipped with an array of AprilTag markers (Tag-F
 Recently, the Roboquarium testbed has been equipped with a professional underwater motion capture system to provide high-precision ground truth pose data of the tracked underwater objects.
 The installed motion capture system features four \textit{Qualisys\,Miqus\,3} underwater cameras that are mounted into the corners of the water basin, as shown in \Cref{fig:testbed_topview}.
 Prior to the experiment, the objects to be tracked, i.\,e. the \ac{uauv}, are equipped with multiple reflective markers, as depicted in \Cref{fig:hippo_with_marker}. 
-In the current setup, the motion capture system provides 6-DOF data of pre-defined underwater objects at 100\,Hz, see also the 3D-overlay in \Cref{fig:qtm_3d} and the multi-camera reflection intensity view in \Cref{fig:qtm_intensity}.
-Note that the motion captures system has been integrated into the Roboquarium ROS network.
-This allows us to use the data live within the experiment, e.\,g. as pose data for the vehicle control loops.
-
-Prior to the experimental study, the motion capture system is calibrated to determine the camera positions with respect to the base frame origin. 
-Moreover, the averaged residuals are computed using the software \textit{Qualisys Tracking Manager} (QTM).
-The parameters are summarized in \Cref{tab:mocap_parameters}.
-
-
 \begin{figure}
     \centering
     \includesvg[width=6cm]{images/04/hippo_with_markers}
     \caption{HippoCampus \ac{uauv} equipped with reflective markers. Note that the black tape is used to avoid reflections on the acrylic glas enclosure that can be misinterpreted as markers.}
     \label{fig:hippo_with_marker}
 \end{figure}
+In the current setup, the motion capture system provides 6-DOF data of pre-defined underwater objects at 100\,Hz, see also the 3D-overlay in \Cref{fig:qtm_3d} and the multi-camera reflection intensity view in \Cref{fig:qtm_intensity}.
+Note that the motion captures system has been integrated into the Roboquarium ROS network.
+This allows us to use the data live within the experiment, e.\,g. as pose data for the vehicle control loops.
+
+
+Prior to the experimental study, the motion capture system is calibrated to determine the camera positions with respect to the base frame origin. 
+Moreover, the averaged residuals are computed using the software \textit{Qualisys Tracking Manager} (QTM).
+The parameters are summarized in \Cref{tab:mocap_parameters}.
 
 
 \begin{figure}
@@ -151,7 +151,7 @@ The parameters are summarized in \Cref{tab:mocap_parameters}.
 		\label{tab:mocap_parameters}
 \end{table}
 
-
+\newpage
 
 \section{Body Rates Analysis}
 
@@ -342,22 +342,18 @@ Only generated trajectories that are cheaper than an already found solution, in 
 In this section, the performance of the trajectory and control system is analyzed as a whole in simulation and lab experiments.
 The implicit feedback scheme as proposed in \cite{MuellerHehn15} and presented in \Cref{sec:implicit-feedback-control} is compared with the trajectory tracking controller presented in \Cref{sec:closed-loop-tracking}.
 
-An overview of the setup can be seen \Cref{fig:experimental_setup_drawing}.
-The vehicle moves autonomously to a defined start position using pure-pursuit.
-Subsequently, the trajectory module is activated and the vehicle tries to reach one of the possible final states to achieve the high-level objective of moving through a circular hoop.
-
-\textcolor{red}{Hier fehlt noch das generelle setup -- was testen wir überhaupt -- trajectory tracking, mit und ohne implizites feedback}
-
-
+An overview of the setup is shown in \Cref{fig:experimental_setup_drawing}.
+The \ac{uauv} moves autonomously to a defined start position using pure-pursuit control.
+After arrival at the start position, the trajectory module is activated and the vehicle tries to reach one of the possible final states to achieve the high-level objective of moving through a circular hoop.
 \begin{figure}
     \centering
     \includesvg[width=0.8\textwidth]{images/04/experimental_setup_drawing}
-    \caption{\textcolor{red}{The experimental setup for simulation and lab experiments for evaluating the trajectory generation and tracking framework as a whole. The HippoCampus \ac{uauv}...}}
+    \caption{The experimental setup for simulation and lab experiments for evaluating the trajectory generation and tracking framework as a whole. The HippoCampus \ac{uauv} generates trajectories to reach one of the possible final states to achieve the high-level objective of moving through the hoop depicted on the right side of the tank.}
     \label{fig:experimental_setup_drawing}
 \end{figure}
 
 \subsection{Simulation}
-The most severe difference between the application of the proposed trajectory framework and the corresponding implicit feedback control scheme for quadcopters and \acp{uauv}, are the different dynamics of the vehicle types. This is mainly a result from the presence of hydrodynamic damping in submerged settings. Consequently, we analyze the influence of the added damping in this section.
+The most severe difference between the application of the proposed trajectory framework and the corresponding implicit feedback control scheme for quadcopters and \acp{uauv} are the different dynamics of both vehicle types. This mainly results from the presence of hydrodynamic damping in submerged settings. Consequently, we analyze the influence of the added damping in this section.
 
 The model of the vehicle is simulated with the parameters as stated in \Cref{tab:sim_parameters}. The implicit feedback control scheme presented in \Cref{sec:implicit-feedback-control} is applied, i.\,e. the desired trajectory is recomputed in every control step with a rate of $\unit[50]{Hz}$. The sampling of possible final states is performed according to \Cref{sec:sampling-strategy}.
 
@@ -369,70 +365,76 @@ The results are shown in \Cref{fig:damping_analysis}.
 	\begin{subfigure}[t]{0.49\textwidth}
 		\centering
 		\input{plots/sim/implicit/replanning_xy_perfect.tex}
-		\caption{$1.0 X_u$}
+		\caption{$100\,\%$ added damping $X_u$ (reference).}
 	\end{subfigure}
-
-	\begin{subfigure}[t]{0.49\textwidth}
+ 
+    \vspace{0.7cm}
+    \begin{subfigure}[t]{0.49\textwidth}
 		\centering
 		\input{plots/sim/implicit/replanning_xy_damping_4.4.tex}
-		\caption{$0.8 X_u$}
+		\caption{$80\,\%$ added damping $X_u$.}
 	\end{subfigure}
 	\begin{subfigure}[t]{0.49\textwidth}
 		\centering
 		\input{plots/sim/implicit/replanning_xy_damping_4.9.tex}
-		\caption{$0.9 X_u$}
+		\caption{$90\,\%$ added damping $X_u$.}
 	\end{subfigure}
-
+ 
+    \vspace{0.7cm}
 	\begin{subfigure}[t]{0.49\textwidth}
 		\centering
 		\input{plots/sim/implicit/replanning_xy_damping_5.9.tex}
-		\caption{$1.1 X_u$}
+		\caption{$110\,\%$ added damping $X_u$.}
         \label{fig:slightly-overestimated-damping}
 	\end{subfigure}
 	\begin{subfigure}[t]{0.49\textwidth}
 		\centering
 		\input{plots/sim/implicit/replanning_xy_damping_6.4.tex}
-		\caption{$1.2 X_u$}
+		\caption{$120\,\%$ added damping $X_u$.}
         \label{fig:even-more-slightly-overestimated-damping}
 	\end{subfigure}
-	\caption{The implicit feedback control scheme applied with different damping parameters. Overestimation of the hydrodynamic damping leads to instability.}
+	\caption{The implicit feedback control scheme applied with different damping parameters $X_u$ varied within a $+/-20\%$ range. Overestimation of the hydrodynamic damping leads to instability.}
     \label{fig:damping_analysis}
 \end{figure}
 The recomputed target paths are plotted in \textit{teal} and the actual taken path in \textit{red}.
-We observe that the tracking performance decreases the more $X_u$ is underestimated. In contrast, considerably worse results are achieved in case of overestimating them. In \Cref{fig:slightly-overestimated-damping} with a overestimation of only $\unit[10]{\%}$ the implicit feedback controller already misses the target. In case of $\unit[20]{\%}$ overestimation, the controller becomes unstable, visible in \Cref{fig:even-more-slightly-overestimated-damping}. To analyze the the behavior of the controller more thoroughly, the magnitude of the desired and actual velocity, as well as the thrust command sent by the trajectory module, is depicted in \Cref{fig:implicit_problem_velocity}.
+We observe that the tracking performance decreases the more $X_u$ is underestimated. In contrast, even stronger performance drops are observed if the damping is overestimated. In \Cref{fig:slightly-overestimated-damping} with an overestimate of only $\unit[10]{\%}$, the implicit feedback controller already misses the target. In case of $\unit[20]{\%}$ overestimation, the controller becomes unstable, visible in \Cref{fig:even-more-slightly-overestimated-damping}. To analyze the the behavior of the controller more thoroughly, the magnitude of the desired and actual velocity, as well as the thrust command sent by the trajectory module, are depicted in \Cref{fig:implicit_problem_velocity}.
 \begin{figure}
 	\input{plots/sim/implicit_problem.tex}
-	\caption{Implicit feedback-loop closed each \unit[0.5]{s} causes problems due to underestimated damping ($0.9 X_{\dot{u}}$)}
+	\caption{Implicit feedback-loop, closed each \unit[0.5]{s}, causes problems due to underestimated damping ($\unit[90]{\%} X_u$)}
 	\label{fig:implicit_problem_velocity}
 \end{figure}
 To highlight the effect of the erroneous damping estimation, the control rate is reduced to $\unit[2]{Hz}$. The desired velocity (\emph{red}) increases faster than the actual velocity between control updates.
 This is caused by the underestimated damping. Consequently, the desired thrust computed by the trajectory module is not sufficient to reach the desired velocity.
 As soon as the trajectory updates, the desired velocity is reset to the vehicle's current velocity, recognizable by sudden jumps of the red line.
-As a consequence of the sudden drop in velocity from the perspective of the trajectory module, the computed desired thrust drops as well and hence, amplifies the problem.
+As a consequence of the sudden drop in velocity from the perspective of the trajectory module, the computed desired thrust drops as well and, hence, amplifies the problem.
 
-\tddo{Daniel reminder} For the overestimation the effect is the opposite. The velocity increases more than desired.
+For the overestimation, the effect is the opposite. The velocity increases more than desired.
 The controller expects higher damping forces it has to compensate.
 Due to the overestimated damping parameter, the thrust is increased even further, leading to the unstable behavior depicted in \Cref{fig:even-more-slightly-overestimated-damping}.
 
 To overcome this limitation, a mixed control scheme is proposed. Despite the limitations in the control performance of the trajectory generation system, it is desirable to recalculate the trajectory to dynamically react to changes of the environment.
-The closed loop trajectory tracking controller presented in \Cref{sec:closed-loop-tracking} is normally only active, if the trajectory generator is not able to find a new feasible trajectory. For the mixed control scheme, it is continuously used to improve the tracking performance. Each time the trajectory generation system computes a new trajectory, the tracking error is reset to zero, since each trajectory starts with the actual state of the vehicle. Thus, recomputing the trajectories at higher rates, degrades the performance, but improves the ability to dynamically react to changes in the environment, like moving or newly detected obstacles. The scenario depicted in \Cref{fig:even-more-slightly-overestimated-damping} is repeated with the mixed control scheme and the results are shown in \Cref{fig:improved-performance-mixed-control}.
+The closed loop trajectory tracking controller presented in \Cref{sec:closed-loop-tracking} is normally only active, if the trajectory generator is not able to find a new feasible trajectory. For the mixed control scheme, it is used continuously to improve the tracking performance. Each time the trajectory generation system computes a new trajectory, the tracking error is reset to zero, since each trajectory starts with the actual state of the vehicle. Thus, recomputing the trajectories at higher rates, degrades the performance, but improves the ability to dynamically react to changes in the environment, like moving or newly detected obstacles. The scenario depicted in \Cref{fig:even-more-slightly-overestimated-damping} is repeated with the mixed control scheme and the results are shown in \Cref{fig:improved-performance-mixed-control}.
 \begin{figure}
 	\centering
 	\input{plots/sim/mixed_planned_path.tex}
-	\caption{Improved tracking performance despite overestimated damping ($1.2 X_u$), if re-planning with $\unit[2]{Hz}$ and non-implicit feedback trajectory tracking are mixed.}
+	\caption{Improved tracking performance despite overestimated damping ($120\,\% X_u$), if re-planning with $\unit[2]{Hz}$ and non-implicit feedback trajectory tracking are mixed.}
     \label{fig:improved-performance-mixed-control}
 \end{figure}
-The combination of implicit feedback at $\unit[2]{Hz}$ and the tracking controller improve the performance significantly. The same parameters leading to an unstable controller in \Cref{fig:even-more-slightly-overestimated-damping} do not cause instability for the mixed control.
+The combination of implicit feedback at $\unit[2]{Hz}$ and the tracking controller improves the performance significantly. The same parameters leading to an unstable controller in \Cref{fig:even-more-slightly-overestimated-damping} do not cause instability for the mixed control.
+% \begin{figure}
+% 	\centering
+% 	\input{plots/sim/implicit/ring_all.tex}
+% 	\caption{Intersections with the plane of the target object. The target object is visualized as a black circle. High repeatability and accuracy are achieved as long as damping is not overestimated.\color{red}loeschen?}
+%     \label{fig:}
+% \end{figure}
 
-\begin{figure}
-	\centering
-	\input{plots/sim/implicit/ring_all.tex}
-	\caption{Intersections with the plane of the target object. The target object is visualized as black circle. High repeatability and accuracy as long as damping is not overestimated.\color{red}loeschen?}
-\end{figure}
+\newpage
 
 \subsection{Lab Experiments}
 
-For the practical validation of the framework developed in this thesis, lab experiments are carried out. The external motion capture system is used to track the the motion of the robot, as described in \Cref{sec:experimental-testbed}. The pose data is fed into the onboard state estimation of the \ac{fcu}, to receive latency compensated state estimations. The procedure for the lab experiment is identical to the the previously described one for the simulation. Additional parameters of the setup are given in \Cref{tab:lab-params}. \Cref{fig:hippo_in_tank} shows the vehicle driving inside the test tank.
+For the practical validation of the framework developed in this thesis, lab experiments are carried out.
+\Cref{fig:hippo_in_tank} shows the vehicle driving inside the test tank.
+The external motion capture system is used to track the the motion of the robot, as described in \Cref{sec:experimental-testbed}. The pose data is fed into the onboard state estimation of the \ac{fcu}, to receive latency compensated state estimations. The procedure for the lab experiment is identical to the simulation. Additional parameters of the setup are provided in \Cref{tab:lab-params}. 
 \begin{table}[]
 	\caption{Parameters of the lab experiment.}
 	%\hspace*{-1.5cm}  % move table down (left in landscape) - tabular width: 
@@ -452,7 +454,7 @@ For the practical validation of the framework developed in this thesis, lab expe
 		\midrule
 		%%%%%%%% Beispiel
 		Start Position & $\pbo_0$ & $\left[\unit[0.8]{m}, \unit[3.0]{m}, \unit[-0.5]{m}\right]^\top$\\
-        Target Center & $\pbo_{\text{t}}$ & $\left[\unit[1.0]{m}, \unit[1.0]{m}, \unit[-0.8]{m}\right]$ \\
+        Target Center & $\pbo_{\text{t}}$ & $\left[\unit[1.0]{m}, \unit[1.0]{m}, \unit[-0.8]{m}\right]^\top$ \\
 		Max. Duration & $T_{\text{f}}$ & $\unit[3.0]{s}$ \\
 		Runs & $n$ & $20$ \\
 		\bottomrule
@@ -462,16 +464,17 @@ For the practical validation of the framework developed in this thesis, lab expe
 \begin{figure}
     \centering
     \includegraphics[width=0.7\textwidth]{images/04/hippo_in_tank.png}
-    \caption{\textcolor{blue}{HippoCampus \ac{uauv} tracking generated trajectory inside test tank. Note that the moving target, i.\,e. the ring, is simulated only.}}
+    \caption{HippoCampus \ac{uauv} tracking generated trajectory inside test tank. Note that the time dependent target, i.\,e. the hoop, is simulated only.}
     \label{fig:hippo_in_tank}
 \end{figure}
-Two control setups are compared. First, generating trajectories only once at the start of the run and tracking the selected trajectory with the tracking controller presented in \Cref{sec:closed-loop-tracking}. Second, regenerating trajectories with a frequency of \unit[2]{Hz} and tracking the corresponding selected trajectory with the tracking controller as well. The evaluation in terms of reaching the high level goal of passing a hoop with a radius of \unit[0.15]{m} is depicted in \Cref{fig:hoop-experiment}, with the first setup in \Cref{fig:hoop-experiment-without-replanning} and the second in \Cref{fig:hoop-experiment-with-replanning}.
+
+Two control setups are compared. First, generating trajectories only once at the start of the run and tracking the selected trajectory with the tracking controller presented in \Cref{sec:closed-loop-tracking}. Second, regenerating trajectories with a frequency of \unit[2]{Hz} and tracking the corresponding selected trajectory with the tracking controller as well. The evaluation in terms of reaching the high-level goal of passing a hoop with a radius of \unit[0.15]{m} is depicted in \Cref{fig:hoop-experiment}, with the first setup in \Cref{fig:hoop-experiment-without-replanning} and the second in \Cref{fig:hoop-experiment-with-replanning}.
 \begin{figure}
 	\centering
  \begin{subfigure}[t]{0.49\textwidth}
 		\centering
 		\input{plots/lab/explicit/ring.tex}
-     \caption{Trajectory tracking without implicit feedback with a mean error between desired and actual position of \unit[8.3]{cm} and a standard deviation of \unit[1.5]{cm}.}
+     \caption{Trajectory tracking without implicit feedback with a mean error between the desired and actual position of \unit[8.3]{cm} and a standard deviation of \unit[1.5]{cm}.}
      \label{fig:hoop-experiment-without-replanning}
  \end{subfigure}
     \begin{subfigure}[t]{0.49\textwidth}
@@ -484,8 +487,10 @@ Two control setups are compared. First, generating trajectories only once at the
     \label{fig:hoop-experiment}
 \end{figure}
 The coordinate system's origin coincides with the center of the hoop. The cross-markers visualize the intersection of the vehicle with the plane of the hoop. Note that the controller is not necessarily trying to cross the ring at its center. The chosen final state of the trajectory is sampled over different points of the hoop's plane. A run is considered successful, as long as the \ac{uauv} is able to pass through the hoop. We can observe that the vehicle achieved the goal for every run.
-The mean error between the actual and desired intersection with the hoop in case that only single trajectory is tracked over a whole run (\Cref{fig:hoop-experiment-without-replanning}) is \unit[8.3]{cm}.
-For the case of regular re-planning (\Cref{fig:hoop-experiment-with-replanning}, the mean error is \unit[4.3]{cm}. This does not, however, necessarily imply a better performance of the second setup. By re-planning the desired trajectory can choose a target intersection point, that better fits the current movement of the vehicle and thereby reduces the error by changing the target instead of an improved tracking performance. The small standard deviation of \unit[1.5]{cm} for the first setup without re-planning indicates a high repeatability. It is likely that thorough tuning of the control parameters -- that is beyond the scope of this thesis -- could reduce the error even further. For a better overview, the results can be found in \Cref{tab:lab-errors}.
+The mean error between the actual and desired intersection with the hoop is \unit[8.3]{cm} for the case that only single trajectory is tracked over a whole run (\Cref{fig:hoop-experiment-without-replanning}).
+For the case of continuous re-planning (\Cref{fig:hoop-experiment-with-replanning}, a smaller mean error of \unit[4.3]{cm} is achieved. 
+This does not, however, necessarily imply a better performance of the second setup. By re-planning the desired trajectory can choose a target intersection point, that better fits the current movement of the vehicle and thereby reduces the error by changing the target instead of improving tracking performance. 
+Anyhow, the small standard deviation of \unit[1.5]{cm} for the first setup without re-planning indicates high repeatability. It is likely that thorough tuning of the control parameters could reduce the error even further which is beyond in the scope of this work. For a direct comparison, the results are summarized in \Cref{tab:lab-errors}.
 
 \begin{table}[]
 	\caption{Parameters of the lab experiment.}

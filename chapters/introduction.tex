@@ -55,7 +55,7 @@ The goal of this thesis is to develop such a system meeting the above-mentioned 
 \begin{figure}
     \centering
     \includesvg{agile_maneuvering_motivation}
-    \caption{A \ac{uauv} agile maneuvering in a confined and cluttered underwater environment. The mission goal is to catch the moving ring (\textit{red)}.}
+    \caption{A \ac{uauv} agile maneuvering in a confined and cluttered underwater environment. The mission goal is to catch the moving hoop (\textit{red)}.}
     \label{fig:agile_maneuvering_motivation}
 \end{figure}
 
@@ -65,8 +65,8 @@ This thesis bridges several existing gaps present in current research on agile s
 A detailed literature review in \Cref{sec:review-motion-planning} on existing underwater path planning approaches in general and methods focusing purely on aggressive motion planning, e.\,g. in the field of aerial drones, revealed the need for agile maneuvering methods suitable for the underwater domain. 
 
 From this, the present thesis exploits the synergies between aerobatic \acp{uav} and hydrobatic \acp{uauv}:  the concept of computational efficient trajectory generation for quadcopters in \cite{MuellerHehn15} is transferred to the underwater domain.
-However, the differences in modeling the vehicle's dynamics have to be considered and addressed by the proposed planning method with respect to (i) computational efficiency, (ii) robustness of the trajectory tracking performance, and (iii) the sampling strategy. \todo{Beachten wir die sampling strategie irgendwo?}
-\todo[inline]{Schon mal sagen, welche Erkenntnisse konkret aus den Experimenten gewonnen werden. Muss abgestimmt werden, mit dem, was ich am Ende tatsaechlich dort stehen habe}
+However, the differences in modeling the vehicle's dynamics have to be considered and addressed by the proposed planning method with respect to (i) computational efficiency, (ii) robustness of the trajectory tracking performance, and (iii) the sampling strategy. %\todo{Beachten wir die sampling strategie irgendwo?}
+%\todo[inline]{Schon mal sagen, welche Erkenntnisse konkret aus den Experimenten gewonnen werden. Muss abgestimmt werden, mit dem, was ich am Ende tatsaechlich dort stehen habe}
 Besides the domain transfer, this thesis proposes a new implementation architecture using the recently released framework ROS2 that greatly increases robustness and simplifies implementation.
 The performance of the proposed method is demonstrated in a series of numerical and real-world experiments.
 
